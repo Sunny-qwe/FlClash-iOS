@@ -268,6 +268,12 @@ List<String> mitmModuleUrls(String text) {
       'stash' || 'clash' when action == 'install-override' => [
         ?uri.queryParameters['url'],
       ],
+      'egern'
+          when action == 'install-module' ||
+              action == 'install' ||
+              action == 'import' => [
+        ?uri.queryParameters['url'] ?? ?uri.queryParameters['module'],
+      ],
       'quantumult-x'
           when const {
             'add-resource',
@@ -309,9 +315,14 @@ MitmModuleContent parseMitmModule(
 }) {
   final parser = _ModuleParser(values: values, resources: resources);
   final override = _stashOverride(text);
-  return override == null
-      ? parser.parse(text)
-      : parser.parseStash(override, text);
+  if (override != null) {
+    final isEgern = _egernKeys.any(override.containsKey) ||
+        (override['mitm'] is Map && !override.containsKey('http'));
+    return isEgern
+        ? parser.parseEgern(override, text)
+        : parser.parseStash(override, text);
+  }
+  return parser.parse(text);
 }
 
 /// What consent to a module's scripts covers; a line run names its content's hash.
@@ -326,7 +337,29 @@ Set<String> mitmScriptScope(
 
 /// Keys at the top of a Stash override that a Surge module or a Quantumult X
 /// snippet read as YAML never has.
-const _stashKeys = {'http', 'script-providers', 'cron', 'rules', 'tiles'};
+const _stashKeys = {
+  'http',
+  'script-providers',
+  'cron',
+  'rules',
+  'tiles',
+  'url_rewrites',
+  'url_rewrite',
+  'scriptings',
+  'scripts',
+  'header_rewrites',
+  'map_locals',
+  'mitm',
+};
+
+const _egernKeys = {
+  'url_rewrites',
+  'url_rewrite',
+  'scriptings',
+  'scripts',
+  'header_rewrites',
+  'map_locals',
+};
 
 const _stashScriptTypes = {
   'request': 'http-request',
@@ -408,6 +441,9 @@ const _qxFilterTypes = {
   'host-wildcard': 'DOMAIN-WILDCARD',
   'ip-cidr': 'IP-CIDR',
   'ip6-cidr': 'IP-CIDR6',
+  'geoip': 'GEOIP',
+  'ip-asn': 'IP-ASN',
+  'user-agent': 'USER-AGENT',
 };
 
 final _qxFilterPattern = RegExp(
@@ -503,6 +539,11 @@ const _ruleTypes = {
   'SRC-PORT': 'SRC-PORT',
   'IN-PORT': 'IN-PORT',
   'PROCESS-NAME': 'PROCESS-NAME',
+  'GEOIP': 'GEOIP',
+  'IP-ASN': 'IP-ASN',
+  'ASN': 'IP-ASN',
+  'USER-AGENT': 'USER-AGENT',
+  'URL-REGEX': 'URL-REGEX',
 };
 
 const _loonContentTypes = {
@@ -1278,6 +1319,10 @@ class _ModuleParser {
         if (!_validPorts(value)) {
           return null;
         }
+      case 'GEOIP' || 'IP-ASN' || 'USER-AGENT' || 'URL-REGEX':
+        if (value.isEmpty) {
+          return null;
+        }
       default:
         if (value.isEmpty || value.contains(',')) {
           return null;
@@ -1590,6 +1635,134 @@ class _ModuleParser {
       },
       const {'timeout': _qxTaskTimeout},
     );
+  }
+
+  MitmModuleContent parseEgern(Map<String, Object?> egern, String text) {
+    for (final key in const ['name', 'description', 'desc']) {
+      if (egern[key] case final Object value) {
+        _meta[key == 'description' ? 'desc' : key] = '$value';
+      }
+    }
+    _readDeclarations(text.split(RegExp(r'\r\n|\r|\n')));
+
+    // 1. MITM hostnames
+    if (egern['mitm'] case final Map<String, Object?> mitm) {
+      if (mitm['hostnames'] case final List hostnames) {
+        for (final h in hostnames) {
+          final host = '$h'.trim();
+          if (host.isNotEmpty) {
+            final cleaned = host.endsWith(':*')
+                ? host.substring(0, host.length - 2)
+                : (host.endsWith(':443')
+                    ? host.substring(0, host.length - 4)
+                    : host);
+            _hostname.add(cleaned.trim());
+          }
+        }
+      }
+    }
+
+    // 2. URL Rewrites
+    final rewrites = egern['url_rewrites'] ?? egern['url_rewrite'];
+    if (rewrites is List) {
+      for (final item in rewrites) {
+        if (item is Map) {
+          final match = _stashText(item['match']);
+          final location =
+              item['location'] != null ? _stashText(item['location']) : null;
+          final reject = item['reject'] == true ||
+              (item['status_code'] == 200 &&
+                  (item['body'] == '' ||
+                      item['body'] == null && location == null));
+          final statusCode = item['status_code']?.toString();
+          if (match.isEmpty) continue;
+
+          if (reject) {
+            _urlRewrite.add('${_field(match)} reject');
+          } else if (location != null && location.isNotEmpty) {
+            final type = (statusCode == '307') ? '307' : '302';
+            _urlRewrite.add('${_field(match)} ${_field(location)} $type');
+          }
+        } else if (item is String) {
+          _readStashUrlRewrite('url_rewrites', item);
+        }
+      }
+    }
+
+    // 3. Scriptings
+    final scriptings = egern['scriptings'] ?? egern['scripts'];
+    if (scriptings is List) {
+      for (final item in scriptings) {
+        if (item is Map) {
+          final match = _stashText(item['match']);
+          final rawType = _stashText(item['type']).toLowerCase();
+          final scriptUrl = _stashText(
+            item['script_url'] ?? item['script_path'] ?? item['path'],
+          );
+          final name = _stashText(item['name']).isNotEmpty
+              ? _stashText(item['name'])
+              : 'egern_script_${_script.length + 1}';
+          final bodyRequired = item['body_required'] == true;
+          final timeout = item['timeout']?.toString();
+
+          final type = switch (rawType) {
+            'http_request' || 'request' => 'http-request',
+            'http_response' || 'response' => 'http-response',
+            'cron' => 'cron',
+            _ => 'http-response',
+          };
+
+          if (match.isNotEmpty && scriptUrl.isNotEmpty) {
+            _addScript('scriptings', match, name, scriptUrl, {
+              'type': type,
+              'pattern': match,
+              if (bodyRequired) 'requires-body': 'true',
+              if (timeout != null) 'timeout': timeout,
+            });
+          }
+        }
+      }
+    }
+
+    // 4. Header Rewrites
+    if (egern['header_rewrites'] case final List headers) {
+      for (final item in headers) {
+        if (item is Map) {
+          final match = _stashText(item['match']);
+          final name = _stashText(item['name']);
+          final value = _stashText(item['value']);
+          final type = _stashText(item['type']).toLowerCase() == 'response'
+              ? 'response'
+              : 'request';
+          final action = switch (_stashText(item['action']).toLowerCase()) {
+            'add' => 'add',
+            'del' || 'delete' => 'del',
+            _ => 'replace',
+          };
+          if (match.isNotEmpty && name.isNotEmpty) {
+            _headerRewrite.add(
+              'http-$type ${_field(match)} header-$action $name $value',
+            );
+          }
+        }
+      }
+    }
+
+    // 5. Map Locals
+    if (egern['map_locals'] case final List mocks) {
+      for (final item in mocks) {
+        _readStashMock('map_locals', item);
+      }
+    }
+
+    // 6. Rules
+    if (egern['rules'] case final List rules) {
+      for (final rule in rules) {
+        _readRule('rules', _stashText(rule), shown: _stashLine(rule));
+      }
+    }
+
+    return _content();
   }
 
   MitmModuleContent parseStash(Map<String, Object?> override, String text) {
