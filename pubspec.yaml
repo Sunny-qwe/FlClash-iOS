@@ -75,6 +75,7 @@ dependencies:
   setup:
     path: plugins/setup
 dev_dependencies:
+  xml: ^7.0.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0

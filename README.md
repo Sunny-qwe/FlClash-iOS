@@ -1,143 +1,96 @@
 <div align="center">
 
-<img src="assets/images/icon.png" alt="FlClash" width="88">
+<img src="assets/images/icon.png" alt="FlClash for iOS" width="100" style="border-radius: 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
 
-# FlClash
+# FlClash for iOS
 
-A multi-platform proxy client based on ClashMeta. Simple to use, open source and ad-free.
+### Next-Generation High-Performance Proxy Client Tailored for iOS
+
+Powered by **Mihomo (Clash.Meta)** core and **Flutter** modern architecture. Clean, open-source, ad-free, ultra-fast, and memory-optimized.
 
 **English** · [简体中文](README_zh_CN.md)
 
-[![Release](https://img.shields.io/github/v/release/chen08209/FlClash?style=flat-square&label=release)](https://github.com/chen08209/FlClash/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/chen08209/FlClash/total?style=flat-square&logo=github)](https://github.com/chen08209/FlClash/releases)
-[![License](https://img.shields.io/github/license/chen08209/FlClash?style=flat-square)](LICENSE)
-[![Telegram](https://img.shields.io/badge/Telegram-channel-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/FlClash)
+<br/>
 
-[Website](https://chen08209.github.io/FlClash) · [Download](#download) · [Changelog](CHANGELOG.md) · [Build from source](#build-from-source)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2015.0%2B-007AFF?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/Sunny-qwe/FlClash-iOS)
+[![Arch](https://img.shields.io/badge/Arch-arm64-black?style=for-the-badge)](https://github.com/Sunny-qwe/FlClash-iOS)
+[![LiveContainer](https://img.shields.io/badge/LiveContainer-Compatible-34C759?style=for-the-badge&logo=apple)](https://github.com/Sunny-qwe/FlClash-iOS)
+[![License](https://img.shields.io/badge/License-GPL--3.0-orange?style=for-the-badge)](LICENSE)
+
+<br/>
+
+[✨ Features](#-key-features) · [📥 Installation](#-installation-guide) · [🌐 Protocol Matrix](#-protocol-support-matrix) · [🛠️ CI/CD Build](#️-cloud-automated-build-cicd)
 
 </div>
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="snapshots/preview-dark.png">
-    <img alt="FlClash dashboard on a MacBook and a phone" src="snapshots/preview.png" width="92%">
-  </picture>
-</p>
+---
 
-## Features
+## 🌟 Key Features
 
-- **One app for Android, Windows, macOS and Linux**, with x64 and ARM64 builds on the desktop.
-- **mihomo (Clash.Meta) core** with rule routing, proxy groups, latency tests, system proxy and TUN mode.
-- **Profiles** from a subscription link or a file, with a built-in editor, override scripts, and custom rules,
-  proxies and proxy groups.
-- **Live views** of connections, requests, DNS queries and logs.
-- **Material You design with Apple-style interaction**: dynamic color, light and dark themes, continuous corners,
-  sheets that snap between heights, and layouts that adapt from phones to desktops.
-- **Backup and restore** through WebDAV or a local file.
-- **Platform touches**: a Quick Settings tile, per-app proxy and Android TV support on Android; a tray menu and
-  global hotkeys on the desktop.
-- **Open source and ad-free**, licensed under GPL-3.0.
+- 🍏 **Native iOS NetworkExtension Optimization**  
+  Built on Apple's native NetworkExtension framework. Rigorously engineered to prevent iOS Jetsam memory limit kills (OOM protection) and maintain rock-solid connection stability.
 
-## Download
+- 🛡️ **Loopback Protection & Local Bypass**  
+  Native exclusion for local loopback (`127.0.0.1`) and reserved IP ranges. Perfect compatibility for **LiveContainer** and **SideStore** sandboxed environments.
 
-Get the latest build from [GitHub Releases](https://github.com/chen08209/FlClash/releases/latest), or open the
-[website](https://chen08209.github.io/FlClash#download), which picks the right file for your device.
+- 🚀 **Intelligent Anti-403 Subscription Import**  
+  Built-in multi-tier User-Agent fallback engine (Clash Verge / Safari / Shadowrocket headers). Seamlessly bypasses strict airport WAF (V2Board, XBoard, SSPanel) and Cloudflare bot filters.
 
-| Platform | Packages | Notes |
-| --- | --- | --- |
-| Android | APK for `arm64-v8a`, `armeabi-v7a` and `x86_64` | Most phones use `arm64-v8a`. Also on the F-Droid repository below. |
-| Windows 10 and later | Installer (`.exe`) or portable `.zip`, for x64 and ARM64 | Pick ARM64 on Snapdragon and other ARM laptops. |
-| macOS 12 and later | DMG for Apple Silicon and Intel | Also on Homebrew. |
-| Linux | `.deb`, `.rpm` and AppImage, for x64 and ARM64 | See the tray note below. |
+- 🌐 **One-Click Link Unwrapping**  
+  Supports quick-import URLs (`clash://install-config`, `stash://`), automatically parsing real subscription endpoints and extracting profile titles.
 
-<p>
-  <a href="https://chen08209.github.io/FlClash-fdroid-repo/repo?fingerprint=789D6D32668712EF7672F9E58DEEB15FBD6DCEEC5AE7A4371EA72F2AAE8A12FD"><img alt="Get it on F-Droid" src="snapshots/get-it-on-fdroid.svg" height="56"></a>
-  <a href="https://github.com/chen08209/FlClash/releases/latest"><img alt="Get it on GitHub" src="snapshots/get-it-on-github.svg" height="56"></a>
-</p>
+- 🎨 **Apple Design Aesthetics**  
+  Preview ribbon and test watermark completely removed (No PRE Banner). Features fluid Material 3/Apple Human Interface dynamics, adaptive dark mode, and smooth continuous corners.
 
-**Homebrew**
+- ⚡ **Full Mihomo (Clash.Meta) Power**  
+  Comprehensive rule-based routing, proxy group latency checks, advanced DNS traffic management, TUN mode, and external rule-set providers.
 
-```bash
-brew tap chen08209/tap
-brew install --cask flclash
+---
+
+## 📥 Installation Guide
+
+This repository builds unsigned iOS app bundles (`.ipa`) automatically via GitHub Actions:
+
+### Method 1: LiveContainer (Recommended ⭐⭐⭐⭐⭐)
+> **No certificate required! No 7-day expiration hassle!**
+1. Install [LiveContainer](https://github.com/khanld/livecontainer) on your iOS device.
+2. Download the `.ipa` artifact from [GitHub Actions](#️-cloud-automated-build-cicd) or Releases to your device's Files app.
+3. Open LiveContainer, tap the **「+」** icon, select the `.ipa`, and launch instantly!
+
+### Method 2: Certificate Signing (ESign, GBox, Bullfrog, Sideloadly)
+- Send the `.ipa` to your device and import into your preferred sideloading tool (ESign, GBox, AltStore) with your Apple ID or enterprise certificate.
+
+---
+
+## 🌐 Protocol Support Matrix
+
+| Category | Protocols | Highlights |
+| :--- | :--- | :--- |
+| **Next-Gen Speed** | **Hysteria 2 / Hy2**, Hysteria 1, **TUIC v4 / v5** | QUIC/UDP-based, port hopping, BBR congestion control |
+| **Core Anti-Censorship** | **VLESS**, **VMess** | Full **Reality** support, Vision, gRPC, WebSocket, H2, HTTPUpgrade |
+| **Classic Proxies** | **Trojan**, **Shadowsocks (SS)**, **ShadowsocksR (SSR)** | SIP002, AEAD 2022, Shadow-TLS, v2ray-plugin |
+| **Tunnels & VPNs** | **WireGuard / AmneziaWG**, **Snell (v1~v4)**, **SSH** | Pre-shared keys (PSK), reserved bytes, AWG parameters |
+| **Universal Protocols** | **SOCKS5**, **HTTP / HTTPS**, **AnyTLS**, **Mieru** | Pure proxy protocols and anti-probe tunnels |
+
+---
+
+## 🛠️ Cloud Automated Build (CI/CD)
+
+```mermaid
+flowchart LR
+    A["Modify Code Locally"] -->|"git push"| B["GitHub Repository"]
+    B --> C["GitHub Actions<br/>(macOS Runner)"]
+    C --> D["Automated Compilation"]
+    D --> E["Download FlClash.ipa<br/>(Ready to Install)"]
 ```
 
-**Linux tray icon**
+1. Navigate to your repository's **「Actions」** tab.
+2. Select the **「Build iOS IPA」** workflow on the left.
+3. Click the blue **「Run workflow」** button.
+4. Download the newly compiled `.ipa` from the **Artifacts** section once complete!
 
-The `.deb` package installs its own dependencies. With the AppImage or the `.rpm`, install the AyatanaAppIndicator
-library so the tray icon can show:
+---
 
-```bash
-sudo apt-get install libayatana-appindicator3-1   # Debian and Ubuntu
-sudo dnf install libayatana-appindicator-gtk3     # Fedora
-```
+## 📄 License
 
-**Unattended desktop**
-
-FlClash starts the core only after the disclaimer is accepted. Where nobody can click it, such as a container, set
-`FLCLASH_ACCEPT_DISCLAIMER=1` in the app's environment to accept it on first launch.
-
-## Usage
-
-**Import a profile from a link.** Opening a link in this form imports the subscription into FlClash. The `clashmeta://`
-and `flclash://` schemes work the same way.
-
-```text
-clash://install-config?url=<URL-encoded subscription link>
-```
-
-**Automate on Android.** Tasker, MacroDroid and similar apps can start, stop or toggle the proxy by starting an
-activity with one of these actions:
-
-```text
-com.follow.clash.action.START
-com.follow.clash.action.STOP
-com.follow.clash.action.TOGGLE
-```
-
-From a computer, the same works over adb:
-
-```bash
-adb shell am start -a com.follow.clash.action.TOGGLE
-```
-
-## Build from source
-
-You need [Flutter](https://docs.flutter.dev/get-started/install) 3.47 (release builds use 3.47.6),
-[Go](https://go.dev/dl/) 1.27 and [Rust](https://rustup.rs/) installed through rustup. Each platform builds on its own
-host, except Android, which builds anywhere.
-
-```bash
-git clone --recursive https://github.com/chen08209/FlClash.git
-cd FlClash
-flutter pub get
-dart setup.dart android   # or windows, macos, linux
-```
-
-Packages land in `dist/`. The Go core and the Rust libraries are compiled as part of the Flutter build.
-
-| Platform | Also needed |
-| --- | --- |
-| Android | Android SDK with the NDK. Add `--arch arm64` to build a single ABI. |
-| Windows | GCC (MinGW-w64) for the core and [Inno Setup](https://jrsoftware.org/isinfo.php) 6 for the installer. |
-| macOS | Xcode and Node.js. The script installs `appdmg` through npm. |
-| Linux | Debian or Ubuntu. The script installs the build packages with apt and downloads `appimagetool`. |
-
-Run `dart setup.dart --help` for the remaining options, such as `--targets` to build only some package formats.
-
-## Support
-
-Starring the repository is the easiest way to support the project. Questions and announcements go to the
-[Telegram channel](https://t.me/FlClash); bugs and feature requests go to
-[GitHub Issues](https://github.com/chen08209/FlClash/issues).
-
-<a href="https://star-history.com/#chen08209/FlClash&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chen08209/FlClash&type=Date&theme=dark">
-    <img alt="Star history" src="https://api.star-history.com/svg?repos=chen08209/FlClash&type=Date" width="640">
-  </picture>
-</a>
-
-## License
-
-FlClash is released under the [GPL-3.0 license](LICENSE).
+Open-sourced under the [GPL-3.0 License](LICENSE).
