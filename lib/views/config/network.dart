@@ -472,7 +472,8 @@ List<Widget> networkOptionsItems({
 }
 
 class VpnSections extends ConsumerWidget {
-  const VpnSections({super.key});
+  final bool isIOS;
+  const VpnSections({super.key, this.isIOS = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -482,11 +483,11 @@ class VpnSections extends ConsumerWidget {
     );
     return Column(
       children: [
-        generateSection(items: const [VPNItem()]),
+        if (!isIOS) generateSection(items: const [VPNItem()]),
         generateSection(
           title: 'VPN',
-          items: const [
-            VpnSystemProxyItem(),
+          items: [
+            const VpnSystemProxyItem(),
             BypassDomainItem(),
             AllowBypassItem(),
             Ipv6Item(),
@@ -554,7 +555,7 @@ class NetworkListView extends StatelessWidget {
         bottom: 16 + context.bottomInset,
       ),
       children: [
-        if (system.isAndroid) const VpnSections(),
+        if (system.isMobile) VpnSections(isIOS: system.isIOS),
         if (system.isDesktop) const SystemProxySection(),
         const NetworkOptionsSection(),
         TunSection(

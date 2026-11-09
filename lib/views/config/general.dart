@@ -260,10 +260,11 @@ class GeneralView extends ConsumerWidget {
         select: (state) => state.autoRun,
         update: (state, value) => state.copyWith(autoRun: value),
       ),
-      ListItem.open(
-        title: Text(appLocalizations.onDemand),
-        widget: const OnDemandView(),
-      ),
+      if (!system.isIOS)
+        ListItem.open(
+          title: Text(appLocalizations.onDemand),
+          widget: const OnDemandView(),
+        ),
       _appSettingToggle(
         title: (l) => l.minimizeOnExit,
         select: (state) => state.minimizeOnExit,

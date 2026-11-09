@@ -58,7 +58,7 @@ class ThemeManager extends ConsumerWidget {
   const ThemeManager({super.key, required this.child});
 
   Widget _buildSystemUi(Widget child) {
-    if (!system.isAndroid) {
+    if (!system.isMobile) {
       return child;
     }
     return Consumer(
@@ -70,6 +70,7 @@ class ThemeManager extends ConsumerWidget {
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
+            statusBarBrightness: brightness,
             statusBarIconBrightness: iconBrightness,
             systemNavigationBarIconBrightness: iconBrightness,
             systemNavigationBarColor: Colors.transparent,
