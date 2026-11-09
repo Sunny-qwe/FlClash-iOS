@@ -39,16 +39,16 @@
   <table border="0" style="border-collapse: collapse; border: none;">
     <tr style="border: none;">
       <td align="center" width="50%" style="border: none; padding: 12px;">
-        <img src="docs/images/mobile_light.png" alt="明亮模式 / Light Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18));" />
+        <img src="docs/images/dashboard_real.png" alt="iOS 实机纯净界面" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18)); border-radius: 36px;" />
         <br/><br/>
-        <b>☀️ 明亮模式 · 极简原生体验</b><br/>
-        <sub>实时速率曲线 · 住宅节点检测 · 灵动悬浮底栏</sub>
+        <b>🍏 iOS 原生实机界面</b><br/>
+        <sub>纯净无暇 · 灵动悬浮底栏 · 丝滑平滑开关</sub>
       </td>
       <td align="center" width="50%" style="border: none; padding: 12px;">
         <img src="docs/images/mobile_dark.png" alt="暗色模式 / Dark Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.35));" />
         <br/><br/>
         <b>🌙 暗色模式 · 深邃灵动质感</b><br/>
-        <sub>纯黑 OLED 节电适配 · 舒适护眼微光 · 丝滑微动效</sub>
+        <sub>纯黑 OLED 节电适配 · 舒适护眼微光 · 实时速率曲线</sub>
       </td>
     </tr>
   </table>

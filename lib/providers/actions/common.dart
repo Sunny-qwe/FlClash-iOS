@@ -11,6 +11,17 @@ class CommonAction extends _$CommonAction {
 
   void toggleRunning() {
     final running = !ref.read(isStartProvider);
+    if (running) {
+      final profiles = ref.read(profilesProvider);
+      final currentProfile = ref.read(currentProfileProvider);
+      if (profiles.isEmpty || currentProfile == null) {
+        dialogs.showBanner(
+          currentAppLocalizations.nullProfileDesc,
+          level: BannerLevel.warning,
+        );
+        return;
+      }
+    }
     unawaited(
       globalState.safeRun(
         () => ref

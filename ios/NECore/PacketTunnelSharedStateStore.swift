@@ -47,7 +47,7 @@ final class PacketTunnelSharedStateStore {
     FileManager.default.containerURL(
       forSecurityApplicationGroupIdentifier:
         PacketTunnelEnvironment.appGroupIdentifier
-    )
+    ) ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
   }
 
   func saveRunTime() {

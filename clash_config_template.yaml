@@ -1,0 +1,278 @@
+# ==============================================================================
+# FlClash / Clash.Meta (Mihomo) 高性能专业完整配置文件模板
+# ==============================================================================
+# 适用平台: iOS / Android / Windows / macOS / Linux
+# 特性: 完备分流规则 + 智能节点分组 + 国外媒体/AI/社交独立分流 + 防 DNS 污染
+# 使用说明:
+# 1. 在下方的 `proxies:` 字段中填入您的真实节点信息（或从机场订阅复制节点替换）。
+# 2. 将此文件保存为 `.yaml` 格式，在 FlClash 的「配置」页面中导入即可立即使用。
+# ==============================================================================
+
+# 基础通用配置
+port: 7890
+socks-port: 7891
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+ipv6: false
+external-controller: 127.0.0.1:9090
+secret: ""
+
+# 全局 TUN 虚拟网卡配置（iOS NetworkExtension 专用核心参数）
+tun:
+  enable: true
+  stack: gvisor
+  dns-hijack:
+    - "any:53"
+  auto-route: true
+  auto-detect-interface: true
+
+# 智能防污染 DNS 配置
+dns:
+  enable: true
+  listen: 0.0.0.0:1053
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - "*.lan"
+    - "*.local"
+    - "localhost.ptlogin2.qq.com"
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  fallback:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+
+# ==============================================================================
+# 代理节点列表 (请在此处填入您的专属节点，以下为示例模版)
+# ==============================================================================
+proxies:
+  # 示例 1: Shadowsocks 节点
+  - name: "🇭🇰 香港 01 [SS]"
+    type: ss
+    server: hk01.example.com
+    port: 8388
+    cipher: 2022-blake3-aes-128-gcm
+    password: "Password123"
+
+  # 示例 2: VLESS + Reality 最新抗封锁节点
+  - name: "🇯🇵 日本 01 [Reality]"
+    type: vless
+    server: jp01.example.com
+    port: 443
+    uuid: 12345678-1234-1234-1234-123456789abc
+    network: tcp
+    tls: true
+    udp: true
+    flow: xtls-rprx-vision
+    servername: itunes.apple.com
+    reality-opts:
+      public-key: "AbCdEfGhIjKlMnOpQrStUvWxYz0123456789"
+      short-id: "0123456789abcdef"
+    client-fingerprint: chrome
+
+  # 示例 3: Hysteria 2 极速抗弱网节点
+  - name: "🇺🇸 美国 01 [Hy2]"
+    type: hysteria2
+    server: us01.example.com
+    port: 443
+    password: "Password123"
+    sni: us01.example.com
+    skip-cert-verify: true
+
+  # 示例 4: Trojan 节点
+  - name: "🇸🇬 新加坡 01 [Trojan]"
+    type: trojan
+    server: sg01.example.com
+    port: 443
+    password: "Password123"
+    sni: sg01.example.com
+    skip-cert-verify: true
+
+# ==============================================================================
+# 策略组分类 (节点分类管理)
+# ==============================================================================
+proxy-groups:
+  # 🚀 主选择器
+  - name: 🚀 节点选择
+    type: select
+    proxies:
+      - ♻️ 自动选择
+      - 🇭🇰 香港节点
+      - 🇯🇵 日本节点
+      - 🇸🇬 新加坡节点
+      - 🇺🇸 美国节点
+      - 🎯 全球直连
+      - 🇭🇰 香港 01 [SS]
+      - 🇯🇵 日本 01 [Reality]
+      - 🇺🇸 美国 01 [Hy2]
+      - 🇸🇬 新加坡 01 [Trojan]
+
+  # ♻️ 延迟自动优选
+  - name: ♻️ 自动选择
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    proxies:
+      - 🇭🇰 香港 01 [SS]
+      - 🇯🇵 日本 01 [Reality]
+      - 🇺🇸 美国 01 [Hy2]
+      - 🇸🇬 新加坡 01 [Trojan]
+
+  # 地区分组
+  - name: 🇭🇰 香港节点
+    type: select
+    proxies:
+      - 🇭🇰 香港 01 [SS]
+
+  - name: 🇯🇵 日本节点
+    type: select
+    proxies:
+      - 🇯🇵 日本 01 [Reality]
+
+  - name: 🇸🇬 新加坡节点
+    type: select
+    proxies:
+      - 🇸🇬 新加坡 01 [Trojan]
+
+  - name: 🇺🇸 美国节点
+    type: select
+    proxies:
+      - 🇺🇸 美国 01 [Hy2]
+
+  # 业务细分分流组
+  - name: 🤖 人工智能
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - 🇺🇸 美国节点
+      - 🇯🇵 日本节点
+      - 🇸🇬 新加坡节点
+
+  - name: 🎬 国外媒体
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - 🇭🇰 香港节点
+      - 🇯🇵 日本节点
+      - 🇸🇬 新加坡节点
+      - 🇺🇸 美国节点
+
+  - name: 💬 即时通讯
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - 🇸🇬 新加坡节点
+      - 🇭🇰 香港节点
+      - 🎯 全球直连
+
+  - name: 🎮 游戏平台
+    type: select
+    proxies:
+      - 🎯 全球直连
+      - 🚀 节点选择
+      - 🇭🇰 香港节点
+      - 🇯🇵 日本节点
+
+  - name: 🍎 苹果服务
+    type: select
+    proxies:
+      - 🎯 全球直连
+      - 🚀 节点选择
+      - 🇺🇸 美国节点
+
+  - name: 🪟 微软服务
+    type: select
+    proxies:
+      - 🎯 全球直连
+      - 🚀 节点选择
+
+  - name: 🛑 广告拦截
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+
+  - name: 🎯 全球直连
+    type: select
+    proxies:
+      - DIRECT
+
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - 🎯 全球直连
+
+# ==============================================================================
+# 分流规则列表 (基于 Clash.Meta 现代内置规则与 Geo 库)
+# ==============================================================================
+rules:
+  # 本地局域网回环免代理
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+
+  # 广告拦截
+  - GEOSITE,category-ads-all,🛑 广告拦截
+
+  # 人工智能 (ChatGPT / Claude / Gemini / Copilot)
+  - GEOSITE,openai,🤖 人工智能
+  - GEOSITE,anthropic,🤖 人工智能
+  - GEOSITE,google-gemini,🤖 人工智能
+  - DOMAIN-SUFFIX,oaistatic.com,🤖 人工智能
+  - DOMAIN-SUFFIX,oaiusercontent.com,🤖 人工智能
+  - DOMAIN-SUFFIX,claude.ai,🤖 人工智能
+  - DOMAIN-SUFFIX,perplexity.ai,🤖 人工智能
+
+  # 国际流媒体影音
+  - GEOSITE,youtube,🎬 国外媒体
+  - GEOSITE,netflix,🎬 国外媒体
+  - GEOSITE,disney,🎬 国外媒体
+  - GEOSITE,spotify,🎬 国外媒体
+  - GEOSITE,tiktok,🎬 国外媒体
+
+  # 社交与即时通讯
+  - GEOSITE,telegram,💬 即时通讯
+  - GEOSITE,discord,💬 即时通讯
+  - GEOSITE,twitter,🚀 节点选择
+  - IP-CIDR,91.108.56.0/22,💬 即时通讯,no-resolve
+  - IP-CIDR,91.108.4.0/22,💬 即时通讯,no-resolve
+  - IP-CIDR,91.108.8.0/22,💬 即时通讯,no-resolve
+  - IP-CIDR,91.108.16.0/22,💬 即时通讯,no-resolve
+  - IP-CIDR,91.108.12.0/22,💬 即时通讯,no-resolve
+  - IP-CIDR,149.154.160.0/20,💬 即时通讯,no-resolve
+
+  # 游戏平台
+  - GEOSITE,steam,🎮 游戏平台
+  - GEOSITE,epicgames,🎮 游戏平台
+  - GEOSITE,ea,🎮 游戏平台
+  - GEOSITE,blizzard,🎮 游戏平台
+
+  # 苹果与微软专用服务
+  - GEOSITE,apple@cn,🎯 全球直连
+  - GEOSITE,apple,🍎 苹果服务
+  - GEOSITE,microsoft@cn,🎯 全球直连
+  - GEOSITE,microsoft,🪟 微软服务
+
+  # 国内主流服务直连
+  - GEOSITE,bilibili,🎯 全球直连
+  - GEOSITE,cn,🎯 全球直连
+  - GEOIP,CN,🎯 全球直连
+
+  # 最终兜底规则
+  - MATCH,🐟 漏网之鱼

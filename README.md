@@ -39,16 +39,16 @@ Powered by **Mihomo (Clash.Meta)** core and **Flutter** modern architecture. Cle
   <table border="0" style="border-collapse: collapse; border: none;">
     <tr style="border: none;">
       <td align="center" width="50%" style="border: none; padding: 12px;">
-        <img src="docs/images/mobile_light.png" alt="Light Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18));" />
+        <img src="docs/images/dashboard_real.png" alt="Real iOS Device View" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18)); border-radius: 36px;" />
         <br/><br/>
-        <b>☀️ Light Theme · Native iOS Experience</b><br/>
-        <sub>Real-time Speed · Residential Node Badge · Floating Dock</sub>
+        <b>🍏 Native iOS Live Interface</b><br/>
+        <sub>Clean & Uncluttered · Floating Dock · Smooth Toggle Switch</sub>
       </td>
       <td align="center" width="50%" style="border: none; padding: 12px;">
         <img src="docs/images/mobile_dark.png" alt="Dark Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.35));" />
         <br/><br/>
         <b>🌙 Dark Theme · Deep OLED Aesthetics</b><br/>
-        <sub>True Black Contrast · Battery-Saving · Fluid Animations</sub>
+        <sub>True Black Contrast · Battery-Saving · Fluid Motion</sub>
       </td>
     </tr>
   </table>
