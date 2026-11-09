@@ -130,7 +130,7 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
                       scale: 1.15,
                       child: ShapeBadge(
                         shape: MaterialShapes.cookie9Sided,
-                        color: const Color(0xFF007AFF).withValues(alpha: 0.05),
+                        color: const Color(0xFFEFEDF0),
                         size: metrics.decorationSize,
                       ),
                     ),
@@ -307,37 +307,40 @@ class _ExitRow extends StatelessWidget {
     ).copyWith(letterSpacing: 0);
     final info = this.info;
     final appLocalizations = context.appLocalizations;
-    final Widget ip = info != null
-        ? Tooltip(
-            message: appLocalizations.details(appLocalizations.outboundIp),
-            child: FocusRing(
-              shape: AppShape.xs,
-              standsOff: true,
-              child: PressRegion(
-                onTap: () => showIpQualitySheet(context, ip: info.ip),
-                shape: AppShape.xs,
-                overlay: PressRegion.focusOverlay,
-                child: _IpText(ip: info.ip, style: style),
-              ),
-            ),
-          )
-        : failed
-        ? Text(
-            appLocalizations.serviceFailed,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: style.copyWith(color: colorScheme.error),
-          )
-        : !active
-        ? Container(
-            width: 140,
-            height: 16,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8EBEF),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          )
-        : SkeletonText(width: 140, style: style);
+    final Widget ip;
+    if (!active) {
+      ip = Container(
+        width: 160,
+        height: 18,
+        decoration: BoxDecoration(
+          color: const Color(0xFFE8EBEF),
+          borderRadius: BorderRadius.circular(9),
+        ),
+      );
+    } else if (info != null) {
+      ip = Tooltip(
+        message: appLocalizations.details(appLocalizations.outboundIp),
+        child: FocusRing(
+          shape: AppShape.xs,
+          standsOff: true,
+          child: PressRegion(
+            onTap: () => showIpQualitySheet(context, ip: info.ip),
+            shape: AppShape.xs,
+            overlay: PressRegion.focusOverlay,
+            child: _IpText(ip: info.ip, style: style),
+          ),
+        ),
+      );
+    } else if (failed) {
+      ip = Text(
+        appLocalizations.serviceFailed,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: style.copyWith(color: colorScheme.error),
+      );
+    } else {
+      ip = SkeletonText(width: 140, style: style);
+    }
     return Row(
       spacing: 12,
       children: [
@@ -375,7 +378,7 @@ class _ExitRow extends StatelessWidget {
                   ),
                 )
               else
-                _IpChips(quality: quality, loading: loading, large: large),
+                _IpChips(quality: quality, loading: loading, large: large, active: active),
             ],
           ),
         ),
@@ -408,18 +411,46 @@ class _IpChips extends StatelessWidget {
     required this.quality,
     required this.loading,
     required this.large,
+    required this.active,
   });
 
   final IpQuality? quality;
   final bool loading;
   final bool large;
+  final bool active;
 
   @override
   Widget build(BuildContext context) {
     final quality = this.quality;
     final height = _chipHeight(large);
-    // Chips that do not fit wrap onto a clipped second line; the details
-    // sheet still lists them all.
+
+    if (!active) {
+      return SizedBox(
+        height: height,
+        child: Row(
+          spacing: 6,
+          children: [
+            Container(
+              width: 58,
+              height: 26,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8EBEF),
+                borderRadius: BorderRadius.circular(13),
+              ),
+            ),
+            Container(
+              width: 78,
+              height: 26,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8EBEF),
+                borderRadius: BorderRadius.circular(13),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return SizedBox(
       height: height,
       child: ClipRect(
@@ -444,24 +475,7 @@ class _IpChips extends StatelessWidget {
               for (final width in _chipSkeletonWidths)
                 SkeletonPill(width: width, height: height),
             ],
-            null => [
-              Container(
-                width: 50,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8EBEF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              Container(
-                width: 65,
-                height: 16,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8EBEF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ],
+            null => const [],
           },
         ),
       ),

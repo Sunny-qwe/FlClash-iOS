@@ -18,6 +18,9 @@ class FlClashHttpOverrides extends HttpOverrides {
 
   /// The bundle the core embeds; only release CI fills it.
   static Future<void> trustCoreRoots() async {
+    if (system.isIOS || system.isMacOS) {
+      return;
+    }
     try {
       final data = await rootBundle.load(_coreRootsAsset);
       if (data.lengthInBytes == 0) return;
