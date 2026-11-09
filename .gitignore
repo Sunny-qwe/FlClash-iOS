@@ -47,7 +47,9 @@ app.*.map.json
 .claude/worktrees/
 
 # Documentation (generated/planning artifacts)
-docs/
+core/Clash.Meta/docs/
+/docs/*
+!/docs/images/
 
 
 # Android Studio will place build artifacts here

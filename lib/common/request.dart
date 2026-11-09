@@ -64,13 +64,13 @@ class Request {
   Future<Response<T>> _download<T>(String url, ResponseType responseType) async {
     final target = downloadTarget(url);
     final candidateUserAgents = [
-      globalState.ua.isNotEmpty
-          ? globalState.ua
-          : 'clash-verge/v2.4.2 ClashforWindows/0.20.39 Clash.Meta',
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
+      if (globalState.ua.isNotEmpty) globalState.ua,
+      'clash-verge/v2.4.2 ClashforWindows/0.20.39 Clash.Meta',
+      'ClashforWindows/0.20.39',
       'Shadowrocket/2.2.35 (iOS 18.1; iPhone)',
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1',
       'clash.meta',
-    ];
+    ].toSet().toList();
     DioException? lastException;
     for (var i = 0; i < candidateUserAgents.length; i++) {
       final ua = candidateUserAgents[i];
@@ -105,10 +105,22 @@ class Request {
               },
             );
         if (res.statusCode == 403 || res.statusCode == 401 || res.statusCode == 406) {
+          lastException = DioException.badResponse(
+            statusCode: res.statusCode!,
+            requestOptions: res.requestOptions,
+            response: res,
+          );
           commonPrint.log(
             'Download $url with UA "$ua" returned ${res.statusCode}, trying next UA candidate...',
           );
           continue;
+        }
+        if (res.statusCode != null && res.statusCode! >= 400) {
+          throw DioException.badResponse(
+            statusCode: res.statusCode!,
+            requestOptions: res.requestOptions,
+            response: res,
+          );
         }
         return res;
       } on DioException catch (e) {
@@ -130,7 +142,7 @@ class Request {
     try {
       commonPrint.log('Trying direct fallback download for $url...');
       final directCancel = CancelToken();
-      return await dio
+      final directRes = await dio
           .getUri<T>(
             target.uri,
             options: Options(
@@ -142,7 +154,7 @@ class Request {
               },
               followRedirects: true,
               maxRedirects: 10,
-              validateStatus: (status) => status != null && status < 500,
+              validateStatus: (status) => status != null && status < 400,
             ),
             cancelToken: directCancel,
           )
@@ -156,8 +168,12 @@ class Request {
               );
             },
           );
-    } catch (_) {
-      throw lastException!;
+      return directRes;
+    } catch (e) {
+      if (lastException != null) {
+        throw lastException;
+      }
+      rethrow;
     }
   }
   Future<Response<Uint8List>> getFileResponseForUrl(String url) async {
