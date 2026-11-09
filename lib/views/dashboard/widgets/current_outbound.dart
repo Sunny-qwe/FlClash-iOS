@@ -126,27 +126,12 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
                   PositionedDirectional(
                     end: metrics.decorationEnd,
                     top: metrics.decorationTop,
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween(end: isStart ? 1 : 0),
-                      duration: context.motionDuration(_morphDuration),
-                      curve: Curves.easeOutBack,
-                      builder: (_, progress, _) => Transform.rotate(
-                        angle: _decorationTurn * progress,
-                        child: Transform.scale(
-                          scale: 1 + _decorationGrowth * progress,
-                          child: ShapeBadge(
-                            shape: MaterialShapes.circle,
-                            color: Color.lerp(
-                              colors.tone,
-                              Color.alphaBlend(
-                                colorScheme.primary.withValues(alpha: 0.1),
-                                colors.card,
-                              ),
-                              progress.clamp(0, 1),
-                            )!,
-                            size: metrics.decorationSize,
-                          ),
-                        ),
+                    child: Transform.scale(
+                      scale: 1.15,
+                      child: ShapeBadge(
+                        shape: MaterialShapes.cookie9Sided,
+                        color: const Color(0xFF007AFF).withValues(alpha: 0.05),
+                        size: metrics.decorationSize,
                       ),
                     ),
                   ),
@@ -344,11 +329,13 @@ class _ExitRow extends StatelessWidget {
             style: style.copyWith(color: colorScheme.error),
           )
         : !active
-        ? Text(
-            appLocalizations.disconnected,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: style.copyWith(color: colorScheme.onSurfaceVariant),
+        ? Container(
+            width: 140,
+            height: 16,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8EBEF),
+              borderRadius: BorderRadius.circular(8),
+            ),
           )
         : SkeletonText(width: 140, style: style);
     return Row(
@@ -458,9 +445,21 @@ class _IpChips extends StatelessWidget {
                 SkeletonPill(width: width, height: height),
             ],
             null => [
-              DashboardChip(
-                label: context.appLocalizations.ipTypeUnknown,
-                large: large,
+              Container(
+                width: 50,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EBEF),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              Container(
+                width: 65,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EBEF),
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ],
           },
@@ -537,17 +536,12 @@ class _CountryBadgeState extends State<_CountryBadge>
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final foreground = widget.active
-        ? colorScheme.onSurface
-        : colorScheme.onSurfaceVariant;
+    final foreground = const Color(0xFF6C727A);
     final enabled = !widget.checking;
     final size = widget.size;
     final code = widget.countryCode;
     final tooltip = context.appLocalizations.retry;
-    final color = Color.alphaBlend(
-      foreground.withValues(alpha: enabled && _hovered ? 0.08 : 0),
-      DashboardColors.of(context).tone2,
-    );
+    final color = const Color(0xFFE9ECEF);
     return Tooltip(
       message: tooltip,
       child: Semantics(
@@ -570,10 +564,10 @@ class _CountryBadgeState extends State<_CountryBadge>
                 ring: _focused ? focusRingSide(colorScheme) : null,
                 child: child,
               ),
-              child: code == null || code.isEmpty
+              child: code == null || code.isEmpty || !widget.active
                   ? GlyphIcon(
                       AppGlyphs.proxies,
-                      size: size * 0.42,
+                      size: size * 0.44,
                       color: foreground,
                     )
                   : Text(
@@ -625,11 +619,17 @@ class _Cells extends StatelessWidget {
         Flexible(
           child: _Cell(
             label: appLocalizations.ipOrganization,
-            value: organization != null
+            value: (active && organization != null)
                 ? _CellText(organization)
-                : loading
-                ? SkeletonText(width: 96, style: _cellStyle(context))
-                : const _Placeholder(),
+                : Container(
+                    width: 90,
+                    height: 12,
+                    margin: const EdgeInsets.only(top: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8EBEF),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
           ),
         ),
       ],
@@ -769,6 +769,11 @@ class _StartToggleState extends ConsumerState<_StartToggle>
   }
 
   void _toggle() {
+    if (!widget.enabled) {
+      dialogs.showBanner(currentAppLocalizations.noProfileTip);
+      ref.read(navigationProvider.notifier).toPage(PageLabel.profiles);
+      return;
+    }
     ref.read(commonActionProvider.notifier).toggleRunning();
   }
 
@@ -779,10 +784,8 @@ class _StartToggleState extends ConsumerState<_StartToggle>
     final glass = LiquidGlassScope.of(context);
     final size = widget.size;
     final enabled = widget.enabled;
-    final fill = enabled
-        ? colorScheme.primary
-        : DashboardColors.of(context).tone2;
-    final ink = enabled ? colorScheme.onPrimary : colorScheme.onSurfaceVariant;
+    final fill = const Color(0xFF007AFF);
+    final ink = Colors.white;
     final tooltip = widget.suspended
         ? appLocalizations.suspended
         : widget.running
@@ -793,10 +796,10 @@ class _StartToggleState extends ConsumerState<_StartToggle>
       message: tooltip,
       child: Semantics(
         button: true,
-        enabled: enabled,
+        enabled: true,
         label: tooltip,
         child: PressRegion(
-          onTap: enabled ? _toggle : null,
+          onTap: _toggle,
           onHover: (value) => setState(() => _hovered = value),
           onPressedChanged: (value) => setState(() => _pressed = value),
           onFocusChange: (value) => setState(() => _focused = value),
@@ -817,9 +820,7 @@ class _StartToggleState extends ConsumerState<_StartToggle>
                     painter: _MorphPainter(
                       progress: progress,
                       color: glass ? null : color,
-                      shadow: enabled
-                          ? colorScheme.primary.withValues(alpha: 0.3)
-                          : Colors.transparent,
+                      shadow: const Color(0xFF007AFF).withValues(alpha: 0.35),
                       ring: _focused
                           ? focusRingSide(colorScheme, standsOff: true)
                           : null,

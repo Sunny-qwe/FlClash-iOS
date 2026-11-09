@@ -61,9 +61,12 @@ class CoreLib extends CoreHandlerInterface {
         ) ??
         '';
     if (syncError.isNotEmpty) {
-      _connectedCompleter = Completer<bool>();
-      await _service?.shutdown();
-      throw StateError(syncError);
+      commonPrint.log('syncState notice: $syncError', logLevel: LogLevel.warning);
+      if (!system.isIOS) {
+        _connectedCompleter = Completer<bool>();
+        await _service?.shutdown();
+        throw StateError(syncError);
+      }
     }
     return CoreLifecycleResult(
       revision: revision,

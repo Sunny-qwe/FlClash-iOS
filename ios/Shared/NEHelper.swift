@@ -21,9 +21,14 @@ public enum NEHelper {
   public static var runTimeURL: URL? { appGroupFile("run_time") }
 
   private static func appGroupFile(_ name: String) -> URL? {
-    FileManager.default.containerURL(
+    let base = FileManager.default.containerURL(
       forSecurityApplicationGroupIdentifier: appGroupIdentifier
-    )?.appendingPathComponent(name)
+    ) ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    if let base {
+      try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+      return base.appendingPathComponent(name)
+    }
+    return nil
   }
 
   /// Set by the app, so an intent it runs reaches the tunnel's one owner there

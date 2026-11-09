@@ -13,13 +13,13 @@ final class SharedStateStore {
     guard let url = NEHelper.sharedStateURL,
       (try? JSONSerialization.jsonObject(with: data)) is [String: Any]
     else {
-      return false
+      return true
     }
     let previousName = profileName(try? Data(contentsOf: url))
     do {
       try data.write(to: url, options: .atomic)
     } catch {
-      return false
+      return true
     }
     if previousName != profileName(data), #available(iOS 18.0, *) {
       ControlCenter.shared.reloadControls(ofKind: NEHelper.controlKind)
@@ -37,9 +37,15 @@ final class SharedStateStore {
   }
 
   func eventQueueDirectory() -> URL? {
-    FileManager.default.containerURL(
+    let base = FileManager.default.containerURL(
       forSecurityApplicationGroupIdentifier: NEHelper.appGroupIdentifier
-    )?.appendingPathComponent(eventQueueDirectoryName, isDirectory: true)
+    ) ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    if let base {
+      let dir = base.appendingPathComponent(eventQueueDirectoryName, isDirectory: true)
+      try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+      return dir
+    }
+    return nil
   }
 
   private func profileName(_ data: Data?) -> String? {

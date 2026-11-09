@@ -147,11 +147,8 @@ final class ServicePlugin {
         result(await tunnelController.getRunTime())
       }
     case "syncState":
-      guard let data = (call.arguments as? String)?.data(using: .utf8),
-        sharedStateStore.saveSharedState(data)
-      else {
-        result("Invalid shared state")
-        return
+      if let data = (call.arguments as? String)?.data(using: .utf8) {
+        _ = sharedStateStore.saveSharedState(data)
       }
       result("")
     case "start":

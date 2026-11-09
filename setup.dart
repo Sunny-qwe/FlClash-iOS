@@ -544,6 +544,7 @@ Future<int> packageIOSNoSign({
     'ios',
     '--release',
     '--no-codesign',
+    '--split-debug-info=build/ios/symbols',
     '--dart-define-from-file=env.json',
   ], workingDirectory: rootDir);
   process.stdout.listen((data) {
@@ -609,6 +610,17 @@ Future<int> packageIOSNoSign({
       );
       if (exitCode != 0) return exitCode;
     }
+    final binariesToStrip = [
+      p.join(appDir.path, 'Runner'),
+      p.join(appDir.path, 'PlugIns', 'NECore.appex', 'NECore'),
+      p.join(appDir.path, 'Frameworks', 'App.framework', 'App'),
+    ];
+    for (final bin in binariesToStrip) {
+      if (File(bin).existsSync()) {
+        await Process.run('strip', ['-S', bin]);
+      }
+    }
+
     final payloadDir = Directory(p.join(tempDir.path, 'Payload'));
     await payloadDir.create();
     final copyResult = await Process.run('ditto', [
