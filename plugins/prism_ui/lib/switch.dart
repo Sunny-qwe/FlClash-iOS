@@ -38,7 +38,7 @@ class _SwitchState extends State<Switch> with TickerProviderStateMixin {
   static const _midThumb = Size(34, 22);
   static const _heldThumb = 40.0;
   static const _heldStretch = Offset(10, -2);
-  static const _toggleDuration = Duration(milliseconds: 300);
+  static const _toggleDuration = Duration(milliseconds: 240);
   static const _pressDuration = Duration(milliseconds: 150);
   static const _tapLift = Duration(milliseconds: 200);
 
@@ -49,8 +49,8 @@ class _SwitchState extends State<Switch> with TickerProviderStateMixin {
   );
   late final _position = CurvedAnimation(
     parent: _toggle,
-    curve: Curves.easeOutBack,
-    reverseCurve: Curves.easeOutBack.flipped,
+    curve: Curves.easeInOutCubic,
+    reverseCurve: Curves.easeInOutCubic,
   );
   late final _pressController = AnimationController(
     vsync: this,
@@ -77,15 +77,10 @@ class _SwitchState extends State<Switch> with TickerProviderStateMixin {
   void didUpdateWidget(Switch oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value) {
-      if (_toggle.isDismissed || _toggle.isCompleted) {
+      if (!_dragging) {
         _position
-          ..curve = Curves.easeOutBack
-          ..reverseCurve = Curves.easeOutBack.flipped;
-      }
-      // A drag hands over its flip with the thumb already past halfway.
-      final across = (_toggle.value - (widget.value ? 1 : 0)).abs() > 0.5;
-      if (across && widget.onChanged != null) {
-        _liftAcross();
+          ..curve = Curves.easeInOutCubic
+          ..reverseCurve = Curves.easeInOutCubic;
       }
       _settle();
     }
@@ -133,12 +128,12 @@ class _SwitchState extends State<Switch> with TickerProviderStateMixin {
   }
 
   void _handleRelease() {
+    _pressController.value = 0;
+    _tapLiftTimer?.cancel();
     if (!_dragging) {
       _flip();
-      _liftAcross();
       return;
     }
-    _pressController.reverse();
     _dragging = false;
     if (_toggle.value >= 0.5 == widget.value) {
       _settle();
@@ -162,11 +157,9 @@ class _SwitchState extends State<Switch> with TickerProviderStateMixin {
   }
 
   Rect _thumbIn(Rect track, bool rtl) {
-    final on = _toggle.value;
-    final stretch = math.sin(math.pi * on.clamp(0.0, 1.0));
     final size = Size.lerp(
-      Size.lerp(const Size.square(_thumb), _midThumb, stretch),
-      const Size.square(_heldThumb) + _heldStretch * stretch,
+      const Size.square(_thumb),
+      const Size.square(_heldThumb),
       _press.value,
     )!;
     final along =

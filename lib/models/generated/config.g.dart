@@ -233,7 +233,7 @@ Map<String, dynamic> _$WindowPropsToJson(_WindowProps instance) =>
     };
 
 _VpnProps _$VpnPropsFromJson(Map<String, dynamic> json) => _VpnProps(
-  enable: json['enable'] as bool? ?? true,
+  enable: json['enable'] as bool? ?? false,
   systemProxy: json['systemProxy'] as bool? ?? true,
   ipv6: json['ipv6'] as bool? ?? false,
   allowBypass: json['allowBypass'] as bool? ?? true,

@@ -350,7 +350,7 @@ extension WindowPropsExt on WindowProps {
 @freezed
 abstract class VpnProps with _$VpnProps {
   const factory VpnProps({
-    @Default(true) bool enable,
+    @Default(false) bool enable,
     @Default(true) bool systemProxy,
     @Default(false) bool ipv6,
     @Default(true) bool allowBypass,
