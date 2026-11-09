@@ -272,7 +272,8 @@ List<String> mitmModuleUrls(String text) {
           when action == 'install-module' ||
               action == 'install' ||
               action == 'import' => [
-        ?uri.queryParameters['url'] ?? ?uri.queryParameters['module'],
+        ?uri.queryParameters['url'],
+        ?uri.queryParameters['module'],
       ],
       'quantumult-x'
           when const {
