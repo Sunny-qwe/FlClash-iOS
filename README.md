@@ -20,6 +20,13 @@ Powered by **Mihomo (Clash.Meta)** core and **Flutter** modern architecture. Cle
 
 <br/>
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="snapshots/preview-dark.png">
+    <img alt="FlClash for iOS" src="snapshots/preview.png" width="94%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);">
+  </picture>
+</p>
+
 [📱 Screenshots](#-screenshots) · [✨ Features](#-key-features) · [📥 Installation](#-installation-guide) · [🌐 Protocol Matrix](#-protocol-support-matrix) · [🛠️ CI/CD Build](#️-cloud-automated-build-cicd)
 
 </div>
@@ -29,25 +36,19 @@ Powered by **Mihomo (Clash.Meta)** core and **Flutter** modern architecture. Cle
 ## 📱 Screenshots
 
 <div align="center">
-  <table border="0">
-    <tr>
-      <td align="center" width="33%">
-        <img src="docs/images/dashboard.jpg" alt="Dashboard View" style="border-radius: 14px; max-height: 520px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-        <br />
-        <b>Dashboard & Floating Dock</b><br/>
-        <sub>Real-time Speed · Outbound Rules · Clean Controls</sub>
+  <table border="0" style="border-collapse: collapse; border: none;">
+    <tr style="border: none;">
+      <td align="center" width="50%" style="border: none; padding: 12px;">
+        <img src="docs/images/mobile_light.png" alt="Light Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18));" />
+        <br/><br/>
+        <b>☀️ Light Theme · Native iOS Experience</b><br/>
+        <sub>Real-time Speed · Residential Node Badge · Floating Dock</sub>
       </td>
-      <td align="center" width="33%">
-        <img src="docs/images/status_card.png" alt="Status Card" style="border-radius: 14px; max-height: 520px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-        <br />
-        <b>Organic Status Card & Quality</b><br/>
-        <sub>Subtle Wave Curvature · Residential IP Detection</sub>
-      </td>
-      <td align="center" width="33%">
-        <img src="docs/images/tools.jpg" alt="Tools & Settings" style="border-radius: 14px; max-height: 520px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-        <br />
-        <b>Tools & Advanced Settings</b><br/>
-        <sub>DNS Lookup · Resource Monitor · Multi-Language</sub>
+      <td align="center" width="50%" style="border: none; padding: 12px;">
+        <img src="docs/images/mobile_dark.png" alt="Dark Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.35));" />
+        <br/><br/>
+        <b>🌙 Dark Theme · Deep OLED Aesthetics</b><br/>
+        <sub>True Black Contrast · Battery-Saving · Fluid Animations</sub>
       </td>
     </tr>
   </table>

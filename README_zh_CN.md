@@ -20,34 +20,35 @@
 
 <br/>
 
-[📱 界面预览](#-界面预览) · [✨ 核心特性](#-核心特性) · [📥 安装指南](#-安装指南) · [🌐 协议支持](#-全协议支持矩阵) · [🛠️ 编译与打包](#️-云端自动构建-cicd)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="snapshots/preview-dark.png">
+    <img alt="FlClash for iOS" src="snapshots/preview.png" width="94%" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);">
+  </picture>
+</p>
+
+[📱 界面展示](#-界面展示) · [✨ 核心特性](#-核心特性) · [📥 安装指南](#-安装指南) · [🌐 协议支持](#-全协议支持矩阵) · [🛠️ 编译与打包](#️-云端自动构建-cicd)
 
 </div>
 
 ---
 
-## 📱 界面预览
+## 📱 界面展示
 
 <div align="center">
-  <table border="0">
-    <tr>
-      <td align="center" width="33%">
-        <img src="docs/images/dashboard.jpg" alt="仪表盘主页" style="border-radius: 14px; max-height: 520px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-        <br />
-        <b>仪表盘主页 & 悬浮灵动 Dock</b><br/>
-        <sub>实时速率 · 策略分流 · 便捷总控</sub>
+  <table border="0" style="border-collapse: collapse; border: none;">
+    <tr style="border: none;">
+      <td align="center" width="50%" style="border: none; padding: 12px;">
+        <img src="docs/images/mobile_light.png" alt="明亮模式 / Light Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.18));" />
+        <br/><br/>
+        <b>☀️ 明亮模式 · 极简原生体验</b><br/>
+        <sub>实时速率曲线 · 住宅节点检测 · 灵动悬浮底栏</sub>
       </td>
-      <td align="center" width="33%">
-        <img src="docs/images/status_card.png" alt="状态卡片" style="border-radius: 14px; max-height: 520px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-        <br />
-        <b>波浪状态卡片 & 节点质量</b><br/>
-        <sub>精美曲线底纹 · 住宅/数据中心智能标注</sub>
-      </td>
-      <td align="center" width="33%">
-        <img src="docs/images/tools.jpg" alt="工具箱与设置" style="border-radius: 14px; max-height: 520px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-        <br />
-        <b>实用工具箱 & 进阶设置</b><br/>
-        <sub>DNS 解析 · 连接审计 · 备份与多语言</sub>
+      <td align="center" width="50%" style="border: none; padding: 12px;">
+        <img src="docs/images/mobile_dark.png" alt="暗色模式 / Dark Theme" width="340" style="filter: drop-shadow(0 12px 28px rgba(0,0,0,0.35));" />
+        <br/><br/>
+        <b>🌙 暗色模式 · 深邃灵动质感</b><br/>
+        <sub>纯黑 OLED 节电适配 · 舒适护眼微光 · 丝滑微动效</sub>
       </td>
     </tr>
   </table>
