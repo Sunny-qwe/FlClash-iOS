@@ -280,20 +280,14 @@ class _LoopbackItem extends StatelessWidget {
       title: Text(localizations.loopback.isNotEmpty ? localizations.loopback : '本地回环'),
       subtitle: const Text('LiveContainer / SideStore / TUN 回环保护'),
       onTap: () {
-        dialogs.showSheet(
+        dialogs.showAlert(
           title: '本地回环 (Loopback)',
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Text(
-                '已为进阶版配置全自动本地回环保护：\n\n'
+          message: const TextSpan(
+            text: '已为进阶版配置全自动本地回环保护：\n\n'
                 '• iOS TUN 回环排除：已将 127.0.0.0/8、10.7.0.0/24 (SideStore/LiveContainer 通信网段) 及 ::1/128 写入 VPN 排除路由。\n\n'
                 '• 保护效果：开启代理时不会劫持 LiveContainer / SideStore 的设备端本地配对服务与 JIT 通信，彻底避免 "Reject loopback" 错误与冲突。\n\n'
                 '• 代理例外列表：127.0.0.1、localhost、10.7.0.1 已自动加入系统代理豁免名单。',
-                style: context.textTheme.bodyMedium,
-              ),
-            ),
-          ],
+          ),
         );
       },
     );
