@@ -770,8 +770,8 @@ class _StartToggleState extends ConsumerState<_StartToggle>
 
   void _toggle() {
     if (!widget.enabled) {
-      dialogs.showBanner(currentAppLocalizations.noProfileTip);
-      ref.read(navigationProvider.notifier).toPage(PageLabel.profiles);
+      dialogs.showBanner(context.appLocalizations.nullProfileDesc);
+      ref.read(currentPageLabelProvider.notifier).toPage(PageLabel.profiles);
       return;
     }
     ref.read(commonActionProvider.notifier).toggleRunning();

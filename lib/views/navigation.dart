@@ -22,9 +22,7 @@ class Navigation implements NavigationPort {
         glyph: AppGlyphs.proxies,
         label: PageLabel.proxies,
         builder: (_) => const ProxiesView(),
-        modes: hasProxies
-            ? [NavigationItemMode.mobile, NavigationItemMode.desktop]
-            : [],
+        modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
       ),
       NavigationItem(
         glyph: AppGlyphs.profiles,
@@ -47,7 +45,7 @@ class Navigation implements NavigationPort {
         glyph: AppGlyphs.resources,
         label: PageLabel.resources,
         builder: (_) => const ResourcesView(),
-        modes: [NavigationItemMode.more, NavigationItemMode.mobile],
+        modes: const [NavigationItemMode.desktop, NavigationItemMode.more],
       ),
       NavigationItem(
         glyph: AppGlyphs.logs,
