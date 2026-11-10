@@ -95,6 +95,9 @@ class _MitmViewState extends ConsumerState<MitmView> {
     required bool canTrust,
     required MitmTrustCheck? check,
   }) {
+    if (system.isIOS) {
+      return '在 iOS 上安装证书后，请务必前往【设置 › 通用 › 关于本机 › 证书信任设置】中启用完全信任，MITM 脚本及重写规则方可生效。';
+    }
     if (!canTrust) {
       return appLocalizations.mitmCertificateExportTip;
     }
@@ -205,6 +208,55 @@ class _MitmViewState extends ConsumerState<MitmView> {
       case MitmInstallOutcome.installed || MitmInstallOutcome.prompted || null:
         break;
     }
+  }
+
+  Future<void> _installIOS(
+    BuildContext context,
+    MitmCertificate certificate,
+  ) async {
+    await _export(context, certificate);
+    if (context.mounted) {
+      await _showIOSTrustGuide(context);
+    }
+  }
+
+  Future<void> _showIOSTrustGuide(BuildContext context) async {
+    await dialogs.showMessage(
+      title: 'iOS 证书安装与信任指引',
+      message: const TextSpan(
+        children: [
+          TextSpan(
+            text: '第一步：下载证书\n',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+            text: '点击“导出/安装证书”将【FlClash CA.crt】保存到 iPhone“文件”APP 或在 Safari 中打开。\n\n',
+          ),
+          TextSpan(
+            text: '第二步：安装描述文件\n',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+            text: '打开 iPhone 系统【设置】，在最上方点击【已下载描述文件】，点击右上角【安装】。\n\n',
+          ),
+          TextSpan(
+            text: '第三步：信任根证书（关键步骤）\n',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+            text: '进入系统【设置】›【通用】›【关于本机】› 滑到最底部【证书信任设置】。\n\n',
+          ),
+          TextSpan(
+            text: '第四步：开启完全信任\n',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+            text: '在“针对根证书启用完全信任”列表中，找到 “FlClash CA”，将开关打开为绿色（已开启）即可！',
+          ),
+        ],
+      ),
+      confirmText: '我知道了',
+    );
   }
 
   Future<void> _export(
@@ -325,10 +377,25 @@ class _MitmViewState extends ConsumerState<MitmView> {
     return [
       ListItem(
         title: Text(certificate.subject),
-        subtitle: Text(_trustLabel(appLocalizations, trust)),
+        subtitle: Text(
+          system.isIOS
+              ? '有效期至 ${certificate.notAfter.year}-${certificate.notAfter.month.toString().padLeft(2, '0')}-${certificate.notAfter.day.toString().padLeft(2, '0')}'
+              : _trustLabel(appLocalizations, trust),
+        ),
         onTap: () => _showDetails(context, certificate),
       ),
-      if (installable)
+      if (system.isIOS) ...[
+        ListItem(
+          title: Text(appLocalizations.installCertificate),
+          subtitle: const Text('安装证书并在设置中信任'),
+          onTap: () => _installIOS(context, certificate),
+        ),
+        ListItem(
+          title: const Text('证书信任操作指引'),
+          subtitle: const Text('查看 iOS 详细安装与完全信任步骤'),
+          onTap: () => _showIOSTrustGuide(context),
+        ),
+      ] else if (installable)
         ListItem(
           title: Text(
             trust.value?.trust == MitmTrust.untrusted
@@ -364,6 +431,7 @@ class _MitmViewState extends ConsumerState<MitmView> {
       isLoading: ref.watch(loadingProvider(LoadingTag.mitm)),
       body: NullStatusSwitcher(
         isLoading: certificate.isLoading && !certificate.hasValue,
+        holdsArrival: false,
         child: CustomScrollView(
           slivers: [
             SliverPadding(

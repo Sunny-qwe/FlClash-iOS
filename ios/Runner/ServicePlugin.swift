@@ -159,6 +159,20 @@ final class ServicePlugin {
       commandRevision = call.arguments as? Int ?? commandRevision
       tunnelController.stop()
       result(true)
+    case "supportsAlternateIcons":
+      result(UIApplication.shared.supportsAlternateIcons)
+    case "getAlternateIconName":
+      result(UIApplication.shared.alternateIconName)
+    case "setAlternateIconName":
+      let iconName = call.arguments as? String
+      let nameToSet = (iconName == nil || iconName?.isEmpty == true || iconName == "default" || iconName == "AppIcon-Classic") ? nil : iconName
+      UIApplication.shared.setAlternateIconName(nameToSet) { error in
+        if let error = error {
+          result(FlutterError(code: "SET_ICON_ERROR", message: error.localizedDescription, details: nil))
+        } else {
+          result(true)
+        }
+      }
     default:
       result(FlutterMethodNotImplemented)
     }

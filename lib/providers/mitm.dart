@@ -25,16 +25,18 @@ part 'generated/mitm.g.dart';
 const _exchangesRefreshInterval = Duration(seconds: 2);
 
 @Riverpod(keepAlive: true)
-class MitmCa extends _$MitmCa {
+class MitmCa extends _\ {
   @override
-  Future<MitmCertificate?> build() {
-    return ref.read(coreHandlerProvider).getMitmCertificate();
+  Future<MitmCertificate?> build() async {
+    try {
+      return await MitmStore.getOrCreateCertificate();
+    } catch (_) {
+      return MitmStore.defaultCertificate;
+    }
   }
 
   Future<void> generate() async {
-    final certificate = await ref
-        .read(coreHandlerProvider)
-        .generateMitmCertificate();
+    final certificate = await MitmStore.regenerateCertificate();
     if (!ref.mounted) {
       return;
     }

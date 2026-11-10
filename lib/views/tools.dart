@@ -17,6 +17,7 @@ import 'config/advanced.dart';
 import 'developer.dart';
 import 'disclaimer.dart';
 import 'theme.dart';
+import 'config/app_icon.dart';
 
 class ToolsView extends ConsumerStatefulWidget {
   const ToolsView({super.key});
@@ -75,6 +76,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
       items: [
         const _LocaleItem(),
         const _ThemeItem(),
+        const _AppIconItem(),
         if (system.isDesktop) const _HotkeyItem(),
         if (system.isAndroid) const _AccessItem(),
         const _BackupItem(),
@@ -160,6 +162,19 @@ class _ThemeItem extends StatelessWidget {
       leading: const GlyphIcon(AppGlyphs.paintbrush),
       title: Text(context.appLocalizations.theme),
       widget: const ThemeView(),
+    );
+  }
+}
+
+class _AppIconItem extends StatelessWidget {
+  const _AppIconItem();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListItem.open(
+      leading: const GlyphIcon(AppGlyphs.palette),
+      title: const Text('应用图标'),
+      widget: const AppIconView(),
     );
   }
 }

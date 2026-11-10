@@ -120,22 +120,14 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
                 shape: AppShape.all(dashboardCardRadius(density)),
                 textDirection: Directionality.of(context),
               ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  PositionedDirectional(
-                    end: metrics.decorationEnd,
-                    top: metrics.decorationTop,
-                    child: Transform.scale(
-                      scale: 1.15,
-                      child: ShapeBadge(
-                        shape: MaterialShapes.cookie9Sided,
-                        color: const Color(0xFFEFEDF0),
-                        size: metrics.decorationSize,
-                      ),
-                    ),
-                  ),
-                ],
+              child: CustomPaint(
+                size: Size.infinite,
+                painter: _StatusWavePainter(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : const Color(0xFFEFEDF0),
+                  isRtl: Directionality.of(context) == TextDirection.rtl,
+                ),
               ),
             ),
           ),
@@ -971,4 +963,49 @@ class _MorphClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(_MorphClipper oldClipper) =>
       oldClipper.progress != progress;
+}
+
+class _StatusWavePainter extends CustomPainter {
+  const _StatusWavePainter({
+    required this.color,
+    this.isRtl = false,
+  });
+
+  final Color color;
+  final bool isRtl;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    if (w <= 0 || h <= 0) return;
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    canvas.save();
+    if (isRtl) {
+      canvas.scale(-1, 1);
+      canvas.translate(-w, 0);
+    }
+
+    final path = Path()
+      ..moveTo(w * 0.540, 0)
+      ..cubicTo(w * 0.540, h * 0.120, w * 0.510, h * 0.180, w * 0.505, h * 0.280)
+      ..cubicTo(w * 0.500, h * 0.380, w * 0.535, h * 0.500, w * 0.565, h * 0.600)
+      ..cubicTo(w * 0.590, h * 0.700, w * 0.630, h * 0.770, w * 0.675, h * 0.815)
+      ..cubicTo(w * 0.710, h * 0.855, w * 0.750, h * 0.878, w * 0.800, h * 0.865)
+      ..cubicTo(w * 0.840, h * 0.845, w * 0.870, h * 0.825, w * 0.905, h * 0.828)
+      ..cubicTo(w * 0.940, h * 0.835, w * 0.970, h * 0.875, w, h * 0.845)
+      ..lineTo(w, 0)
+      ..close();
+
+    canvas.drawPath(path, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _StatusWavePainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.isRtl != isRtl;
 }

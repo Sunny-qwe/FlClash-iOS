@@ -152,6 +152,21 @@ class Service {
     return DateTime.fromMillisecondsSinceEpoch(ms);
   }
 
+  Future<bool> supportsAlternateIcons() async {
+    if (!system.isIOS) return false;
+    return await methodChannel.invokeMethod<bool>('supportsAlternateIcons') ?? false;
+  }
+
+  Future<String?> getAlternateIconName() async {
+    if (!system.isIOS) return null;
+    return await methodChannel.invokeMethod<String?>('getAlternateIconName');
+  }
+
+  Future<bool> setAlternateIconName(String? name) async {
+    if (!system.isIOS) return false;
+    return await methodChannel.invokeMethod<bool>('setAlternateIconName', name) ?? false;
+  }
+
   bool get hasListeners {
     return _listeners.isNotEmpty;
   }
