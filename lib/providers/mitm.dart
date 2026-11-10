@@ -25,7 +25,7 @@ part 'generated/mitm.g.dart';
 const _exchangesRefreshInterval = Duration(seconds: 2);
 
 @Riverpod(keepAlive: true)
-class MitmCa extends _\ {
+class MitmCa extends _$MitmCa {
   @override
   Future<MitmCertificate?> build() async {
     try {

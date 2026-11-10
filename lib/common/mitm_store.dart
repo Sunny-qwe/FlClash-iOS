@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/mitm_trust.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:path/path.dart' show join;
 
