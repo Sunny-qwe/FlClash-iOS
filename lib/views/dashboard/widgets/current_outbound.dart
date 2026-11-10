@@ -461,7 +461,12 @@ class _IpChips extends StatelessWidget {
               for (final width in _chipSkeletonWidths)
                 SkeletonPill(width: width, height: height),
             ],
-            null => const [],
+            null => [
+              DashboardChip(
+                label: context.appLocalizations.ipTypeUnknown,
+                large: large,
+              ),
+            ],
           },
         ),
       ),
@@ -619,6 +624,10 @@ class _Cells extends StatelessWidget {
             label: appLocalizations.ipOrganization,
             value: (active && organization != null)
                 ? _CellText(organization)
+                : active
+                ? loading
+                    ? SkeletonText(width: 96, style: _cellStyle(context))
+                    : const _Placeholder()
                 : Container(
                     width: 96,
                     height: 12,

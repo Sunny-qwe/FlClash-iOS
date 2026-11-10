@@ -103,6 +103,7 @@ Widget _app(
     locale: const Locale('en'),
     overrides: [
       profilesProvider.overrideWithValue(const [_profile]),
+      runTimeProvider.overrideWithBuild((_, _) => 1),
       suspendProvider.overrideWithValue(false),
       rootAccessProvider.overrideWith((_) async => root),
       outboundIpProbeProvider.overrideWithBuild(
@@ -122,11 +123,13 @@ Widget _app(
 Widget _probingApp(
   CoreHandlerInterface core, {
   Future<IpQuality> Function(Ref ref, String ip)? quality,
+  bool running = false,
 }) {
   return TestApp(
     locale: const Locale('en'),
     overrides: [
       profilesProvider.overrideWithValue(const [_profile]),
+      runTimeProvider.overrideWithBuild((_, _) => running ? 1 : null),
       routeTrackerProvider.overrideWithBuild(
         (ref, _) => RouteState(
           coreEpoch: 1,
@@ -252,7 +255,7 @@ void main() {
       await tester.pump();
 
       expect(find.text('GB'), findsOneWidget);
-      expect(find.text('Not running'), findsOneWidget);
+      expect(find.text('Running'), findsOneWidget);
       expect(_chip(tester, 'Unknown type').tone, DashboardChipTone.idle);
       expect(find.byType(DashboardChip), findsNWidgets(2));
       expect(find.text('Example Broadband'), findsNothing);
@@ -267,6 +270,7 @@ void main() {
           locale: const Locale('en'),
           overrides: [
             profilesProvider.overrideWithValue(const [_profile]),
+            runTimeProvider.overrideWithBuild((_, _) => 1),
             suspendProvider.overrideWithValue(false),
             outboundIpProbeProvider.overrideWith(_Ips.new),
             ipQualityProvider.overrideWith((_, _) => quality.future),
@@ -276,8 +280,8 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byType(SkeletonPill), findsNWidgets(3));
-      expect(find.byType(SkeletonText), findsOneWidget);
+      expect(find.byType(SkeletonPill), findsNWidgets(2));
+      expect(find.byType(SkeletonText), findsNWidgets(2));
       expect(tester.widget<PressRegion>(_clover()).onTap, isNull);
       final turn = _cloverTurn(tester);
       await tester.pump(const Duration(milliseconds: 300));
@@ -301,6 +305,7 @@ void main() {
       await tester.pumpWidget(
         _probingApp(
           core,
+          running: true,
           quality: (_, _) async {
             calls++;
             throw const IpQualityLookupException([]);
@@ -456,7 +461,7 @@ void main() {
       await tester.pumpWidget(_probingApp(core));
       await tester.pump();
       await tester.pump(commonDuration);
-      expect(find.text(_ip), findsOneWidget);
+      expect(find.text(_ip), findsNothing);
 
       start(tester);
       await tester.pump();
@@ -526,6 +531,7 @@ void main() {
       overrides: [
         initProvider.overrideWithBuild((_, _) => true),
         profilesProvider.overrideWithValue(profiles),
+        currentProfileProvider.overrideWithValue(profiles.firstOrNull),
         outboundIpProbeProvider.overrideWith(_Ips.new),
         ipQualityProvider.overrideWith((_, _) async => _residential),
         setupActionProvider.overrideWith(_RecordingSetupAction.new),
@@ -623,12 +629,15 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('is off without a profile', (tester) async {
+    testWidgets('opens profiles when no profile is available', (tester) async {
       container = containerWith(profiles: const []);
       await pumpCard(tester, density: DashboardDensity.mobile);
 
       final toggle = tester.widget<PressRegion>(startButton());
-      expect(toggle.onTap, isNull);
+      expect(toggle.onTap, isNotNull);
+      await tester.tap(startButton());
+      await tester.pumpAndSettle();
+      expect(container.read(currentPageLabelProvider), PageLabel.profiles);
       expect(tester.takeException(), isNull);
     });
   });

@@ -44,7 +44,8 @@ jobs:
         run: |
           dart format lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart test/core/controller_test.dart test/views/dashboard/status_reference_test.dart setup.dart
           flutter analyze --no-fatal-infos --no-fatal-warnings lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart
-          flutter test test/core/controller_test.dart test/views/dashboard/current_outbound_test.dart test/views/dashboard/status_reference_test.dart test/setup_test.dart
+          flutter test test/core/controller_test.dart test/views/dashboard/current_outbound_test.dart test/views/dashboard/status_reference_test.dart
+          flutter test test/setup_test.dart --plain-name 'iOS'
 
       - name: Build iOS IPA (Unsigned)
         run: dart setup.dart ios --no-codesign -v
