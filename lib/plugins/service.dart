@@ -9,6 +9,7 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:prism_ui/prism_ui.dart' show BannerLevel;
 
 final _utf8JsonDecoder = utf8.decoder.fuse(json.decoder);
 

@@ -28,10 +28,6 @@ bool isBuiltinOutbound(String name) => _builtinOutbounds.contains(name);
 
 const _ipMask = '*****';
 
-const _decorationGrowth = 0.12;
-
-const _decorationTurn = 2 * math.pi / 12;
-
 /// The address the proxied traffic leaves by, next to the start button.
 class CurrentOutboundCard extends ConsumerStatefulWidget {
   const CurrentOutboundCard({super.key});
@@ -89,8 +85,6 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
     final loading = ipInfo == null ? !failed : qualityLoading;
     final metrics = _OutboundMetrics.of(density);
     final appLocalizations = context.appLocalizations;
-    final colorScheme = context.colorScheme;
-    final colors = DashboardColors.of(context);
     final (chipLabel, chipTone) = suspended
         ? (appLocalizations.suspended, DashboardChipTone.warn)
         : isStart
@@ -504,7 +498,6 @@ class _CountryBadgeState extends State<_CountryBadge>
     vsync: this,
     duration: _spinPeriod,
   );
-  var _hovered = false;
   var _focused = false;
 
   @override
@@ -556,7 +549,6 @@ class _CountryBadgeState extends State<_CountryBadge>
         label: tooltip,
         child: PressRegion(
           onTap: enabled ? widget.onRefresh : null,
-          onHover: (value) => setState(() => _hovered = value),
           onFocusChange: (value) => setState(() => _focused = value),
           child: ElasticPress(
             enabled: enabled,
