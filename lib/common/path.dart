@@ -3,10 +3,9 @@ import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path_provider_foundation/path_provider_foundation.dart';
 
 class AppPath {
   static AppPath? _instance;
@@ -56,19 +55,59 @@ class AppPath {
     return _instance!;
   }
 
-  // The Network Extension sets its Core up from this directory.
-  // Fall back to supportDirectory for LiveContainer or free non-group certificates.
   static Future<Directory> _appGroupDirectory() async {
+    String? path;
     try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      final path = await PathProviderFoundation().getContainerPath(
-        appGroupIdentifier: 'group.${packageInfo.packageName}',
-      );
-      if (path != null) {
-        return Directory(path);
+      path = await const MethodChannel(
+        '$packageName/service',
+      ).invokeMethod<String>('getAppGroupDirectory');
+    } on MissingPluginException {
+      return supportDirectory();
+    }
+    return resolveIOSDataDirectory(path, await supportDirectory());
+  }
+
+  @visibleForTesting
+  static Future<Directory> resolveIOSDataDirectory(
+    String? sharedPath,
+    Directory legacy,
+  ) async {
+    if (sharedPath == null) return legacy;
+    final shared = Directory(sharedPath);
+    await shared.create(recursive: true);
+    if (equals(legacy.absolute.path, shared.absolute.path) ||
+        !await legacy.exists()) {
+      return shared;
+    }
+    final migration = File(join(shared.path, '.legacy-data-migrated'));
+    if (await migration.exists()) return shared;
+    await _copyLegacyData(legacy, shared);
+    await migration.writeAsString('complete', flush: true);
+    return shared;
+  }
+
+  static Future<void> _copyLegacyData(Directory source, Directory target) async {
+    await for (final entry in source.list(followLinks: false)) {
+      final name = basename(entry.path);
+      if (const {
+        'responses',
+        'core-events',
+        'run_time',
+        'shared_state.json',
+        'FlClash.lock',
+      }.contains(name)) {
+        continue;
       }
-    } catch (_) {}
-    return supportDirectory();
+      final destination = join(target.path, name);
+      if (entry is Directory) {
+        final directory = Directory(destination);
+        await directory.create(recursive: true);
+        await _copyLegacyData(entry, directory);
+      } else if (entry is File && !await File(destination).exists()) {
+        final temporary = await entry.copy('$destination.migrating');
+        await temporary.rename(destination);
+      }
+    }
   }
 
   String get executableExtension {

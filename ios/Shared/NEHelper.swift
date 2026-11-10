@@ -10,7 +10,7 @@ public enum NEHelper {
     return bundleId
   }
 
-  public static var appGroupIdentifier: String { "group.\(appBundleId)" }
+  public static var appGroupDirectory: URL? { AppGroupLocation.directory }
   public static var controlKind: String { "\(appBundleId).Widget" }
   public static var providerBundleIdentifier: String {
     "\(appBundleId).NECore"
@@ -21,9 +21,7 @@ public enum NEHelper {
   public static var runTimeURL: URL? { appGroupFile("run_time") }
 
   private static func appGroupFile(_ name: String) -> URL? {
-    let base = FileManager.default.containerURL(
-      forSecurityApplicationGroupIdentifier: appGroupIdentifier
-    ) ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    let base = appGroupDirectory
     if let base {
       try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
       return base.appendingPathComponent(name)

@@ -37,9 +37,7 @@ final class SharedStateStore {
   }
 
   func eventQueueDirectory() -> URL? {
-    let base = FileManager.default.containerURL(
-      forSecurityApplicationGroupIdentifier: NEHelper.appGroupIdentifier
-    ) ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    let base = NEHelper.appGroupDirectory
     if let base {
       let dir = base.appendingPathComponent(eventQueueDirectoryName, isDirectory: true)
       try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

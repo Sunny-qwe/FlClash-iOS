@@ -162,13 +162,13 @@ final class ServicePlugin {
         return
       }
       result("")
+    case "getAppGroupDirectory":
+      result(NEHelper.appGroupDirectory?.path)
     case "start":
-      guard FileManager.default.containerURL(
-        forSecurityApplicationGroupIdentifier: NEHelper.appGroupIdentifier
-      ) != nil else {
+      guard NEHelper.appGroupDirectory != nil else {
         result(FlutterError(
           code: "APP_GROUP_UNAVAILABLE",
-          message: "签名未提供共享容器 \(NEHelper.appGroupIdentifier)，主应用和 VPN 扩展无法共享配置。请给两者启用相同的 App Group 后重新签名。",
+          message: "签名后没有可访问的共享目录。请在签名时保留主应用与 VPN 扩展相同的 App Groups 权限。",
           details: nil
         ))
         return
@@ -198,9 +198,12 @@ final class ServicePlugin {
       DispatchQueue.main.async {
         UIApplication.shared.setAlternateIconName(nameToSet) { error in
           if let error = error {
-            result(FlutterError(code: "SET_ICON_ERROR", message: error.localizedDescription, details: nil))
+            let error = error as NSError
+            DispatchQueue.main.async {
+              result(FlutterError(code: "SET_ICON_ERROR", message: "\(error.localizedDescription) [\(error.domain):\(error.code)]", details: nil))
+            }
           } else {
-            result(true)
+            DispatchQueue.main.async { result(true) }
           }
         }
       }

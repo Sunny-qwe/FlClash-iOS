@@ -301,7 +301,7 @@ class _ExitRow extends StatelessWidget {
         width: 140,
         height: 18,
         decoration: const ShapeDecoration(
-          color: Color(0xFFECE9EB),
+          color: Color(0xB3ECE9EB),
           shape: AppShape.full,
         ),
       );
@@ -422,7 +422,7 @@ class _IpChips extends StatelessWidget {
               width: 48,
               height: 28,
               decoration: const ShapeDecoration(
-                color: Color(0xFFECE9EB),
+                color: Color(0xB3ECE9EB),
                 shape: AppShape.full,
               ),
             ),
@@ -430,7 +430,7 @@ class _IpChips extends StatelessWidget {
               width: 72,
               height: 28,
               decoration: const ShapeDecoration(
-                color: Color(0xFFECE9EB),
+                color: Color(0xB3ECE9EB),
                 shape: AppShape.full,
               ),
             ),

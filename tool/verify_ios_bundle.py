@@ -67,7 +67,8 @@ def verify_ipa(path, report_path=None):
             assert ICONS <= alternates.keys(), (key, 'Missing alternate icons', sorted(alternates))
             for name in ICONS:
                 files = alternates[name].get('CFBundleIconFiles', [])
-                if not files:
+                assert files, (key, name, 'Missing standalone icon references')
+                if alternates[name].get('CFBundleIconName'):
                     asset_name = alternates[name].get('CFBundleIconName')
                     assert asset_name == name, (key, name, 'Missing icon resource reference', alternates[name])
                     if verified_assets is None:
@@ -84,8 +85,15 @@ def verify_ipa(path, report_path=None):
                                or asset.startswith(name + '83.5x83.5')
                                for asset in verified_assets), (name, 'Missing compiled icon', sorted(verified_assets))
                 for filename in files:
-                    assert any(item.startswith(root + filename) and item.endswith('.png')
-                               for item in archive.namelist()), (key, name, filename)
+                    scales = ('2x', '3x') if key == 'CFBundleIcons' else (('2x',) if '83.5' in filename else ('1x', '2x'))
+                    size = 60 if key == 'CFBundleIcons' else (83.5 if '83.5' in filename else 76)
+                    for scale in scales:
+                        suffix = f'@{scale}' if scale != '1x' else ''
+                        image = archive.read(root + filename + suffix + '.png')
+                        assert image[:8] == b'\x89PNG\r\n\x1a\n', filename
+                        dimensions = struct.unpack_from('>II', image, 16)
+                        expected_size = int(size * int(scale[0]))
+                        assert dimensions == (expected_size, expected_size), (filename, dimensions)
         groups = [f'group.{bundle_id}']
         for suffix, executable in (('', 'Runner'), ('NECore', 'NECore'), ('Widget', 'Widget')):
             folder = root + (f'PlugIns/{suffix}.appex/' if suffix else '')

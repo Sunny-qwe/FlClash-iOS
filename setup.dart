@@ -562,6 +562,19 @@ Future<int> packageIOSNoSign({
     return 1;
   }
 
+  final iconResult = await Process.run('python3', [
+    p.join(rootDir, 'tool', 'prepare_ios_icons.py'),
+    '--app',
+    appDir.path,
+    '--assets',
+    p.join(rootDir, 'ios', 'Runner', 'Assets.xcassets'),
+  ]);
+  stdout.write(iconResult.stdout);
+  if (iconResult.exitCode != 0) {
+    stderr.write(iconResult.stderr);
+    return iconResult.exitCode;
+  }
+
   final bundleResult = await Process.run('plutil', [
     '-extract',
     'CFBundleIdentifier',

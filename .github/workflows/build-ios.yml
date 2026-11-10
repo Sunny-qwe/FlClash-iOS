@@ -40,11 +40,17 @@ jobs:
       - name: Verify alternate icon sources
         run: python3 tool/verify_ios_bundle.py --assets ios/Runner/Assets.xcassets
 
+      - name: Verify signing compatibility
+        run: |
+          swiftc ios/Shared/AppGroupLocation.swift tool/tests/ios_app_group_test.swift -o /tmp/flclash-group-tests
+          /tmp/flclash-group-tests
+          python3 -m unittest discover -s tool/tests -p 'test_prepare_ios_icons.py'
+
       - name: Verify Dart changes and startup ordering
         run: |
-          dart format lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart test/core/controller_test.dart test/views/dashboard/status_reference_test.dart setup.dart
-          flutter analyze --no-fatal-infos --no-fatal-warnings lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart
-          flutter test test/core/controller_test.dart test/views/dashboard/current_outbound_test.dart test/views/dashboard/status_reference_test.dart
+          dart format lib/common/path.dart lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart test/common/path_test.dart test/core/controller_test.dart test/views/dashboard/status_reference_test.dart setup.dart
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib/common/path.dart lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart
+          flutter test test/common/path_test.dart test/core/controller_test.dart test/views/dashboard/current_outbound_test.dart test/views/dashboard/status_reference_test.dart
           flutter test test/setup_test.dart --plain-name 'iOS'
 
       - name: Build iOS IPA (Unsigned)

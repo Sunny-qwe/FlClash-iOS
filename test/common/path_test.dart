@@ -24,6 +24,29 @@ void main() {
     }
   });
 
+  test('iOS remapped group preserves old data without replacing newer data', () async {
+    final legacy = Directory(join(root.path, 'legacy'));
+    final shared = Directory(join(root.path, 'shared'));
+    await Directory(join(legacy.path, 'profiles')).create(recursive: true);
+    await shared.create();
+    await File(join(legacy.path, 'profiles', '1.yaml')).writeAsString('profile');
+    await File(join(legacy.path, 'shared_preferences.json')).writeAsString('old');
+    await File(join(shared.path, 'shared_preferences.json')).writeAsString('new');
+    await File(join(legacy.path, 'run_time')).writeAsString('stale');
+
+    final directory = await AppPath.resolveIOSDataDirectory(shared.path, legacy);
+    expect(directory.path, shared.path);
+    expect(await File(join(shared.path, 'profiles', '1.yaml')).readAsString(), 'profile');
+    expect(await File(join(shared.path, 'shared_preferences.json')).readAsString(), 'new');
+    expect(await File(join(shared.path, 'run_time')).exists(), isFalse);
+    expect(await File(join(legacy.path, 'profiles', '1.yaml')).exists(), isTrue);
+
+    await File(join(shared.path, 'profiles', '1.yaml')).delete();
+    await AppPath.resolveIOSDataDirectory(shared.path, legacy);
+    expect(await File(join(shared.path, 'profiles', '1.yaml')).exists(), isFalse);
+    expect((await AppPath.resolveIOSDataDirectory(null, legacy)).path, legacy.path);
+  });
+
   test('provider directories match the paths handed to the core', () async {
     const proxiesUrl = 'https://example.com/a.yaml';
     const rulesUrl = 'https://example.com/b.yaml';

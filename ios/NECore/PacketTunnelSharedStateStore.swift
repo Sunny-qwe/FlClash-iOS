@@ -5,7 +5,6 @@ enum PacketTunnelEnvironment {
   static let baseBundleIdentifier = String(
     extensionBundleIdentifier.dropLast(".NECore".count)
   )
-  static let appGroupIdentifier = "group.\(baseBundleIdentifier)"
   static let controlKind = "\(baseBundleIdentifier).Widget"
   static let eventNotificationName =
     "\(extensionBundleIdentifier).event"
@@ -23,21 +22,6 @@ final class PacketTunnelSharedStateStore {
        let opts = try? JSONDecoder().decode(PacketTunnelVPNOptions.self, from: data) {
       return opts
     }
-    // Sideload/fallback defaults when shared state file is not reachable across sandboxes
-    let fallbackDict: [String: Any] = [
-      "port": 7890,
-      "ipv6": false,
-      "dnsHijacking": true,
-      "systemProxy": false,
-      "bypassDomain": [] as [String],
-      "stack": "gvisor",
-      "routeAddress": ["0.0.0.0/1", "128.0.0.0/1"],
-      "mtu": 9000,
-      "congestionController": ""
-    ]
-    if let data = try? JSONSerialization.data(withJSONObject: fallbackDict) {
-      return try? JSONDecoder().decode(PacketTunnelVPNOptions.self, from: data)
-    }
     return nil
   }
 
@@ -47,20 +31,7 @@ final class PacketTunnelSharedStateStore {
        let str = String(data: data, encoding: .utf8), !str.isEmpty {
       return str
     }
-    let fallback: [String: Any] = [
-      "selected-map": [String: String](),
-      "options": [
-        "test-url": "",
-        "skip-cert-verify": false,
-        "delay-test-timeout": 0,
-        "mitm-capture": false,
-      ],
-    ]
-    if let data = try? JSONSerialization.data(withJSONObject: fallback),
-       let str = String(data: data, encoding: .utf8) {
-      return str
-    }
-    return "{}"
+    return nil
   }
 
   // The key spelling is a contract with the Go wrapper's InitParams.
@@ -74,10 +45,7 @@ final class PacketTunnelSharedStateStore {
   }
 
   func appGroupDirectory() -> URL? {
-    FileManager.default.containerURL(
-      forSecurityApplicationGroupIdentifier:
-        PacketTunnelEnvironment.appGroupIdentifier
-    ) ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+    AppGroupLocation.directory
   }
 
   func saveRunTime() {
