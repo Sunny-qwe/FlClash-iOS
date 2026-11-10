@@ -280,8 +280,8 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byType(SkeletonPill), findsNWidgets(2));
-      expect(find.byType(SkeletonText), findsNWidgets(2));
+      expect(find.byType(SkeletonPill), findsNWidgets(3));
+      expect(find.byType(SkeletonText), findsOneWidget);
       expect(tester.widget<PressRegion>(_clover()).onTap, isNull);
       final turn = _cloverTurn(tester);
       await tester.pump(const Duration(milliseconds: 300));
