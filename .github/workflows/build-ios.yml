@@ -37,8 +37,27 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Verify alternate icon sources
+        run: python3 tool/verify_ios_bundle.py --assets ios/Runner/Assets.xcassets
+
+      - name: Verify Dart changes and startup ordering
+        run: |
+          dart format lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart test/core/controller_test.dart test/views/dashboard/status_reference_test.dart setup.dart
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart
+          flutter test test/core/controller_test.dart test/views/dashboard/status_reference_test.dart
+
       - name: Build iOS IPA (Unsigned)
         run: dart setup.dart ios --no-codesign -v
+
+      - name: Verify packaged icons and extension entitlements
+        run: python3 tool/verify_ios_bundle.py --ipa dist/*.ipa
+
+      - name: Upload dashboard render
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-reference-render
+          path: build/verification/status-card.png
+          if-no-files-found: error
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4

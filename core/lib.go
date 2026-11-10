@@ -286,21 +286,21 @@ func QuickSetup(initParamsString, setupParamsString string, answer func(string))
 			answer("init failed")
 			return
 		}
-		_ = handleInit(&initParams)
+		if err := handleInit(&initParams); err != nil {
+			answer(err.Error())
+			return
+		}
 		setupParams := &SetupParams{}
 		if err := json.Unmarshal([]byte(setupParamsString), setupParams); err != nil {
 			answer(err.Error())
 			return
 		}
+		setRunning(true)
 		if err := handleSetupConfig(setupParams); err != nil {
-			// Do not leave the core marked as running when configuration setup
-			// failed.  A failed first start must be retryable on the next tunnel
-			// launch instead of being treated as an already-running core.
-			setRunning(false)
+			handleStopListener()
 			answer(err.Error())
 			return
 		}
-		setRunning(true)
 		answer("")
 	}()
 }

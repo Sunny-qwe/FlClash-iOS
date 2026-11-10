@@ -80,6 +80,7 @@ final class TunnelWait {
   let manager: NETunnelProviderManager
   let continuation: CheckedContinuation<TunnelWaitResult, Never>
   var hasObservedProgress = false
+  var timeoutTask: Task<Void, Never>?
 
   init(
     request: TunnelRequest,

@@ -69,6 +69,18 @@ class Service {
             );
           }
           break;
+        case 'startFailed':
+          final failure = Map<String, Object?>.from(call.arguments as Map);
+          if (failure['revision'] != _commandRevision || !_startRequested) {
+            break;
+          }
+          _startRequested = false;
+          dialogs.showBanner(
+            failure['message'] as String,
+            level: BannerLevel.error,
+          );
+          _dispatch('start failure', (listener) => listener.onServiceStopped());
+          break;
         case 'stopped':
           // A report stamped before the newest command no longer describes it.
           if (call.arguments != _commandRevision || !_startRequested) {

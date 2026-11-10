@@ -159,9 +159,15 @@ extension type CoreController._(CoreHandlerInterface _interface)
   Future<void> setupConfig({
     required SetupParams params,
     Future<void> Function()? preloadInvoke,
+    bool waitForConfig = false,
   }) async {
     if (preloadInvoke == null) {
       return _interface.setupConfig(params);
+    }
+    if (waitForConfig) {
+      await _interface.setupConfig(params);
+      await preloadInvoke();
+      return;
     }
     await (_interface.setupConfig(params), preloadInvoke()).wait;
   }

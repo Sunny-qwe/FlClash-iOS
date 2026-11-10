@@ -3,6 +3,7 @@ import 'package:fl_clash/plugins/service.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -83,6 +84,7 @@ class AppIconView extends ConsumerStatefulWidget {
 class _AppIconViewState extends ConsumerState<AppIconView> {
   String _currentIconId = 'AppIcon-Classic';
   bool _isLoading = true;
+  bool _isSwitching = false;
 
   @override
   void initState() {
@@ -95,6 +97,7 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
     if (system.isIOS) {
       try {
         current = await service?.getAlternateIconName();
+        current ??= 'AppIcon-Classic';
       } catch (_) {}
     }
     if (current == null || current.isEmpty) {
@@ -110,35 +113,27 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
   }
 
   Future<void> _switchIcon(AppIconOption option) async {
-    if (_currentIconId == option.id) return;
-    final previousIconId = _currentIconId;
-    setState(() {
-      _currentIconId = option.id;
-    });
-
-    if (system.isIOS) {
-      try {
+    if (_isSwitching || _currentIconId == option.id) return;
+    _isSwitching = true;
+    try {
+      if (system.isIOS) {
         final iconName = option.id == 'AppIcon-Classic' ? null : option.id;
-        await service?.setAlternateIconName(iconName);
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            _currentIconId = previousIconId;
-          });
-          dialogs.showBanner('切换图标失败: $e', level: BannerLevel.error);
-          return;
+        final changed = await service?.setAlternateIconName(iconName) ?? false;
+        if (!changed) {
+          throw const MessageException('系统未确认图标切换成功');
         }
       }
-    }
-
-    final sp = await SharedPreferences.getInstance();
-    await sp.setString(_selectedIconPrefKey, option.id);
-
-    if (mounted) {
-      dialogs.showBanner(
-        '已切换应用图标为【${option.name}】',
-        level: BannerLevel.success,
-      );
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString(_selectedIconPrefKey, option.id);
+      if (!mounted) return;
+      setState(() => _currentIconId = option.id);
+      dialogs.showBanner('已切换应用图标为【${option.name}】', level: BannerLevel.success);
+    } catch (error) {
+      if (!mounted) return;
+      final message = error is PlatformException ? error.message : error.toString();
+      dialogs.showBanner('切换图标失败: $message', level: BannerLevel.error);
+    } finally {
+      _isSwitching = false;
     }
   }
 

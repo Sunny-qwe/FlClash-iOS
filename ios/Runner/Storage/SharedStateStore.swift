@@ -13,13 +13,13 @@ final class SharedStateStore {
     guard let url = NEHelper.sharedStateURL,
       (try? JSONSerialization.jsonObject(with: data)) is [String: Any]
     else {
-      return true
+      return false
     }
     let previousName = profileName(try? Data(contentsOf: url))
     do {
       try data.write(to: url, options: .atomic)
     } catch {
-      return true
+      return false
     }
     if previousName != profileName(data), #available(iOS 18.0, *) {
       ControlCenter.shared.reloadControls(ofKind: NEHelper.controlKind)

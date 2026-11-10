@@ -84,6 +84,10 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             self.logger.error(
               "quickSetup failed: \(message, privacy: .public)"
             )
+            self.eventQueue.stop()
+            self.memoryPressureSource?.cancel()
+            self.memoryPressureSource = nil
+            MobileStopTun()
             completionHandler(PacketTunnelProviderError.setupFailed(message))
             return
           }

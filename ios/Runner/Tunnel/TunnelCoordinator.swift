@@ -9,6 +9,7 @@ final class TunnelCoordinator {
   private let onTunnelStateChanged: (TunnelTarget) -> Void
   private let onExternalStart: () -> Void
   private let onExternalStop: () -> Void
+  private let onFailure: (Error) -> Void
   private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier ?? "",
     category: "TunnelCoordinator"
@@ -33,12 +34,14 @@ final class TunnelCoordinator {
     managerStore: TunnelManagerStore,
     onTunnelStateChanged: @escaping (TunnelTarget) -> Void,
     onExternalStart: @escaping () -> Void,
-    onExternalStop: @escaping () -> Void
+    onExternalStop: @escaping () -> Void,
+    onFailure: @escaping (Error) -> Void
   ) {
     self.managerStore = managerStore
     self.onTunnelStateChanged = onTunnelStateChanged
     self.onExternalStart = onExternalStart
     self.onExternalStop = onExternalStop
+    self.onFailure = onFailure
   }
 
   func submitTunnelRequest(
@@ -169,9 +172,12 @@ final class TunnelCoordinator {
         log(
           "\(request.target.description) failed: \(error.localizedDescription)"
         )
+        if request.target == .running {
+          onFailure(error)
+        }
         finishTunnelRequest(
           request,
-          actualState: stableFailureState(status)
+          actualState: stableFailureState(status) ?? .stopped
         )
         return
       }
@@ -296,6 +302,11 @@ final class TunnelCoordinator {
       }
       switch result {
       case .status(let status):
+        if status.tunnelState != .running {
+          let error = await lastDisconnectError(manager.connection)
+          guard isCurrent(request) else { return }
+          onFailure(error)
+        }
         finishTunnelRequest(
           request,
           actualState: status.tunnelState
@@ -329,6 +340,21 @@ final class TunnelCoordinator {
     case .superseded:
       return false
     }
+  }
+
+  private func lastDisconnectError(_ connection: NEVPNConnection) async -> Error {
+    if #available(iOS 16.0, *) {
+      let error: Error? = await withCheckedContinuation { continuation in
+        connection.fetchLastDisconnectError { error in
+          continuation.resume(returning: error)
+        }
+      }
+      if let error { return error }
+    }
+    return NSError(
+      domain: "FlClash.VPN", code: 1,
+      userInfo: [NSLocalizedDescriptionKey: "VPN 扩展未能启动。请确认签名包含 Network Extension 和 App Group 权限，并保留 NECore 扩展。"]
+    )
   }
 
   private func stopBeforeRestart(
@@ -409,6 +435,16 @@ final class TunnelCoordinator {
       )
       tunnelWait = wait
       consumeWaitStatus(manager.connection.status)
+      if tunnelWait === wait {
+        wait.timeoutTask = Task { @MainActor [weak self, weak wait] in
+          try? await Task.sleep(nanoseconds: 45_000_000_000)
+          guard !Task.isCancelled, let self, let wait,
+            self.tunnelWait === wait, self.isCurrent(wait.request)
+          else { return }
+          wait.manager.connection.stopVPNTunnel()
+          self.resolveTunnelWait(wait, result: .status(.disconnected))
+        }
+      }
     }
   }
 
@@ -449,6 +485,7 @@ final class TunnelCoordinator {
       return
     }
     tunnelWait = nil
+    wait.timeoutTask?.cancel()
     wait.continuation.resume(returning: result)
   }
 

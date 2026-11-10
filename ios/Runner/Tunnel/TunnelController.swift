@@ -23,7 +23,8 @@ final class TunnelController {
     sharedStateStore: SharedStateStore,
     onSessionChanged: @escaping (NETunnelProviderSession?) -> Void,
     onExternalStart: @escaping () -> Void,
-    onStopped: @escaping () -> Void
+    onStopped: @escaping () -> Void,
+    onFailure: @escaping (Error) -> Void
   ) {
     let managerStore = TunnelManagerStore(
       networkExtensionIdentifier: NEHelper.providerBundleIdentifier,
@@ -37,7 +38,8 @@ final class TunnelController {
       managerStore: managerStore,
       onTunnelStateChanged: { stateChanged($0) },
       onExternalStart: onExternalStart,
-      onExternalStop: onStopped
+      onExternalStop: onStopped,
+      onFailure: onFailure
     )
     stateChanged = { [weak self] state in
       self?.updateSession(for: state)

@@ -185,6 +185,42 @@ void main() {
       verify(() => mock.updateConfig(params)).called(1);
     });
 
+    test('VPN start waits until configuration has been written', () async {
+      const params = SetupParams(selectedMap: {}, options: CoreOptions(testUrl: ''));
+      final ready = Completer<void>();
+      final events = <String>[];
+      when(() => mock.setupConfig(params)).thenAnswer((_) async {
+        events.add('writing');
+        await ready.future;
+        events.add('ready');
+      });
+      final operation = controller.setupConfig(
+        params: params,
+        waitForConfig: true,
+        preloadInvoke: () async { events.add('start'); },
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(events, ['writing']);
+      ready.complete();
+      await operation;
+      expect(events, ['writing', 'ready', 'start']);
+    });
+
+    test('invalid configuration never starts the VPN', () async {
+      const params = SetupParams(selectedMap: {}, options: CoreOptions(testUrl: ''));
+      when(() => mock.setupConfig(params)).thenThrow(StateError('bad profile'));
+      var started = false;
+      await expectLater(
+        controller.setupConfig(
+          params: params,
+          waitForConfig: true,
+          preloadInvoke: () async { started = true; },
+        ),
+        throwsStateError,
+      );
+      expect(started, isFalse);
+    });
+
     test('setupConfig waits for asynchronous preload', () async {
       const params = SetupParams(
         selectedMap: {},

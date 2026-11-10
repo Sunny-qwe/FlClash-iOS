@@ -94,6 +94,14 @@ final class ServicePlugin {
       },
       onStopped: { [weak self] in
         self?.notifyStopped()
+      },
+      onFailure: { [weak self] error in
+        guard let self else { return }
+        let error = error as NSError
+        self.channel.invokeMethod("startFailed", arguments: [
+          "revision": self.commandRevision,
+          "message": "\(error.localizedDescription) [\(error.domain):\(error.code)]",
+        ])
       }
     )
     channel.setMethodCallHandler { [weak self] call, result in
@@ -147,11 +155,24 @@ final class ServicePlugin {
         result(await tunnelController.getRunTime())
       }
     case "syncState":
-      if let data = (call.arguments as? String)?.data(using: .utf8) {
-        _ = sharedStateStore.saveSharedState(data)
+      guard let data = (call.arguments as? String)?.data(using: .utf8),
+        sharedStateStore.saveSharedState(data)
+      else {
+        result(FlutterError(code: "SHARED_STATE_ERROR", message: "无法保存 VPN 配置，请检查应用与 VPN 扩展的 App Group 签名权限。", details: nil))
+        return
       }
       result("")
     case "start":
+      guard FileManager.default.containerURL(
+        forSecurityApplicationGroupIdentifier: NEHelper.appGroupIdentifier
+      ) != nil else {
+        result(FlutterError(
+          code: "APP_GROUP_UNAVAILABLE",
+          message: "签名未提供共享容器 \(NEHelper.appGroupIdentifier)，主应用和 VPN 扩展无法共享配置。请给两者启用相同的 App Group 后重新签名。",
+          details: nil
+        ))
+        return
+      }
       commandRevision = call.arguments as? Int ?? commandRevision
       tunnelController.start()
       result(true)
@@ -166,6 +187,14 @@ final class ServicePlugin {
     case "setAlternateIconName":
       let iconName = call.arguments as? String
       let nameToSet = (iconName == nil || iconName?.isEmpty == true || iconName == "default" || iconName == "AppIcon-Classic") ? nil : iconName
+      if UIApplication.shared.alternateIconName == nameToSet {
+        result(true)
+        return
+      }
+      guard UIApplication.shared.supportsAlternateIcons else {
+        result(FlutterError(code: "ICONS_UNAVAILABLE", message: "当前安装包没有可用的备用图标声明，请安装包含完整图标资源的版本。", details: nil))
+        return
+      }
       DispatchQueue.main.async {
         UIApplication.shared.setAlternateIconName(nameToSet) { error in
           if let error = error {

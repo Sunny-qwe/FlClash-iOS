@@ -424,7 +424,6 @@ Future<int> _package(
   if (platform == 'ios' && iosNoSign) {
     return packageIOSNoSign(
       rootDir: rootDir,
-      appBundleId: iosBundleId ?? 'cc.chenx.flclash',
       iosDevelopmentTeam: iosDevelopmentTeam,
       verbose: verbose,
     );
@@ -534,7 +533,6 @@ Future<void> injectPortableConfigDirIntoZip(String zipPath) async {
 
 Future<int> packageIOSNoSign({
   required String rootDir,
-  required String appBundleId,
   String? iosDevelopmentTeam,
   required bool verbose,
 }) async {
@@ -561,6 +559,20 @@ Future<int> packageIOSNoSign({
   );
   if (!await appDir.exists()) {
     stderr.writeln('iOS app bundle not found: ${appDir.path}');
+    return 1;
+  }
+
+  final bundleResult = await Process.run('plutil', [
+    '-extract',
+    'CFBundleIdentifier',
+    'raw',
+    '-o',
+    '-',
+    p.join(appDir.path, 'Info.plist'),
+  ]);
+  final appBundleId = (bundleResult.stdout as String).trim();
+  if (bundleResult.exitCode != 0 || appBundleId.isEmpty) {
+    stderr.writeln('Cannot read the built iOS bundle identifier');
     return 1;
   }
 

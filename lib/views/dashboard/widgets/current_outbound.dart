@@ -302,11 +302,11 @@ class _ExitRow extends StatelessWidget {
     final Widget ip;
     if (!active) {
       ip = Container(
-        width: 160,
+        width: 140,
         height: 18,
-        decoration: BoxDecoration(
-          color: const Color(0xFFE8EBEF),
-          borderRadius: BorderRadius.circular(9),
+        decoration: const ShapeDecoration(
+          color: Color(0xFFECE9EB),
+          shape: AppShape.full,
         ),
       );
     } else if (info != null) {
@@ -423,19 +423,19 @@ class _IpChips extends StatelessWidget {
           spacing: 6,
           children: [
             Container(
-              width: 58,
-              height: 26,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8EBEF),
-                borderRadius: BorderRadius.circular(13),
+              width: 48,
+              height: 28,
+              decoration: const ShapeDecoration(
+                color: Color(0xFFECE9EB),
+                shape: AppShape.full,
               ),
             ),
             Container(
-              width: 78,
-              height: 26,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8EBEF),
-                borderRadius: BorderRadius.circular(13),
+              width: 72,
+              height: 28,
+              decoration: const ShapeDecoration(
+                color: Color(0xFFECE9EB),
+                shape: AppShape.full,
               ),
             ),
           ],
@@ -542,12 +542,12 @@ class _CountryBadgeState extends State<_CountryBadge>
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final foreground = const Color(0xFF6C727A);
+    final foreground = colorScheme.onSurfaceVariant;
     final enabled = !widget.checking;
     final size = widget.size;
     final code = widget.countryCode;
     final tooltip = context.appLocalizations.retry;
-    final color = const Color(0xFFE9ECEF);
+    final color = const Color(0xFFE4E2E4);
     return Tooltip(
       message: tooltip,
       child: Semantics(
@@ -566,7 +566,7 @@ class _CountryBadgeState extends State<_CountryBadge>
                 shape: MaterialShapes.clover4Leaf,
                 color: color,
                 size: size,
-                rotation: _turns.value * 2 * math.pi,
+                rotation: _turns.value * 2 * math.pi + math.pi / 4,
                 ring: _focused ? focusRingSide(colorScheme) : null,
                 child: child,
               ),
@@ -628,12 +628,12 @@ class _Cells extends StatelessWidget {
             value: (active && organization != null)
                 ? _CellText(organization)
                 : Container(
-                    width: 90,
+                    width: 96,
                     height: 12,
                     margin: const EdgeInsets.only(top: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8EBEF),
-                      borderRadius: BorderRadius.circular(6),
+                    decoration: const ShapeDecoration(
+                      color: Color(0xFFECE9EB),
+                      shape: AppShape.full,
                     ),
                   ),
           ),
@@ -991,11 +991,15 @@ class _StatusWavePainter extends CustomPainter {
     }
 
     final path = Path()
-      ..moveTo(w * 0.543, 0)
-      ..cubicTo(w * 0.566, h * 0.141, w * 0.504, h * 0.224, w * 0.507, h * 0.330)
-      ..cubicTo(w * 0.519, h * 0.414, w * 0.569, h * 0.636, w * 0.560, h * 0.730)
-      ..cubicTo(w * 0.608, h * 0.773, w * 0.647, h * 0.881, w * 0.680, h)
-      ..lineTo(w, h)
+      ..moveTo(w * 0.540, 0)
+      ..cubicTo(w * 0.532, h * 0.056, w * 0.565, h * 0.103, w * 0.521, h * 0.200)
+      ..cubicTo(w * 0.478, h * 0.295, w * 0.525, h * 0.365, w * 0.541, h * 0.445)
+      ..cubicTo(w * 0.562, h * 0.540, w * 0.502, h * 0.608, w * 0.555, h * 0.660)
+      ..cubicTo(w * 0.586, h * 0.693, w * 0.629, h * 0.683, w * 0.638, h * 0.771)
+      ..cubicTo(w * 0.648, h * 0.868, w * 0.686, h * 0.867, w * 0.727, h * 0.848)
+      ..cubicTo(w * 0.776, h * 0.825, w * 0.774, h * 0.929, w * 0.833, h * 0.927)
+      ..cubicTo(w * 0.887, h * 0.925, w * 0.879, h * 0.831, w * 0.946, h * 0.850)
+      ..cubicTo(w * 0.974, h * 0.862, w * 0.988, h * 0.858, w, h * 0.842)
       ..lineTo(w, 0)
       ..close();
 

@@ -818,6 +818,7 @@ class SetupAction extends _$SetupAction {
             await _core.setupConfig(
               params: setupParams,
               preloadInvoke: preloadInvoke,
+              waitForConfig: system.isIOS,
             );
           } on CoreMethodException catch (error) {
             if (error.code != 'config_rejected') {
