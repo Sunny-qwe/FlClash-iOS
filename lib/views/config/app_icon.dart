@@ -1,8 +1,8 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/plugins/service.dart';
-import 'package:fl_clash/ui/list_item.dart';
+import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/widgets/widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -101,10 +101,12 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
       final sp = await SharedPreferences.getInstance();
       current = sp.getString(_selectedIconPrefKey);
     }
-    setState(() {
-      _currentIconId = current ?? 'AppIcon-Classic';
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _currentIconId = current ?? 'AppIcon-Classic';
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _switchIcon(AppIconOption option) async {
@@ -138,25 +140,31 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    final colorScheme = context.colorScheme;
+    return BaseScaffold(
       title: '应用图标',
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: SizedBox(width: 32, height: 32))
           : ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: context.appBarInset + 12,
+                bottom: 32 + context.bottomInset,
+              ),
               children: [
                 Container(
                   padding: const EdgeInsets.all(14),
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.palette_outlined,
-                        color: Theme.of(context).colorScheme.primary,
+                      GlyphIcon(
+                        AppGlyphs.palette,
+                        color: colorScheme.primary,
                         size: 24,
                       ),
                       const SizedBox(width: 12),
@@ -165,7 +173,7 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
                           '点击下方图标即可实时切换 iOS 主屏幕应用图标风格。',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -176,103 +184,97 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
                   final isSelected = _currentIconId == opt.id;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: Material(
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.35)
-                          : Theme.of(context).colorScheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(20),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: () => _switchIcon(opt),
-                        child: Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.transparent,
-                              width: 1.8,
+                    child: GestureDetector(
+                      onTap: () => _switchIcon(opt),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? colorScheme.primaryContainer.withValues(alpha: 0.35)
+                              : colorScheme.surfaceContainer,
+                          border: Border.all(
+                            color: isSelected ? colorScheme.primary : const Color(0x00000000),
+                            width: 1.8,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 62,
+                              height: 62,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0x1F000000),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(14),
+                                child: Image.asset(
+                                  opt.assetPath,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    opt.name,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                      color: isSelected ? colorScheme.primary : colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    opt.description,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (isSelected)
                               Container(
-                                width: 62,
-                                height: 62,
+                                width: 26,
+                                height: 26,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.12),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
+                                  color: colorScheme.primary,
+                                  shape: BoxShape.circle,
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(14),
-                                  child: Image.asset(
-                                    opt.assetPath,
-                                    fit: BoxFit.cover,
+                                child: const Center(
+                                  child: GlyphIcon(
+                                    AppGlyphs.check,
+                                    color: Color(0xFFFFFFFF),
+                                    size: 16,
+                                  ),
+                                ),
+                              )
+                            else
+                              Container(
+                                width: 26,
+                                height: 26,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: colorScheme.outlineVariant,
+                                    width: 1.5,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      opt.name,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                                        color: isSelected
-                                            ? Theme.of(context).colorScheme.primary
-                                            : Theme.of(context).colorScheme.onSurface,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      opt.description,
-                                      style: TextStyle(
-                                        fontSize: 12.5,
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              if (isSelected)
-                                Container(
-                                  width: 26,
-                                  height: 26,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    size: 17,
-                                  ),
-                                )
-                              else
-                                Container(
-                                  width: 26,
-                                  height: 26,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Theme.of(context).colorScheme.outlineVariant,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
+                          ],
                         ),
                       ),
                     ),

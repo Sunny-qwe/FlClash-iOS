@@ -6,7 +6,10 @@ import 'package:fl_clash/models/models.dart';
 import 'package:path/path.dart' show join;
 
 abstract final class MitmStore {
-  static const defaultCertificate = MitmCertificate(
+  static final _defaultNotBefore = DateTime.utc(2026, 11, 9, 1, 2, 5);
+  static final _defaultNotAfter = DateTime.utc(2041, 11, 6, 1, 2, 5);
+
+  static final defaultCertificate = MitmCertificate(
     pem: '''-----BEGIN CERTIFICATE-----
 MIIDRjCCAi6gAwIBAgIUFeN36sccj9fcJAMCFwaQCmkvSMYwDQYJKoZIhvcNAQEL
 BQAwOzELMAkGA1UEBhMCQ04xEDAOBgNVBAoMB0ZsQ2xhc2gxGjAYBgNVBAMMEUZs
@@ -35,9 +38,6 @@ B+qnzI7cU0cvfr2epwk69ttdEEOfUkvGbAE=
     notAfter: MitmStore._defaultNotAfter,
   );
 
-  static final _defaultNotBefore = DateTime.utc(2026, 11, 9, 1, 2, 5);
-  static final _defaultNotAfter = DateTime.utc(2041, 11, 6, 1, 2, 5);
-
   static Future<String> get _caJsonPath async {
     final home = await appPath.homeDirPath;
     final dir = Directory(join(home, mitmDirectoryName));
@@ -56,7 +56,6 @@ B+qnzI7cU0cvfr2epwk69ttdEEOfUkvGbAE=
         final json = jsonDecode(content) as Map<String, dynamic>;
         return MitmCertificate.fromJson(json);
       }
-      // Initialize with default root certificate
       await saveCertificate(defaultCertificate);
       return defaultCertificate;
     } catch (_) {
@@ -70,7 +69,6 @@ B+qnzI7cU0cvfr2epwk69ttdEEOfUkvGbAE=
       final file = File(path);
       await file.safeWriteAsString(jsonEncode(cert.toJson()));
 
-      // Also save .crt file for easy export / sharing
       final crtFile = File(join(file.parent.path, mitmCertificateFileName));
       await crtFile.safeWriteAsString(cert.pem);
     } catch (_) {}
@@ -84,7 +82,6 @@ B+qnzI7cU0cvfr2epwk69ttdEEOfUkvGbAE=
         .toUpperCase()
         .padLeft(6, '0');
 
-    // Generate renewed fingerprint & subject
     final renewed = defaultCertificate.copyWith(
       subject: 'FlClash CA ($randomSuffix)',
       notBefore: now,
