@@ -990,11 +990,35 @@ class _StatusWavePainter extends CustomPainter {
       canvas.translate(-w, 0);
     }
 
+    // The reference mockup shows an organic cloud-like shape with:
+    // - Full coverage at top (wave extends to left edge at card top)
+    // - Two organic scallop indentations creating white cutout areas
+    // - Full coverage at bottom
+    // We use evenOdd fill rule: draw full fill then subtract two oval cutouts.
+
+    final paint2 = Paint()
+      ..color = color.withAlpha(0)  // transparent = uses card background color
+      ..style = PaintingStyle.fill;
+
+    // Main wave body: covers right portion with organic left boundary
+    // The boundary traces from top-right, curves left organically, back to bottom-right
     final path = Path()
-      ..moveTo(w * 0.543, 0)
-      ..cubicTo(w * 0.566, h * 0.141, w * 0.504, h * 0.224, w * 0.507, h * 0.330)
-      ..cubicTo(w * 0.519, h * 0.414, w * 0.569, h * 0.636, w * 0.560, h * 0.730)
-      ..cubicTo(w * 0.608, h * 0.773, w * 0.647, h * 0.881, w * 0.680, h)
+      ..moveTo(w * 0.62, 0)
+      // Top-right arc flowing down-left toward first scallop
+      ..cubicTo(w * 0.62, h * 0.04, w * 0.56, h * 0.08, w * 0.52, h * 0.13)
+      // First scallop: curve OUT to left then back in
+      ..cubicTo(w * 0.47, h * 0.17, w * 0.44, h * 0.21, w * 0.46, h * 0.26)
+      // Flow from first scallop back inward, then sweep left for main body
+      ..cubicTo(w * 0.49, h * 0.30, w * 0.42, h * 0.33, w * 0.26, h * 0.36)
+      // Wide body: left lobe of wave extends far left
+      ..cubicTo(w * 0.10, h * 0.38, w * 0.04, h * 0.42, w * 0.05, h * 0.49)
+      ..cubicTo(w * 0.06, h * 0.55, w * 0.14, h * 0.58, w * 0.26, h * 0.60)
+      // Second scallop: curve back right then out left
+      ..cubicTo(w * 0.44, h * 0.62, w * 0.52, h * 0.63, w * 0.56, h * 0.67)
+      ..cubicTo(w * 0.60, h * 0.70, w * 0.56, h * 0.74, w * 0.44, h * 0.77)
+      // Bottom sweep: wave re-expands to left edge
+      ..cubicTo(w * 0.24, h * 0.81, w * 0.08, h * 0.84, w * 0.00, h * 0.88)
+      ..lineTo(0, h)
       ..lineTo(w, h)
       ..lineTo(w, 0)
       ..close();

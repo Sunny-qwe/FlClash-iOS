@@ -43,13 +43,13 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
       }
     }
 
-    guard let vpnOptions = sharedStateStore.loadVPNOptions(),
-      let setupParams = sharedStateStore.loadSetupParams()
-    else {
-      logger.error("startTunnel failed: missing shared state")
+    guard let vpnOptions = sharedStateStore.loadVPNOptions() else {
+      logger.error("startTunnel failed: missing vpnOptions from shared state")
       completionHandler(PacketTunnelProviderError.missingConfiguration)
       return
     }
+    // setupParams may be a fallback minimal config - always has a value now
+    let setupParams = sharedStateStore.loadSetupParams() ?? "{}"
     logger.info(
       "startTunnel stack=\(vpnOptions.stack, privacy: .public) ipv6=\(vpnOptions.ipv6, privacy: .public) dnsHijacking=\(vpnOptions.dnsHijacking, privacy: .public) systemProxy=\(vpnOptions.systemProxy, privacy: .public)"
     )
