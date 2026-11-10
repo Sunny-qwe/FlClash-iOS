@@ -97,6 +97,7 @@ void main() {
     mask.dispose();
     picture.dispose();
       final boundary = capture.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      expect(boundary.size.height, lessThan(220));
       final image = await boundary.toImage(pixelRatio: 589 / 356);
       final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!;
       final output = File('build/verification/status-card.png');

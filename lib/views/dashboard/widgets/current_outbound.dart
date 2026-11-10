@@ -132,6 +132,7 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
               children: [
                 Expanded(
                   child: Column(
+                    mainAxisSize: density.isDesktop ? MainAxisSize.max : MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DashboardCardHeader(
@@ -173,6 +174,7 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
                 SizedBox(
                   width: metrics.buttonSlot,
                   child: Center(
+                    heightFactor: density.isDesktop ? null : 1,
                     child: _StartToggle(
                       size: metrics.buttonSize,
                       enabled: hasProfile,
