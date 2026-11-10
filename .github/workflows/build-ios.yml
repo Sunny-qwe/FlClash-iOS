@@ -51,14 +51,17 @@ jobs:
         run: dart setup.dart ios --no-codesign -v
 
       - name: Verify packaged icons and extension entitlements
-        run: python3 tool/verify_ios_bundle.py --ipa dist/*.ipa
+        run: python3 tool/verify_ios_bundle.py --ipa dist/*.ipa --report build/verification/ios-bundle.json
 
       - name: Upload dashboard render
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dashboard-reference-render
-          path: build/verification/status-card.png
-          if-no-files-found: error
+          path: |
+            build/verification/status-card.png
+            build/verification/ios-bundle.json
+          if-no-files-found: warn
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4

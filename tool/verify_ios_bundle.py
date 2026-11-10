@@ -1,7 +1,11 @@
 import argparse
+import hashlib
 import json
 import plistlib
+import shutil
 import struct
+import subprocess
+import tempfile
 import zipfile
 from pathlib import Path
 
@@ -47,7 +51,13 @@ def entitlements(binary):
     raise AssertionError('Missing executable entitlements')
 
 
-def verify_ipa(path):
+def verify_ipa(path, report_path=None):
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    verified_assets = None
+    if report_path and report_path.exists():
+        report = json.loads(report_path.read_text())
+        assert report['sha256'] == digest, 'Verification report belongs to another IPA'
+        verified_assets = set(report['compiled_icon_assets'])
     with zipfile.ZipFile(path) as archive:
         root = 'Payload/Runner.app/'
         info = plistlib.loads(archive.read(root + 'Info.plist'))
@@ -57,7 +67,22 @@ def verify_ipa(path):
             assert ICONS <= alternates.keys(), (key, 'Missing alternate icons', sorted(alternates))
             for name in ICONS:
                 files = alternates[name].get('CFBundleIconFiles', [])
-                assert files, (key, name, 'Missing icon files')
+                if not files:
+                    asset_name = alternates[name].get('CFBundleIconName')
+                    assert asset_name == name, (key, name, 'Missing icon resource reference', alternates[name])
+                    if verified_assets is None:
+                        assert shutil.which('xcrun'), 'Compiled icons require macOS assetutil or a matching verification report'
+                        with tempfile.TemporaryDirectory() as temporary:
+                            catalog = Path(temporary) / 'Assets.car'
+                            catalog.write_bytes(archive.read(root + 'Assets.car'))
+                            result = subprocess.run(['xcrun', 'assetutil', '--info', str(catalog)],
+                                                    capture_output=True, text=True, check=True)
+                            entries = json.loads(result.stdout)
+                            verified_assets = {entry['Name'] for entry in entries if 'Name' in entry}
+                    assert any(asset == name or asset.startswith(name + '60x60')
+                               or asset.startswith(name + '76x76')
+                               or asset.startswith(name + '83.5x83.5')
+                               for asset in verified_assets), (name, 'Missing compiled icon', sorted(verified_assets))
                 for filename in files:
                     assert any(item.startswith(root + filename) and item.endswith('.png')
                                for item in archive.namelist()), (key, name, filename)
@@ -77,15 +102,20 @@ def verify_ipa(path):
                 assert extension['NSExtensionPointIdentifier'] == 'com.apple.networkextension.packet-tunnel'
                 assert extension['NSExtensionPrincipalClass'].endswith('.PacketTunnelProvider')
         print(f'Verified {path.name}: 8 alternate icons, 3 bundle identifiers, shared group {groups[0]}, VPN extension')
+    if report_path and not report_path.exists():
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(json.dumps({'sha256': digest,
+                                          'compiled_icon_assets': sorted(verified_assets or [])}, indent=2))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--assets', type=Path)
     parser.add_argument('--ipa', type=Path)
+    parser.add_argument('--report', type=Path)
     args = parser.parse_args()
     if args.assets:
         verify_assets(args.assets)
     if args.ipa:
-        verify_ipa(args.ipa)
+        verify_ipa(args.ipa, args.report)
     assert args.assets or args.ipa, 'Provide --assets or --ipa'
