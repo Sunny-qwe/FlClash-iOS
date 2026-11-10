@@ -12,25 +12,42 @@ enum PacketTunnelEnvironment {
 }
 
 final class PacketTunnelSharedStateStore {
+  static var inMemorySharedState: [String: Any]?
+
   private let sharedStateFile = "shared_state.json"
   private let runTimeFile = "run_time"
 
   func loadVPNOptions() -> PacketTunnelVPNOptions? {
-    guard let rawOptions = sharedState()?["vpnOptions"] as? [String: Any],
-      let data = try? JSONSerialization.data(withJSONObject: rawOptions)
-    else {
-      return nil
+    if let rawOptions = sharedState()?["vpnOptions"] as? [String: Any],
+       let data = try? JSONSerialization.data(withJSONObject: rawOptions),
+       let opts = try? JSONDecoder().decode(PacketTunnelVPNOptions.self, from: data) {
+      return opts
     }
-    return try? JSONDecoder().decode(PacketTunnelVPNOptions.self, from: data)
+    // Sideload/fallback defaults when shared state file is not reachable across sandboxes
+    let fallbackDict: [String: Any] = [
+      "port": 7890,
+      "ipv6": false,
+      "dnsHijacking": true,
+      "systemProxy": false,
+      "bypassDomain": [] as [String],
+      "stack": "gvisor",
+      "routeAddress": ["0.0.0.0/1", "128.0.0.0/1"],
+      "mtu": 9000,
+      "congestionController": ""
+    ]
+    if let data = try? JSONSerialization.data(withJSONObject: fallbackDict) {
+      return try? JSONDecoder().decode(PacketTunnelVPNOptions.self, from: data)
+    }
+    return nil
   }
 
   func loadSetupParams() -> String? {
-    guard let setupParams = sharedState()?["setupParams"] as? [String: Any],
-      let data = try? JSONSerialization.data(withJSONObject: setupParams)
-    else {
-      return nil
+    if let setupParams = sharedState()?["setupParams"] as? [String: Any],
+       let data = try? JSONSerialization.data(withJSONObject: setupParams),
+       let str = String(data: data, encoding: .utf8), !str.isEmpty {
+      return str
     }
-    return String(data: data, encoding: .utf8)
+    return "{}"
   }
 
   // The key spelling is a contract with the Go wrapper's InitParams.
@@ -68,6 +85,9 @@ final class PacketTunnelSharedStateStore {
   }
 
   private func sharedState() -> [String: Any]? {
+    if let memory = Self.inMemorySharedState {
+      return memory
+    }
     guard
       let url = appGroupDirectory()?.appendingPathComponent(sharedStateFile),
       let data = try? Data(contentsOf: url)

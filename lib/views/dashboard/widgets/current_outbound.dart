@@ -991,13 +991,11 @@ class _StatusWavePainter extends CustomPainter {
     }
 
     final path = Path()
-      ..moveTo(w * 0.540, 0)
-      ..cubicTo(w * 0.540, h * 0.120, w * 0.510, h * 0.180, w * 0.505, h * 0.280)
-      ..cubicTo(w * 0.500, h * 0.380, w * 0.535, h * 0.500, w * 0.565, h * 0.600)
-      ..cubicTo(w * 0.590, h * 0.700, w * 0.630, h * 0.770, w * 0.675, h * 0.815)
-      ..cubicTo(w * 0.710, h * 0.855, w * 0.750, h * 0.878, w * 0.800, h * 0.865)
-      ..cubicTo(w * 0.840, h * 0.845, w * 0.870, h * 0.825, w * 0.905, h * 0.828)
-      ..cubicTo(w * 0.940, h * 0.835, w * 0.970, h * 0.875, w, h * 0.845)
+      ..moveTo(w * 0.543, 0)
+      ..cubicTo(w * 0.566, h * 0.141, w * 0.504, h * 0.224, w * 0.507, h * 0.330)
+      ..cubicTo(w * 0.519, h * 0.414, w * 0.569, h * 0.636, w * 0.560, h * 0.730)
+      ..cubicTo(w * 0.608, h * 0.773, w * 0.647, h * 0.881, w * 0.680, h)
+      ..lineTo(w, h)
       ..lineTo(w, 0)
       ..close();
 

@@ -579,6 +579,28 @@ Future<int> packageIOSNoSign({
       }
     }
 
+    final binariesToStrip = [
+      p.join(appDir.path, 'Runner'),
+      p.join(appDir.path, 'PlugIns', 'NECore.appex', 'NECore'),
+      p.join(appDir.path, 'Frameworks', 'App.framework', 'App'),
+    ];
+    for (final bin in binariesToStrip) {
+      if (File(bin).existsSync()) {
+        await Process.run('strip', ['-S', bin]);
+      }
+    }
+
+    // Ensure alternate app icon files are bundled in Runner.app
+    final iosRunnerDir = Directory(p.join(rootDir, 'ios', 'Runner'));
+    if (iosRunnerDir.existsSync()) {
+      for (final entity in iosRunnerDir.listSync()) {
+        if (entity is File && p.basename(entity.path).startsWith('AppIcon-') && entity.path.endsWith('.png')) {
+          entity.copySync(p.join(appDir.path, p.basename(entity.path)));
+        }
+      }
+    }
+
+
     final genericSignExit = await _adHocCodesign(appDir.path, deep: true);
     if (genericSignExit != 0) return genericSignExit;
 
@@ -610,27 +632,6 @@ Future<int> packageIOSNoSign({
       );
       if (exitCode != 0) return exitCode;
     }
-    final binariesToStrip = [
-      p.join(appDir.path, 'Runner'),
-      p.join(appDir.path, 'PlugIns', 'NECore.appex', 'NECore'),
-      p.join(appDir.path, 'Frameworks', 'App.framework', 'App'),
-    ];
-    for (final bin in binariesToStrip) {
-      if (File(bin).existsSync()) {
-        await Process.run('strip', ['-S', bin]);
-      }
-    }
-
-    // Ensure alternate app icon files are bundled in Runner.app
-    final iosRunnerDir = Directory(p.join(rootDir, 'ios', 'Runner'));
-    if (iosRunnerDir.existsSync()) {
-      for (final entity in iosRunnerDir.listSync()) {
-        if (entity is File && p.basename(entity.path).startsWith('AppIcon-') && entity.path.endsWith('.png')) {
-          entity.copySync(p.join(appDir.path, p.basename(entity.path)));
-        }
-      }
-    }
-
     final payloadDir = Directory(p.join(tempDir.path, 'Payload'));
     await payloadDir.create();
     final copyResult = await Process.run('ditto', [

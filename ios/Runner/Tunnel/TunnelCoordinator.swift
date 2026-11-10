@@ -1,5 +1,6 @@
 import Foundation
 import NetworkExtension
+import Shared
 import os
 
 @MainActor
@@ -263,7 +264,20 @@ final class TunnelCoordinator {
       }
 
       do {
-        try manager.connection.startVPNTunnel()
+        var startOptions: [String: NSObject] = [:]
+        if let url = NEHelper.sharedStateURL,
+           let str = try? String(contentsOf: url, encoding: .utf8) {
+          startOptions["sharedState"] = str as NSString
+        }
+        if let proto = manager.protocolConfiguration as? NETunnelProviderProtocol {
+          var config = proto.providerConfiguration ?? [:]
+          if let url = NEHelper.sharedStateURL,
+             let str = try? String(contentsOf: url, encoding: .utf8) {
+            config["sharedState"] = str
+          }
+          proto.providerConfiguration = config
+        }
+        try manager.connection.startVPNTunnel(options: startOptions.isEmpty ? nil : startOptions)
         log("start requested")
       } catch {
         if finishRunningRequestIfSatisfied(request, manager: manager) {

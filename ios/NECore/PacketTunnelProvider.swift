@@ -23,6 +23,26 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     logger.info("startTunnel begin")
     sharedStateStore.clearRunTime()
     reloadControls()
+
+    if let jsonString = options?["sharedState"] as? String,
+       let data = jsonString.data(using: .utf8),
+       let dict = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+      logger.info("startTunnel: loaded sharedState from start options")
+      PacketTunnelSharedStateStore.inMemorySharedState = dict
+      if let url = sharedStateStore.appGroupDirectory()?.appendingPathComponent("shared_state.json") {
+        try? data.write(to: url, options: .atomic)
+      }
+    } else if let protoConfig = (protocolConfiguration as? NETunnelProviderProtocol)?.providerConfiguration,
+              let jsonString = protoConfig["sharedState"] as? String,
+              let data = jsonString.data(using: .utf8),
+              let dict = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+      logger.info("startTunnel: loaded sharedState from providerConfiguration")
+      PacketTunnelSharedStateStore.inMemorySharedState = dict
+      if let url = sharedStateStore.appGroupDirectory()?.appendingPathComponent("shared_state.json") {
+        try? data.write(to: url, options: .atomic)
+      }
+    }
+
     guard let vpnOptions = sharedStateStore.loadVPNOptions(),
       let setupParams = sharedStateStore.loadSetupParams()
     else {

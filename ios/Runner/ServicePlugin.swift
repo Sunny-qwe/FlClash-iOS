@@ -166,11 +166,17 @@ final class ServicePlugin {
     case "setAlternateIconName":
       let iconName = call.arguments as? String
       let nameToSet = (iconName == nil || iconName?.isEmpty == true || iconName == "default" || iconName == "AppIcon-Classic") ? nil : iconName
-      UIApplication.shared.setAlternateIconName(nameToSet) { error in
-        if let error = error {
-          result(FlutterError(code: "SET_ICON_ERROR", message: error.localizedDescription, details: nil))
-        } else {
-          result(true)
+      DispatchQueue.main.async {
+        guard UIApplication.shared.supportsAlternateIcons else {
+          result(FlutterError(code: "NOT_SUPPORTED", message: "Device does not support alternate icons", details: nil))
+          return
+        }
+        UIApplication.shared.setAlternateIconName(nameToSet) { error in
+          if let error = error {
+            result(FlutterError(code: "SET_ICON_ERROR", message: error.localizedDescription, details: nil))
+          } else {
+            result(true)
+          }
         }
       }
     default:
