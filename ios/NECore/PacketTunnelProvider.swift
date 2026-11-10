@@ -22,6 +22,9 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
   ) {
     logger.info("startTunnel begin")
     sharedStateStore.clearRunTime()
+    // A Network Extension process can be reused after a failed start. Do not
+    // let a previous attempt's in-memory state override the fresh start data.
+    PacketTunnelSharedStateStore.inMemorySharedState = nil
     reloadControls()
 
     if let jsonString = options?["sharedState"] as? String,

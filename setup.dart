@@ -590,17 +590,6 @@ Future<int> packageIOSNoSign({
       }
     }
 
-    // Ensure alternate app icon files are bundled in Runner.app
-    final iosRunnerDir = Directory(p.join(rootDir, 'ios', 'Runner'));
-    if (iosRunnerDir.existsSync()) {
-      for (final entity in iosRunnerDir.listSync()) {
-        if (entity is File && p.basename(entity.path).startsWith('AppIcon-') && entity.path.endsWith('.png')) {
-          entity.copySync(p.join(appDir.path, p.basename(entity.path)));
-        }
-      }
-    }
-
-
     final genericSignExit = await _adHocCodesign(appDir.path, deep: true);
     if (genericSignExit != 0) return genericSignExit;
 
