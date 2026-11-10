@@ -52,7 +52,9 @@ void main() {
       locale: const Locale('zh', 'CN'),
       theme: ThemeData(fontFamily: 'ReferenceFont'),
       overrides: [
-        profilesProvider.overrideWithValue(const [Profile(id: 1)]),
+        profilesProvider.overrideWithValue(const [
+          Profile(id: 1, autoUpdateDuration: Duration.zero),
+        ]),
         runTimeProvider.overrideWithBuild((_, _) => null),
         suspendProvider.overrideWithValue(false),
         rootAccessProvider.overrideWith((_) async => false),
