@@ -111,12 +111,10 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
 
   Future<void> _switchIcon(AppIconOption option) async {
     if (_currentIconId == option.id) return;
+    final previousIconId = _currentIconId;
     setState(() {
       _currentIconId = option.id;
     });
-
-    final sp = await SharedPreferences.getInstance();
-    await sp.setString(_selectedIconPrefKey, option.id);
 
     if (system.isIOS) {
       try {
@@ -124,11 +122,17 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
         await service?.setAlternateIconName(iconName);
       } catch (e) {
         if (mounted) {
+          setState(() {
+            _currentIconId = previousIconId;
+          });
           dialogs.showBanner('切换图标失败: $e', level: BannerLevel.error);
           return;
         }
       }
     }
+
+    final sp = await SharedPreferences.getInstance();
+    await sp.setString(_selectedIconPrefKey, option.id);
 
     if (mounted) {
       dialogs.showBanner(

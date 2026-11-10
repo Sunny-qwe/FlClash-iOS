@@ -47,46 +47,16 @@ final class PacketTunnelSharedStateStore {
        let str = String(data: data, encoding: .utf8), !str.isEmpty {
       return str
     }
-    // Fallback: return a minimal valid setupParams so the Go core can start.
-    // This allows the tunnel to launch even without a loaded profile.
-    // The user can still load a profile from within the app after the tunnel starts.
-    let minimalConfig = """
-{
-  "port": 7890,
-  "socks-port": 7891,
-  "mixed-port": 7892,
-  "allow-lan": false,
-  "mode": "rule",
-  "log-level": "info",
-  "external-controller": "127.0.0.1:9090",
-  "dns": {
-    "enable": true,
-    "ipv6": false,
-    "default-nameserver": ["223.5.5.5", "119.29.29.29"],
-    "enhanced-mode": "fake-ip",
-    "fake-ip-range": "198.18.0.1/16",
-    "nameserver": ["https://doh.pub/dns-query", "https://dns.alidns.com/dns-query"]
-  },
-  "proxies": [],
-  "proxy-groups": [],
-  "rules": [
-    "DOMAIN-SUFFIX,local,DIRECT",
-    "IP-CIDR,127.0.0.0/8,DIRECT",
-    "IP-CIDR,172.16.0.0/12,DIRECT",
-    "IP-CIDR,192.168.0.0/16,DIRECT",
-    "IP-CIDR,10.0.0.0/8,DIRECT",
-    "MATCH,DIRECT"
-  ]
-}
-"""
-    // Wrap the YAML/JSON config in the setupParams structure expected by Go core
-    let homeDir = appGroupDirectory()?.path ?? NSTemporaryDirectory()
-    let wrapped: [String: Any] = [
-      "home-dir": homeDir,
-      "config": minimalConfig,
-      "version": 0
+    let fallback: [String: Any] = [
+      "selected-map": [String: String](),
+      "options": [
+        "test-url": "",
+        "skip-cert-verify": false,
+        "delay-test-timeout": 0,
+        "mitm-capture": false,
+      ],
     ]
-    if let data = try? JSONSerialization.data(withJSONObject: wrapped),
+    if let data = try? JSONSerialization.data(withJSONObject: fallback),
        let str = String(data: data, encoding: .utf8) {
       return str
     }

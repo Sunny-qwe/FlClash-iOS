@@ -167,28 +167,9 @@ final class ServicePlugin {
       let iconName = call.arguments as? String
       let nameToSet = (iconName == nil || iconName?.isEmpty == true || iconName == "default" || iconName == "AppIcon-Classic") ? nil : iconName
       DispatchQueue.main.async {
-        // Attempt icon switch even on sideloaded/TrollStore apps where
-        // supportsAlternateIcons may return false but the operation can succeed.
-        // OSStatus -54 on sideloaded apps can be worked around by using the
-        // private API path; we attempt standard API first and swallow -54.
         UIApplication.shared.setAlternateIconName(nameToSet) { error in
           if let error = error {
-            let nsError = error as NSError
-            // OSStatus -54 (errSecInteractionNotAllowed) on sideloaded builds:
-            // This happens when iOS doesn't recognise the alternate icon declaration
-            // in Info.plist at runtime. Try a direct plist-based approach as fallback.
-            if nsError.domain == "NSCocoaErrorDomain" && (nsError.code == 3072 || nsError.code == -54) {
-              // Try setting the icon via UserDefaults notification approach
-              // which some TrollStore-patched apps support
-              NotificationCenter.default.post(
-                name: NSNotification.Name("com.apple.mobileicons.settingschanged"),
-                object: nil,
-                userInfo: nameToSet != nil ? ["com.apple.mobileicons.iconName": nameToSet!] : [:]
-              )
-              result(true)
-            } else {
-              result(FlutterError(code: "SET_ICON_ERROR", message: error.localizedDescription, details: nil))
-            }
+            result(FlutterError(code: "SET_ICON_ERROR", message: error.localizedDescription, details: nil))
           } else {
             result(true)
           }
