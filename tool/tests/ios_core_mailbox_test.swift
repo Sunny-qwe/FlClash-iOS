@@ -2,6 +2,10 @@ import Foundation
 
 @main
 struct CoreMailboxTests {
+  static func stage(_ name: String) {
+    FileHandle.standardOutput.write(Data("Testing \(name)\n".utf8))
+  }
+
   static func wait(_ signal: DispatchSemaphore) {
     precondition(signal.wait(timeout: .now() + 10) == .success, "Mailbox test timed out")
   }
@@ -30,12 +34,14 @@ struct CoreMailboxTests {
     defer { try? FileManager.default.removeItem(at: directory) }
     let client = CoreMailboxClient(directory: { directory })
     let server = CoreMailboxServer(directory: directory) { data, reply in reply(data) }
+    stage("same-process large reply")
     try server.start()
     let large = Data(repeating: 65, count: 262144)
     let largeReply = try receive(client, large)
     precondition(largeReply == large)
 
     let completed = DispatchSemaphore(value: 0)
+    stage("concurrent requests")
     var count = 0
     for index in 0..<64 {
       let input = Data("request-\(index)".utf8)
@@ -50,6 +56,7 @@ struct CoreMailboxTests {
     server.stop()
 
     let held = DispatchSemaphore(value: 0)
+    stage("timeout and cancellation")
     let expired = DispatchSemaphore(value: 0)
     let silent = CoreMailboxServer(directory: directory) { _, _ in held.signal() }
     try silent.start()
@@ -73,12 +80,14 @@ struct CoreMailboxTests {
     silent.stop()
 
     let absent = CoreMailboxClient(directory: { nil })
+    stage("unavailable shared directory")
     do {
       _ = try receive(absent, Data("unavailable".utf8))
       preconditionFailure("Missing shared directory must fail")
     } catch CoreMailboxError.unavailable {}
 
     let process = Process()
+    stage("cross-process large reply")
     process.executableURL = URL(fileURLWithPath: CommandLine.arguments[0])
     process.arguments = ["serve", directory.path]
     try process.run()

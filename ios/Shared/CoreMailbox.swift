@@ -42,7 +42,7 @@ private final class CoreMailboxDirectoryWatch {
 
   init(directory: URL, queue: DispatchQueue, changed: @escaping () -> Void) throws {
     let descriptor = open(directory.path, O_EVTONLY)
-    guard descriptor >= 0 else { throw CoreMailboxError.unavailable }
+    guard descriptor >= 0 else { throw NSError(domain: NSPOSIXErrorDomain, code: Int(errno)) }
     source = DispatchSource.makeFileSystemObjectSource(
       fileDescriptor: descriptor, eventMask: .write, queue: queue
     )
@@ -86,7 +86,7 @@ public final class CoreMailboxServer {
         throw error
       }
       for old in (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: nil)) ?? []
-      where old != session && UUID(uuidString: old.lastPathComponent) != nil {
+      where old.lastPathComponent != session.lastPathComponent && UUID(uuidString: old.lastPathComponent) != nil {
         try? FileManager.default.removeItem(at: old)
       }
     }
@@ -96,7 +96,7 @@ public final class CoreMailboxServer {
     queue.sync {
       active = false
       watch = nil
-      if (try? CoreMailbox.session(root)) == session {
+      if (try? CoreMailbox.session(root).lastPathComponent) == session.lastPathComponent {
         try? FileManager.default.removeItem(at: root.appendingPathComponent("ready"))
       }
       try? FileManager.default.removeItem(at: session)
