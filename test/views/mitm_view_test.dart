@@ -73,7 +73,9 @@ void main() {
     (tester) async {
       final scope = ProviderContainer();
       addTearDown(scope.dispose);
-      scope.read(viewSizeProvider.notifier).update((_) => const Size(1000, 2000));
+      scope
+          .read(viewSizeProvider.notifier)
+          .update((_) => const Size(1000, 2000));
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: scope,
