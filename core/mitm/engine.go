@@ -22,14 +22,15 @@ import (
 
 type DialFunc func(context.Context, string, string) (net.Conn, error)
 
+var sessionBudget = make(chan struct{}, 16)
+var scriptBudget = make(chan struct{}, 1)
+
 type Engine struct {
 	config    Config
 	home      string
 	ca        *authority
 	rules     map[string][]rule
 	transport *http.Transport
-	sessions  chan struct{}
-	scripts   chan struct{}
 	maxBody   int64
 	capture   atomic.Bool
 	store     captureStore
@@ -39,7 +40,7 @@ type Engine struct {
 }
 
 func New(home string, cfg Config, dial DialFunc, logger func(string)) (*Engine, error) {
-	e := &Engine{home: home, config: cfg, rules: map[string][]rule{}, maxBody: 256 << 10, sessions: make(chan struct{}, 16), scripts: make(chan struct{}, 1), certs: map[string]*tls.Certificate{}, log: logger}
+	e := &Engine{home: home, config: cfg, rules: map[string][]rule{}, maxBody: 256 << 10, certs: map[string]*tls.Certificate{}, log: logger}
 	e.store.init()
 	if limit := cfg.Limits["capture-entries"]; limit > 0 && limit < e.store.limit {
 		e.store.limit = limit
@@ -132,8 +133,8 @@ func (e *Engine) Serve(conn net.Conn, host string, port uint16, id string) (hand
 		return false
 	}
 	select {
-	case e.sessions <- struct{}{}:
-		defer func() { <-e.sessions }()
+	case sessionBudget <- struct{}{}:
+		defer func() { <-sessionBudget }()
 	default:
 		e.warn("MITM session limit reached; connection passed through")
 		return false

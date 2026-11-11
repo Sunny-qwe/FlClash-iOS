@@ -31,8 +31,8 @@ func scriptHeaders(header http.Header) map[string]string {
 func (e *Engine) runScript(r rule, request *http.Request, response *http.Response, body []byte) (result map[string]any, output ScriptOutput) {
 	output.Logs = []string{}
 	select {
-	case e.scripts <- struct{}{}:
-		defer func() { <-e.scripts }()
+	case scriptBudget <- struct{}{}:
+		defer func() { <-scriptBudget }()
 	default:
 		output.Error = "script concurrency limit reached"
 		return

@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -58,6 +59,12 @@ func TestCertificateRegenerationSignsRealLeaf(t *testing.T) {
 }
 
 func TestHTTPSRewriteScriptAndCapture(t *testing.T) {
+	for _, h2 := range []bool{false, true} {
+		t.Run(fmt.Sprintf("http2=%t", h2), func(t *testing.T) { exerciseHTTPSRewrite(t, h2) })
+	}
+}
+
+func exerciseHTTPSRewrite(t *testing.T, h2 bool) {
 	home := t.TempDir()
 	ca, err := GenerateCertificate(home)
 	if err != nil {
@@ -75,7 +82,7 @@ func TestHTTPSRewriteScriptAndCapture(t *testing.T) {
 		io.WriteString(w, `{"original":true}`)
 	}))
 	defer upstream.Close()
-	engine, err := New(home, Config{Enable: true, DecryptTLS: true, CAFingerprint: ca.Fingerprint, SkipVerify: true, AutoQUICBlock: true, Rules: Rules{Hostname: []string{"-excluded.example", "*.example"}, URLRewrite: []string{`^https://api\.example/ad reject-dict`}, Script: []string{`test = type=http-response,pattern=^https://api\.example/json,requires-body=true,script-path=rewrite.js`}}}, func(ctx context.Context, network, address string) (net.Conn, error) {
+	engine, err := New(home, Config{Enable: true, H2: h2, DecryptTLS: true, CAFingerprint: ca.Fingerprint, SkipVerify: true, AutoQUICBlock: true, Rules: Rules{Hostname: []string{"-excluded.example", "*.example"}, URLRewrite: []string{`^https://api\.example/ad reject-dict`}, Script: []string{`test = type=http-response,pattern=^https://api\.example/json,requires-body=true,script-path=rewrite.js`}}}, func(ctx context.Context, network, address string) (net.Conn, error) {
 		return (&net.Dialer{}).DialContext(ctx, network, upstream.Listener.Addr().String())
 	}, func(text string) { t.Log(text) })
 	if err != nil {
@@ -91,7 +98,7 @@ func TestHTTPSRewriteScriptAndCapture(t *testing.T) {
 	}
 	roots := x509.NewCertPool()
 	roots.AppendCertsFromPEM([]byte(ca.PEM))
-	transport := &http.Transport{TLSClientConfig: &tls.Config{RootCAs: roots}, DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
+	transport := &http.Transport{ForceAttemptHTTP2: h2, TLSClientConfig: &tls.Config{RootCAs: roots}, DialContext: func(ctx context.Context, network, address string) (net.Conn, error) {
 		client, server := net.Pipe()
 		go func() { defer server.Close(); engine.Serve(server, "api.example", 443, "connection-test") }()
 		return client, nil
@@ -102,6 +109,9 @@ func TestHTTPSRewriteScriptAndCapture(t *testing.T) {
 		response, err := client.Get("https://api.example" + test.path)
 		if err != nil {
 			t.Fatal(err)
+		}
+		if h2 && response.ProtoMajor != 2 {
+			t.Fatal("HTTP/2 was not negotiated")
 		}
 		data, err := io.ReadAll(response.Body)
 		response.Body.Close()

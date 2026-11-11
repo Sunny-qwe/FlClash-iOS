@@ -98,6 +98,7 @@ func activateMitm(engine *mitm.Engine) {
 	engine.SetCapture(mitmCapture.Load())
 	old := mitmEngine.Swap(engine)
 	if old != nil {
+		old.SetCapture(false)
 		old.CloseIdle()
 	}
 }
