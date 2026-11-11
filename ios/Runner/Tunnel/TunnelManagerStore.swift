@@ -250,6 +250,7 @@ final class TunnelManagerStore {
     let proto = NETunnelProviderProtocol()
     proto.providerBundleIdentifier = networkExtensionIdentifier
     proto.serverAddress = localizedDescription
+    proto.disconnectOnSleep = false
     manager.protocolConfiguration = proto
     manager.localizedDescription = localizedDescription
     manager.isEnabled = true

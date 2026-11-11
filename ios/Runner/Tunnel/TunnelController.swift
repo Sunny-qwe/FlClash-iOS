@@ -24,7 +24,8 @@ final class TunnelController {
     onSessionChanged: @escaping (NETunnelProviderSession?) -> Void,
     onExternalStart: @escaping () -> Void,
     onStopped: @escaping () -> Void,
-    onFailure: @escaping (Error) -> Void
+    onFailure: @escaping (Error) -> Void,
+    onDiagnostic: @escaping (String) -> Void
   ) {
     let managerStore = TunnelManagerStore(
       networkExtensionIdentifier: NEHelper.providerBundleIdentifier,
@@ -39,7 +40,8 @@ final class TunnelController {
       onTunnelStateChanged: { stateChanged($0) },
       onExternalStart: onExternalStart,
       onExternalStop: onStopped,
-      onFailure: onFailure
+      onFailure: onFailure,
+      onDiagnostic: onDiagnostic
     )
     stateChanged = { [weak self] state in
       self?.updateSession(for: state)
@@ -115,9 +117,8 @@ final class TunnelController {
   // A restart replaces the extension's Core without the coordinator ever
   // settling on stopped, so the route follows every stop the system reports.
   private func handleStatusNotification(_ notification: Notification) {
-    coordinator.handleTunnelStatusNotification(notification)
-    guard let connection = notification.object as? NEVPNConnection,
-      managerStore.isManagedConnection(connection),
+    guard coordinator.handleTunnelStatusNotification(notification),
+      let connection = notification.object as? NEVPNConnection,
       let state = connection.status.tunnelState
     else {
       return

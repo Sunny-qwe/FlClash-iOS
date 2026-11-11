@@ -104,6 +104,9 @@ final class ServicePlugin {
           "revision": self.commandRevision,
           "message": "\(error.localizedDescription) [\(error.domain):\(error.code)]",
         ])
+      },
+      onDiagnostic: { [weak self] message in
+        self?.channel.invokeMethod("vpnDiagnostic", arguments: message)
       }
     )
     channel.setMethodCallHandler { [weak self] call, result in

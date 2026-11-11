@@ -10,6 +10,7 @@ final class TunnelCoordinator {
   private let onExternalStart: () -> Void
   private let onExternalStop: () -> Void
   private let onFailure: (Error) -> Void
+  private let onDiagnostic: (String) -> Void
   private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier ?? "",
     category: "TunnelCoordinator"
@@ -36,13 +37,15 @@ final class TunnelCoordinator {
     onTunnelStateChanged: @escaping (TunnelTarget) -> Void,
     onExternalStart: @escaping () -> Void,
     onExternalStop: @escaping () -> Void,
-    onFailure: @escaping (Error) -> Void
+    onFailure: @escaping (Error) -> Void,
+    onDiagnostic: @escaping (String) -> Void = { _ in }
   ) {
     self.managerStore = managerStore
     self.onTunnelStateChanged = onTunnelStateChanged
     self.onExternalStart = onExternalStart
     self.onExternalStop = onExternalStop
     self.onFailure = onFailure
+    self.onDiagnostic = onDiagnostic
   }
 
   func submitTunnelRequest(
@@ -89,11 +92,12 @@ final class TunnelCoordinator {
     driveCoordinator()
   }
 
-  func handleTunnelStatusNotification(_ notification: Notification) {
+  @discardableResult
+  func handleTunnelStatusNotification(_ notification: Notification) -> Bool {
     guard let connection = notification.object as? NEVPNConnection,
       managerStore.isManagedConnection(connection)
     else {
-      return
+      return false
     }
 
     if let wait = tunnelWait,
@@ -103,17 +107,18 @@ final class TunnelCoordinator {
         connection.status,
         notifyExternal: false
       )
-      return
+      return true
     }
     guard tunnelWait == nil,
       managerStore.isCachedConnection(connection)
     else {
-      return
+      return false
     }
     recordObservedTunnelStatus(
       connection.status,
       notifyExternal: true
     )
+    return true
   }
 
   private func driveCoordinator() {
@@ -221,6 +226,7 @@ final class TunnelCoordinator {
 
       manager.isEnabled = true
       manager.isOnDemandEnabled = false
+      (manager.protocolConfiguration as? NETunnelProviderProtocol)?.disconnectOnSleep = false
       log("start save preferences")
       do {
         try await awaitPreferenceResult { completion in
@@ -346,7 +352,7 @@ final class TunnelCoordinator {
     }
   }
 
-  private func lastDisconnectError(_ connection: NEVPNConnection) async -> Error {
+  private func lastDisconnectError(_ connection: NEVPNConnection, starting: Bool = true) async -> Error {
     let diagnostic = TunnelStartupDiagnostic.read(directory: NEHelper.appGroupDirectory, id: startupID)
     if let diagnostic, let detail = diagnostic.detail {
       return NSError(domain: "FlClash.VPN", code: 2,
@@ -369,7 +375,9 @@ final class TunnelCoordinator {
     }
     return NSError(
       domain: "FlClash.VPN", code: 1,
-      userInfo: [NSLocalizedDescriptionKey: "VPN 扩展未能启动。请确认签名包含 Network Extension 和 App Group 权限，并保留 NECore 扩展。"]
+      userInfo: [NSLocalizedDescriptionKey: starting
+        ? "VPN 扩展未能启动。请确认签名包含 Network Extension 和 App Group 权限，并保留 NECore 扩展。"
+        : "VPN 已停止，系统未提供具体断开错误。"]
     )
   }
 
@@ -576,8 +584,7 @@ final class TunnelCoordinator {
         tunnelRequest == nil,
         let state = status.tunnelState
       {
-        publishedTunnelState = state
-        notifyExternalState(state)
+        publishExternalState(state)
       }
     } catch {
       log("refresh status failed: \(error.localizedDescription)")
@@ -594,6 +601,18 @@ final class TunnelCoordinator {
       log(
         "status changed \(statusDescription(previousStatus ?? .invalid)) -> \(statusDescription(status)) target=\(tunnelRequest?.target.description ?? "none")"
       )
+      if previousStatus?.tunnelState == .running, status.isTerminal,
+        tunnelRequest == nil {
+        let generation = requestGeneration
+        Task { [weak self] in
+          guard let self,
+            let manager = try? await self.managerStore.loadManager(createIfNeeded: false)
+          else { return }
+          let error = await self.lastDisconnectError(manager.connection, starting: false)
+          guard generation == self.requestGeneration else { return }
+          self.log("unexpected disconnect: \(error.localizedDescription)")
+        }
+      }
     }
 
     if tunnelWait != nil {
@@ -682,5 +701,6 @@ final class TunnelCoordinator {
 
   private func log(_ message: String) {
     logger.debug("\(message, privacy: .public)")
+    onDiagnostic(message)
   }
 }

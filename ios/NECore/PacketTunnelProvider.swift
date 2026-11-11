@@ -174,6 +174,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     completionHandler: @escaping () -> Void
   ) {
     logger.info("stopTunnel reason=\(reason.rawValue, privacy: .public)")
+    recordStartup("stopped", error: NSError(domain: "NEProviderStopReason", code: reason.rawValue,
+      userInfo: [NSLocalizedDescriptionKey: "VPN 扩展停止，系统原因代码 \(reason.rawValue)"]))
     stopCore()
     completionHandler()
   }

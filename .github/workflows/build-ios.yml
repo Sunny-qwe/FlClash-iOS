@@ -76,6 +76,11 @@ jobs:
           /tmp/flclash-mailbox-tests
           swiftc ios/Runner/CertificateProfileServer.swift ios/Shared/TunnelStartupDiagnostic.swift tool/tests/ios_certificate_startup_test.swift -o /tmp/flclash-certificate-tests
           /tmp/flclash-certificate-tests
+          vpn_tests=$(mktemp -d)
+          swiftc -emit-library -emit-module -module-name NetworkExtension tool/tests/fixtures/vpn_network_extension.swift -o "$vpn_tests/libNetworkExtension.dylib" -emit-module-path "$vpn_tests/NetworkExtension.swiftmodule"
+          swiftc -emit-library -emit-module -module-name Shared tool/tests/fixtures/vpn_shared.swift ios/Shared/TunnelStartupDiagnostic.swift -o "$vpn_tests/libShared.dylib" -emit-module-path "$vpn_tests/Shared.swiftmodule"
+          swiftc -I "$vpn_tests" -L "$vpn_tests" -lNetworkExtension -lShared -Xlinker -rpath -Xlinker "$vpn_tests" ios/Runner/Tunnel/TunnelTypes.swift ios/Runner/Tunnel/TunnelCoordinator.swift tool/tests/ios_tunnel_lifecycle_test.swift -o "$vpn_tests/lifecycle-tests"
+          "$vpn_tests/lifecycle-tests"
 
       - name: Verify Dart changes and startup ordering
         run: |

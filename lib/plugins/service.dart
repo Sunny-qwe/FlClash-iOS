@@ -57,6 +57,9 @@ class Service {
     methodChannel = const MethodChannel('$packageName/service');
     methodChannel.setMethodCallHandler((call) async {
       switch (call.method) {
+        case 'vpnDiagnostic':
+          commonPrint.log('iOS VPN: ${call.arguments}', logLevel: LogLevel.info);
+          break;
         case 'event':
           final methodCall = CoreMethodCall.fromJson(
             Map<String, Object?>.from(

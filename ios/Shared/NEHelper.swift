@@ -131,6 +131,7 @@ public enum NEHelper {
     }
 
     manager.isEnabled = true
+    (manager.protocolConfiguration as? NETunnelProviderProtocol)?.disconnectOnSleep = false
     try await manager.saveToPreferences()
     try await manager.loadFromPreferences()
 
