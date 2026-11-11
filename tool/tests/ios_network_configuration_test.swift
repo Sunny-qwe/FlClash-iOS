@@ -1,6 +1,10 @@
 import Foundation
 import NetworkExtension
 
+#if os(macOS)
+let CTLIOCGINFO: UInt = 0xc0644e03
+#endif
+
 @main
 struct NetworkConfigurationTests {
   static func main() throws {
