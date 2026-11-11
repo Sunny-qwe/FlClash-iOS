@@ -24,16 +24,19 @@ struct CoreMailboxTests {
         reply(data)
       }
       try server.start()
-      RunLoop.current.run()
-      withExtendedLifetime(server) {}
-      return
+      withExtendedLifetime(server) { dispatchMain() }
     }
 
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: directory) }
     let client = CoreMailboxClient(directory: { directory })
-    let server = CoreMailboxServer(directory: directory) { data, reply in reply(data) }
+    let server = CoreMailboxServer(directory: directory) { data, reply in
+      if let text = String(data: data, encoding: .utf8), text.hasPrefix("request-"),
+        let index = Int(text.dropFirst("request-".count)) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(64 - index)) { reply(data) }
+      } else { reply(data) }
+    }
     stage("same-process large reply")
     try server.start()
     let large = Data(repeating: 65, count: 262144)
