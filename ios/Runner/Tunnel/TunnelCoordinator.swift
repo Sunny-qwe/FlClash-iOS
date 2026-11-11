@@ -458,7 +458,7 @@ final class TunnelCoordinator {
         continuation: continuation
       )
       tunnelWait = wait
-      consumeWaitStatus(manager.connection.status)
+      recordObservedTunnelStatus(manager.connection.status, notifyExternal: false)
       if tunnelWait === wait {
         wait.timeoutTask = Task { @MainActor [weak self, weak wait] in
           try? await Task.sleep(nanoseconds: 45_000_000_000)

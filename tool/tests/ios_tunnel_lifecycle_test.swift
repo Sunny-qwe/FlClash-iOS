@@ -75,6 +75,7 @@ struct TunnelLifecycleTests {
 
     coordinator.submitTunnelRequest(target: .running)
     await settle()
+    precondition(coordinator.requestedTarget == nil && store.manager.connection.status == .connected)
     store.manager.connection.deferDisconnectError = true
     store.manager.connection.status = .disconnected
     coordinator.handleTunnelStatusNotification(Notification(name: Notification.Name("status"), object: store.manager.connection))
