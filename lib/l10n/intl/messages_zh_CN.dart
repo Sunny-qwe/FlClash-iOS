@@ -1007,6 +1007,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Flatpak 版浏览器需要手动导入导出的证书。",
     ),
     "mitmCertificateSavedTip": m53,
+    "mitmCertificateSettings": MessageLookupByLibrary.simpleMessage("MITM 证书"),
     "mitmCertutilMissing": m54,
     "mitmClientRefusedCertificate": MessageLookupByLibrary.simpleMessage(
       "客户端拒绝了证书。请安装证书；如果应用固定了证书，请排除此主机。",
@@ -1016,11 +1017,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmEnableTip": MessageLookupByLibrary.simpleMessage(
       "开启后，FlClash 能读取发往被解密主机的全部内容，包括 Cookie 和密码。请只为需要改写的主机开启。",
     ),
+    "mitmEngineCompatibility": MessageLookupByLibrary.simpleMessage(
+      "支持指定域名的 HTTPS 解密、URL 跳转/拦截、请求头和正文重写、本地响应、请求/响应脚本、\$httpClient、\$task.fetch、计时器与持久存储。脚本有较短的运行时间和大小限制。暂不支持定时/事件脚本、二进制/完整头脚本模式，超大正文原样传输。模块为部分兼容。",
+    ),
     "mitmExcludeHost": MessageLookupByLibrary.simpleMessage("排除解密"),
     "mitmExcludeHostTip": m56,
     "mitmFileTooLarge": m57,
     "mitmHostnameDesc": MessageLookupByLibrary.simpleMessage(
       "以 - 开头表示排除，第一条匹配的生效。",
+    ),
+    "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
+      "导出证书，在 iOS 设置中安装描述文件，再进入“设置 → 通用 → 关于本机 → 证书信任设置”启用完全信任。返回此页面检查信任状态。重新生成证书后需要重新安装。",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("忽略的行"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

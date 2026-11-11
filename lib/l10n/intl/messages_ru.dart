@@ -1362,6 +1362,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "В браузеры из Flatpak экспортированный сертификат нужно импортировать вручную.",
     ),
     "mitmCertificateSavedTip": m53,
+    "mitmCertificateSettings": MessageLookupByLibrary.simpleMessage(
+      "Сертификаты MITM",
+    ),
     "mitmCertutilMissing": m54,
     "mitmClientRefusedCertificate": MessageLookupByLibrary.simpleMessage(
       "Клиент отклонил сертификат. Установите сертификат или исключите этот хост, если приложение закрепляет свой сертификат.",
@@ -1373,6 +1376,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmEnableTip": MessageLookupByLibrary.simpleMessage(
       "FlClash сможет читать всё, что отправляется на расшифровываемые узлы, включая cookie и пароли. Включайте только для узлов, которые нужно перезаписывать.",
     ),
+    "mitmEngineCompatibility": MessageLookupByLibrary.simpleMessage(
+      "Поддерживаются HTTPS выбранных доменов, URL, заголовки, тело, локальные ответы, скрипты запросов/ответов, \$httpClient, \$task.fetch, таймеры и хранение данных. Время и размер скриптов ограничены. Расписания, события, бинарный режим и полный режим заголовков не поддерживаются. Большие тела передаются без изменений. Совместимость модулей частичная.",
+    ),
     "mitmExcludeHost": MessageLookupByLibrary.simpleMessage(
       "Исключить из расшифровки",
     ),
@@ -1380,6 +1386,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmFileTooLarge": m57,
     "mitmHostnameDesc": MessageLookupByLibrary.simpleMessage(
       "Префикс - исключает хост; действует первое совпадение.",
+    ),
+    "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
+      "Экспортируйте сертификат, установите профиль в настройках iOS и включите полное доверие: Основные → Об этом устройстве → Доверие сертификатам. Вернитесь сюда для проверки. После повторного создания установите новый сертификат.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage(
       "Пропущенные строки",

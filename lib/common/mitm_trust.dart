@@ -87,14 +87,19 @@ class IOSMitmTrustStore implements MitmTrustStore {
   static const _channel = MethodChannel('com.follow.clash/service');
 
   @override
-  Future<MitmTrustCheck> check(MitmCertificate ca, Future<String> Function() issueLeaf) async {
+  Future<MitmTrustCheck> check(
+    MitmCertificate ca,
+    Future<String> Function() issueLeaf,
+  ) async {
     final leaf = await issueLeaf();
-    final trusted = await _channel.invokeMethod<bool>('checkMitmTrust', leaf) ?? false;
+    final trusted =
+        await _channel.invokeMethod<bool>('checkMitmTrust', leaf) ?? false;
     return MitmTrustCheck(trusted ? MitmTrust.ready : MitmTrust.untrusted);
   }
 
   @override
-  Future<MitmInstallOutcome> install(MitmCertificate ca) async => MitmInstallOutcome.prompted;
+  Future<MitmInstallOutcome> install(MitmCertificate ca) async =>
+      MitmInstallOutcome.prompted;
 
   @override
   Future<bool> remove(MitmCertificate ca) async => false;
@@ -119,9 +124,12 @@ String mitmSha256Hex(MitmCertificate ca) =>
 
 String mitmIOSProfile(MitmCertificate ca) {
   String uuid(String suffix) {
-    final hex = sha256.convert(utf8.encode('${ca.fingerprint}:$suffix')).toString();
+    final hex = sha256
+        .convert(utf8.encode('${ca.fingerprint}:$suffix'))
+        .toString();
     return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20, 32)}';
   }
+
   final title = const HtmlEscape(HtmlEscapeMode.element).convert(ca.subject);
   final certificate = base64.encode(mitmCertificateDer(ca));
   return '''<?xml version="1.0" encoding="UTF-8"?>

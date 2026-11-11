@@ -1296,6 +1296,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Flatpak browsers need the exported certificate imported by hand.",
     ),
     "mitmCertificateSavedTip": m53,
+    "mitmCertificateSettings": MessageLookupByLibrary.simpleMessage(
+      "MITM certificates",
+    ),
     "mitmCertutilMissing": m54,
     "mitmClientRefusedCertificate": MessageLookupByLibrary.simpleMessage(
       "The client refused the certificate. Install the CA, or exclude this host if the app pins its certificate.",
@@ -1307,6 +1310,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmEnableTip": MessageLookupByLibrary.simpleMessage(
       "FlClash will be able to read everything sent to the decrypted hosts, cookies and passwords included. Turn this on only for hosts you mean to rewrite.",
     ),
+    "mitmEngineCompatibility": MessageLookupByLibrary.simpleMessage(
+      "Supports selected-host HTTPS, redirects/rejects, header/body rewrites, local responses, request/response scripts, \$httpClient, \$task.fetch, timers and persistent storage. Scripts have short runtime and size limits. Scheduled/event scripts and binary/full-header script modes are not supported. Oversized bodies pass through unchanged. Module compatibility is partial.",
+    ),
     "mitmExcludeHost": MessageLookupByLibrary.simpleMessage(
       "Exclude from decryption",
     ),
@@ -1314,6 +1320,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmFileTooLarge": m57,
     "mitmHostnameDesc": MessageLookupByLibrary.simpleMessage(
       "A leading - excludes a host, and the first match decides.",
+    ),
+    "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
+      "Export the certificate, install its profile in iOS Settings, then enable full trust under Settings → General → About → Certificate Trust Settings. Return here to check trust. Regenerating the certificate requires installing the new one.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("Ignored lines"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

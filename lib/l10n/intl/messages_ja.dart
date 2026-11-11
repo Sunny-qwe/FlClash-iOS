@@ -1111,6 +1111,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Flatpak 版ブラウザには、エクスポートした証明書を手動でインポートする必要があります。",
     ),
     "mitmCertificateSavedTip": m53,
+    "mitmCertificateSettings": MessageLookupByLibrary.simpleMessage("MITM 証明書"),
     "mitmCertutilMissing": m54,
     "mitmClientRefusedCertificate": MessageLookupByLibrary.simpleMessage(
       "クライアントが証明書を拒否しました。証明書をインストールするか、アプリが証明書を固定している場合はこのホストを除外してください。",
@@ -1120,11 +1121,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmEnableTip": MessageLookupByLibrary.simpleMessage(
       "オンにすると、FlClash は復号するホストに送られるすべての内容（Cookie やパスワードを含む）を読み取れます。書き換えが必要なホストに限ってオンにしてください。",
     ),
+    "mitmEngineCompatibility": MessageLookupByLibrary.simpleMessage(
+      "指定ホストの HTTPS、URL 転送・拒否、ヘッダー・本文書き換え、ローカル応答、リクエスト・レスポンススクリプト、\$httpClient、\$task.fetch、タイマー、永続保存に対応。スクリプトには短い実行時間とサイズの制限があります。定期・イベント実行、バイナリ・完全ヘッダーモードは未対応。大きな本文はそのまま転送します。モジュールは一部互換です。",
+    ),
     "mitmExcludeHost": MessageLookupByLibrary.simpleMessage("復号から除外"),
     "mitmExcludeHostTip": m56,
     "mitmFileTooLarge": m57,
     "mitmHostnameDesc": MessageLookupByLibrary.simpleMessage(
       "先頭の - は除外を表し、最初に一致した項目が優先されます。",
+    ),
+    "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
+      "証明書をエクスポートし、iOS の設定でプロファイルをインストールしてから、「一般 → 情報 → 証明書信頼設定」で完全な信頼を有効にしてください。この画面に戻ると信頼を確認します。再生成後は新しい証明書のインストールが必要です。",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("無視された行"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

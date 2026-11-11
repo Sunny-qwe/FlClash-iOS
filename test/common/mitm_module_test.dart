@@ -89,7 +89,10 @@ AND,((DOMAIN-SUFFIX,example.com),(PROTOCOL,UDP)),REJECT
       'AND,((DOMAIN-SUFFIX,example.com),(NETWORK,UDP)),REJECT',
     ]);
     expect(content.skipped, hasLength(3));
-    expect(content.skipped.every((item) => item.reason == MitmModuleSkipReason.rule), isTrue);
+    expect(
+      content.skipped.every((item) => item.reason == MitmModuleSkipReason.rule),
+      isTrue,
+    );
   });
 
   group('a Surge module', () {

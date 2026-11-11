@@ -70,8 +70,7 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
           ),
         );
   final allProfileProviders = ref.watch(profileProvidersProvider);
-  final mitmModules =
-      mitmFeature
+  final mitmModules = mitmFeature
       ? ref.watch(mitmModulesProvider.future)
       : null;
   List<ProxyGroup> proxyGroups = [];

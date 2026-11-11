@@ -2257,11 +2257,17 @@ const _androidMitmLimits = {
 const _desktopMitmCaptureOptions = [500, 1000, 2000, 5000, 10000, 20000];
 const _androidMitmCaptureOptions = [200, 500, 1000, 2000, 5000];
 
-List<int> mitmCaptureOptions({required bool isAndroid}) =>
-    system.isIOS ? const [16, 32, 64] : isAndroid ? _androidMitmCaptureOptions : _desktopMitmCaptureOptions;
+List<int> mitmCaptureOptions({required bool isAndroid}) => system.isIOS
+    ? const [16, 32, 64]
+    : isAndroid
+    ? _androidMitmCaptureOptions
+    : _desktopMitmCaptureOptions;
 
-Map<String, Object> _mitmLimits({required bool isAndroid}) =>
-    system.isIOS ? _iosMitmLimits : isAndroid ? _androidMitmLimits : _desktopMitmLimits;
+Map<String, Object> _mitmLimits({required bool isAndroid}) => system.isIOS
+    ? _iosMitmLimits
+    : isAndroid
+    ? _androidMitmLimits
+    : _desktopMitmLimits;
 
 const _iosMitmLimits = {
   'max-body-size': 256 << 10,

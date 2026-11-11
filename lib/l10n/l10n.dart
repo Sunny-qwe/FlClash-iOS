@@ -55,6 +55,36 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `MITM certificates`
+  String get mitmCertificateSettings {
+    return Intl.message(
+      'MITM certificates',
+      name: 'mitmCertificateSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export the certificate, install its profile in iOS Settings, then enable full trust under Settings → General → About → Certificate Trust Settings. Return here to check trust. Regenerating the certificate requires installing the new one.`
+  String get mitmIOSGuide {
+    return Intl.message(
+      'Export the certificate, install its profile in iOS Settings, then enable full trust under Settings → General → About → Certificate Trust Settings. Return here to check trust. Regenerating the certificate requires installing the new one.',
+      name: 'mitmIOSGuide',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Supports selected-host HTTPS, redirects/rejects, header/body rewrites, local responses, request/response scripts, $httpClient, $task.fetch, timers and persistent storage. Scripts have short runtime and size limits. Scheduled/event scripts and binary/full-header script modes are not supported. Oversized bodies pass through unchanged. Module compatibility is partial.`
+  String get mitmEngineCompatibility {
+    return Intl.message(
+      'Supports selected-host HTTPS, redirects/rejects, header/body rewrites, local responses, request/response scripts, \$httpClient, \$task.fetch, timers and persistent storage. Scripts have short runtime and size limits. Scheduled/event scripts and binary/full-header script modes are not supported. Oversized bodies pass through unchanged. Module compatibility is partial.',
+      name: 'mitmEngineCompatibility',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Local network and loopback`
   String get localNetworkSettings {
     return Intl.message(

@@ -33,7 +33,7 @@ final class MitmCaProvider
   MitmCa create() => MitmCa();
 }
 
-String _$mitmCaHash() => r'60b0bb2330efa8242aaa8c6e36b8f64a089c1b2e';
+String _$mitmCaHash() => r'08ad1642958fb1d11ab286704119842ca91cc77e';
 
 abstract class _$MitmCa extends $AsyncNotifier<MitmCertificate?> {
   FutureOr<MitmCertificate?> build();

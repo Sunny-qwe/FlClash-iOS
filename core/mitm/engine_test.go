@@ -117,6 +117,9 @@ func TestHTTPSRewriteScriptAndCapture(t *testing.T) {
 	if len(exchanges.Exchanges) != 2 {
 		t.Fatalf("capture = %+v", exchanges)
 	}
+	if body := engine.Body(exchanges.Exchanges[1].ID, true); body == nil || !strings.Contains(string(exchanges.Exchanges[1].responseBody), `"fixed":true`) {
+		t.Fatal("capture did not retain the scripted response")
+	}
 	engine.SetCapture(false)
 	if len(engine.Exchanges("").Exchanges) != 0 {
 		t.Fatal("disable capture retained bodies")

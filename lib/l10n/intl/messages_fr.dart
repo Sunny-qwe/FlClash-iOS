@@ -1397,6 +1397,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Les navigateurs Flatpak nécessitent d’importer le certificat exporté à la main.",
     ),
     "mitmCertificateSavedTip": m53,
+    "mitmCertificateSettings": MessageLookupByLibrary.simpleMessage(
+      "Certificats MITM",
+    ),
     "mitmCertutilMissing": m54,
     "mitmClientRefusedCertificate": MessageLookupByLibrary.simpleMessage(
       "Le client a refusé le certificat. Installez l’AC, ou excluez cet hôte si l’application épingle son certificat.",
@@ -1408,6 +1411,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmEnableTip": MessageLookupByLibrary.simpleMessage(
       "FlClash pourra lire tout ce qui est envoyé aux hôtes déchiffrés, cookies et mots de passe compris. N’activez cette option que pour les hôtes à réécrire.",
     ),
+    "mitmEngineCompatibility": MessageLookupByLibrary.simpleMessage(
+      "Prend en charge HTTPS ciblé, URL, en-têtes, corps, réponses locales, scripts requête/réponse, \$httpClient, \$task.fetch, minuteries et stockage persistant. Durée et taille des scripts limitées. Planification, événements, modes binaire et en-têtes complets non pris en charge. Les corps volumineux sont transmis sans modification. Compatibilité partielle des modules.",
+    ),
     "mitmExcludeHost": MessageLookupByLibrary.simpleMessage(
       "Exclure du déchiffrement",
     ),
@@ -1415,6 +1421,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmFileTooLarge": m57,
     "mitmHostnameDesc": MessageLookupByLibrary.simpleMessage(
       "Un - en tête exclut un hôte, et la première correspondance l’emporte.",
+    ),
+    "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
+      "Exportez le certificat, installez son profil dans les réglages iOS, puis activez la confiance complète dans Général → Informations → Réglages des certificats. Revenez ici pour vérifier. Après régénération, installez le nouveau certificat.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("Lignes ignorées"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

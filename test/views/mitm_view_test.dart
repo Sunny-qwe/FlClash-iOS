@@ -168,6 +168,31 @@ void main() {
     expect(find.text(currentAppLocalizations.httpCaptureDesc), findsOneWidget);
   });
 
+  testWidgets('the capture list reports when recording is off', (tester) async {
+    await pumpView(tester);
+    when(() => core.getMitmExchanges('')).thenAnswer(
+      (_) async => const MitmExchangeList(closed: true),
+    );
+    await tester.tap(find.text(currentAppLocalizations.httpRequests));
+    await tester.pumpAndSettle();
+
+    verify(() => core.getMitmExchanges('')).called(1);
+    expect(find.text(currentAppLocalizations.httpCaptureOff), findsOneWidget);
+  });
+
+  testWidgets('the capture list displays a failed request', (tester) async {
+    await pumpView(tester);
+    when(() => core.getMitmExchanges('')).thenAnswer(
+      (_) => Future.error(
+        const CoreMethodException(code: 'core_error', message: 'capture failure'),
+      ),
+    );
+    await tester.tap(find.text(currentAppLocalizations.httpRequests));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('capture failure'), findsOneWidget);
+  });
+
   testWidgets('offers a certificate until one is generated', (tester) async {
     await pumpView(tester);
 
@@ -264,7 +289,10 @@ void main() {
   testWidgets('capture waits for decryption to be on', (tester) async {
     await pumpView(tester, certificate: _certificate);
 
-    expect(find.text(currentAppLocalizations.mitm), findsOneWidget);
+    expect(
+      find.text(currentAppLocalizations.mitmCertificateSettings),
+      findsOneWidget,
+    );
     await openCapture(tester);
     expect(tester.widget<Switch>(captureSwitch()).onChanged, isNull);
   });

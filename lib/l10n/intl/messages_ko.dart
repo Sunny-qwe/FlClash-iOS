@@ -1091,6 +1091,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Flatpak 브라우저에는 내보낸 인증서를 직접 가져와야 합니다.",
     ),
     "mitmCertificateSavedTip": m53,
+    "mitmCertificateSettings": MessageLookupByLibrary.simpleMessage("MITM 인증서"),
     "mitmCertutilMissing": m54,
     "mitmClientRefusedCertificate": MessageLookupByLibrary.simpleMessage(
       "클라이언트가 인증서를 거부했습니다. 인증서를 설치하거나, 앱이 인증서를 고정한 경우 이 호스트를 제외하세요.",
@@ -1100,11 +1101,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmEnableTip": MessageLookupByLibrary.simpleMessage(
       "켜면 FlClash가 복호화되는 호스트로 보내는 모든 내용을 읽을 수 있습니다(쿠키와 비밀번호 포함). 재작성이 필요한 호스트에만 켜세요.",
     ),
+    "mitmEngineCompatibility": MessageLookupByLibrary.simpleMessage(
+      "지정 호스트 HTTPS, URL, 헤더 및 본문 재작성, 로컬 응답, 요청/응답 스크립트, \$httpClient, \$task.fetch, 타이머 및 영구 저장을 지원합니다. 스크립트 실행 시간과 크기가 제한됩니다. 예약/이벤트 실행, 바이너리 및 전체 헤더 모드는 지원하지 않습니다. 큰 본문은 그대로 전달하며 모듈은 부분 호환됩니다.",
+    ),
     "mitmExcludeHost": MessageLookupByLibrary.simpleMessage("복호화에서 제외"),
     "mitmExcludeHostTip": m56,
     "mitmFileTooLarge": m57,
     "mitmHostnameDesc": MessageLookupByLibrary.simpleMessage(
       "앞에 -를 붙이면 제외하며, 처음 일치하는 항목이 적용됩니다.",
+    ),
+    "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
+      "인증서를 내보내고 iOS 설정에서 프로파일을 설치한 다음 일반 → 정보 → 인증서 신뢰 설정에서 완전한 신뢰를 활성화하세요. 이 화면으로 돌아오면 신뢰를 확인합니다. 다시 생성한 경우 새 인증서를 설치해야 합니다.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("무시된 줄"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

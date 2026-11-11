@@ -1397,6 +1397,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Los navegadores Flatpak necesitan que importes el certificado exportado a mano.",
     ),
     "mitmCertificateSavedTip": m53,
+    "mitmCertificateSettings": MessageLookupByLibrary.simpleMessage(
+      "Certificados MITM",
+    ),
     "mitmCertutilMissing": m54,
     "mitmClientRefusedCertificate": MessageLookupByLibrary.simpleMessage(
       "El cliente rechazó el certificado. Instala la CA o excluye este host si la app fija su certificado.",
@@ -1408,6 +1411,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmEnableTip": MessageLookupByLibrary.simpleMessage(
       "FlClash podrá leer todo lo que se envíe a los hosts descifrados, incluidas cookies y contraseñas. Actívalo solo para los hosts que quieras reescribir.",
     ),
+    "mitmEngineCompatibility": MessageLookupByLibrary.simpleMessage(
+      "Admite HTTPS seleccionado, URL, cabeceras, cuerpo, respuestas locales, scripts de solicitud/respuesta, \$httpClient, \$task.fetch, temporizadores y almacenamiento persistente. Los scripts tienen límites de tiempo y tamaño. No admite programación, eventos ni modos binario o de cabeceras completas. Los cuerpos grandes pasan sin cambios. Compatibilidad parcial de módulos.",
+    ),
     "mitmExcludeHost": MessageLookupByLibrary.simpleMessage(
       "Excluir del descifrado",
     ),
@@ -1415,6 +1421,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmFileTooLarge": m57,
     "mitmHostnameDesc": MessageLookupByLibrary.simpleMessage(
       "Un - al principio excluye un host, y decide la primera coincidencia.",
+    ),
+    "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
+      "Exporte el certificado, instale su perfil en Ajustes de iOS y active la confianza total en General → Información → Ajustes de confianza de certificados. Vuelva aquí para comprobarla. Tras regenerarlo, instale el nuevo certificado.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage(
       "Líneas ignoradas",

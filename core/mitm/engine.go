@@ -291,6 +291,9 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 			}
 		}
 		response = e.applyScripts("http-request", r, nil, reqBody, &actions)
+		if e.capture.Load() && r.Header.Get("Content-Encoding") == "" {
+			reqBody, _ = readBoundedBody(&r.Body, e.maxBody)
+		}
 		if response == nil {
 			response, err = e.transport.RoundTrip(r)
 		}
@@ -317,6 +320,9 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 		response.Body.Close()
 		response = replacement
 		defer response.Body.Close()
+	}
+	if e.capture.Load() {
+		respBody, _ = e.responseBody(response)
 	}
 	stripHopHeaders(response.Header)
 	for key, values := range response.Header {

@@ -32,7 +32,9 @@ class MitmCa extends _$MitmCa {
   }
 
   Future<void> generate() async {
-    final certificate = await ref.read(coreHandlerProvider).generateMitmCertificate();
+    final certificate = await ref
+        .read(coreHandlerProvider)
+        .generateMitmCertificate();
     if (!ref.mounted) {
       return;
     }

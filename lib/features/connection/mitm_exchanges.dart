@@ -180,22 +180,27 @@ class MitmCaptureListView extends ConsumerWidget {
       title: context.appLocalizations.httpRequests,
       body: NullStatusSwitcher(
         isLoading: state.isLoading && !state.hasValue,
+        loadingStatus: const Center(child: ActivityIndicator.page()),
         isEmpty: exchanges.isEmpty,
         nullStatus: NullStatus(
           label: state.error != null
               ? compactError(state.error!)
               : list?.capturing == false
               ? context.appLocalizations.httpCaptureOff
-              : context.appLocalizations.nullTip(context.appLocalizations.httpRequests),
+              : context.appLocalizations.nullTip(
+                  context.appLocalizations.httpRequests,
+                ),
           illustration: NullStatusIllustration.requests,
         ),
         child: ListView(
           padding: _detailPadding(context),
           children: [
-            generateSection(items: [
-              for (final exchange in exchanges.reversed)
-                _MitmExchangeItem(exchange: exchange),
-            ]),
+            generateSection(
+              items: [
+                for (final exchange in exchanges.reversed)
+                  _MitmExchangeItem(exchange: exchange),
+              ],
+            ),
           ],
         ),
       ),

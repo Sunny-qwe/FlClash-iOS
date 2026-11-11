@@ -271,10 +271,8 @@ List<String> mitmModuleUrls(String text) {
       'egern'
           when action == 'install-module' ||
               action == 'install' ||
-              action == 'import' => [
-        ?uri.queryParameters['url'],
-        ?uri.queryParameters['module'],
-      ],
+              action == 'import' =>
+        [?uri.queryParameters['url'], ?uri.queryParameters['module']],
       'quantumult-x'
           when const {
             'add-resource',
@@ -317,7 +315,8 @@ MitmModuleContent parseMitmModule(
   final parser = _ModuleParser(values: values, resources: resources);
   final override = _stashOverride(text);
   if (override != null) {
-    final isEgern = _egernKeys.any(override.containsKey) ||
+    final isEgern =
+        _egernKeys.any(override.containsKey) ||
         (override['mitm'] is Map && !override.containsKey('http'));
     return isEgern
         ? parser.parseEgern(override, text)
@@ -1653,8 +1652,8 @@ class _ModuleParser {
             final cleaned = host.endsWith(':*')
                 ? host.substring(0, host.length - 2)
                 : (host.endsWith(':443')
-                    ? host.substring(0, host.length - 4)
-                    : host);
+                      ? host.substring(0, host.length - 4)
+                      : host);
             _hostname.add(cleaned.trim());
           }
         }
@@ -1667,9 +1666,11 @@ class _ModuleParser {
       for (final item in rewrites) {
         if (item is Map) {
           final match = _stashText(item['match']);
-          final location =
-              item['location'] != null ? _stashText(item['location']) : null;
-          final reject = item['reject'] == true ||
+          final location = item['location'] != null
+              ? _stashText(item['location'])
+              : null;
+          final reject =
+              item['reject'] == true ||
               (item['status_code'] == 200 &&
                   (item['body'] == '' ||
                       item['body'] == null && location == null));
