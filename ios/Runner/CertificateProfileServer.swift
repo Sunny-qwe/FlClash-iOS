@@ -43,34 +43,40 @@ final class CertificateProfileServer {
       )
       self.listener = listener
       backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "Certificate download") {
-        self.stop()
+        Task { @MainActor in self.stop() }
       }
-      expiry = Timer.scheduledTimer(withTimeInterval: 120, repeats: false) { _ in self.stop() }
+      expiry = Timer.scheduledTimer(withTimeInterval: 120, repeats: false) { _ in
+        Task { @MainActor in self.stop() }
+      }
       listener.stateUpdateHandler = { [weak self, weak listener] state in
-        guard let self, let listener, self.listener === listener else { return }
-        switch state {
-        case .ready:
-          guard let port = listener.port,
-            let url = URL(string: "http://127.0.0.1:\(port.rawValue)\(response.path)") else {
+        MainActor.assumeIsolated {
+          guard let self, let listener, self.listener === listener else { return }
+          switch state {
+          case .ready:
+            guard let port = listener.port,
+              let url = URL(string: "http://127.0.0.1:\(port.rawValue)\(response.path)") else {
+              self.stop()
+              return
+            }
+            UIApplication.shared.open(url) { opened in
+              guard self.listener === listener else { return }
+              if opened { self.finish(nil) } else { self.stop() }
+            }
+          case .failed(let error):
+            self.finish(error)
             self.stop()
-            return
+          default: break
           }
-          UIApplication.shared.open(url) { opened in
-            guard self.listener === listener else { return }
-            if opened { self.finish(nil) } else { self.stop() }
-          }
-        case .failed(let error):
-          self.finish(error)
-          self.stop()
-        default: break
         }
       }
       listener.newConnectionHandler = { [weak self] connection in
-        guard let self, self.connections.count < 4 else { connection.cancel(); return }
-        let id = UUID()
-        self.connections[id] = connection
-        connection.start(queue: .main)
-        self.receive(connection, id: id, data: Data(), response: response)
+        MainActor.assumeIsolated {
+          guard let self, self.connections.count < 4 else { connection.cancel(); return }
+          let id = UUID()
+          self.connections[id] = connection
+          connection.start(queue: .main)
+          self.receive(connection, id: id, data: Data(), response: response)
+        }
       }
       listener.start(queue: .main)
     } catch {
@@ -81,18 +87,22 @@ final class CertificateProfileServer {
 
   private func receive(_ connection: NWConnection, id: UUID, data: Data, response: CertificateProfileResponse) {
     connection.receive(minimumIncompleteLength: 1, maximumLength: 8193) { [weak self] bytes, _, ended, error in
-      guard let self else { return }
-      let received = data + (bytes ?? Data())
-      if let payload = response.response(to: received) {
-        connection.send(content: payload, completion: .contentProcessed { _ in
+      MainActor.assumeIsolated {
+        guard let self else { return }
+        let received = data + (bytes ?? Data())
+        if let payload = response.response(to: received) {
+          connection.send(content: payload, completion: .contentProcessed { _ in
+            MainActor.assumeIsolated {
+              connection.cancel()
+              self.connections.removeValue(forKey: id)
+            }
+          })
+        } else if error != nil || ended || received.count > 8192 {
           connection.cancel()
           self.connections.removeValue(forKey: id)
-        })
-      } else if error != nil || ended || received.count > 8192 {
-        connection.cancel()
-        self.connections.removeValue(forKey: id)
-      } else {
-        self.receive(connection, id: id, data: received, response: response)
+        } else {
+          self.receive(connection, id: id, data: received, response: response)
+        }
       }
     }
   }

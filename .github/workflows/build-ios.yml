@@ -45,6 +45,10 @@ jobs:
       - name: Verify alternate icon sources
         run: python3 tool/verify_ios_bundle.py --assets ios/Runner/Assets.xcassets
 
+      - name: Verify iOS certificate installer
+        run: |
+          xcrun --sdk iphoneos swiftc -swift-version 5 -target arm64-apple-ios15.0 -sdk "$(xcrun --sdk iphoneos --show-sdk-path)" -typecheck ios/Runner/CertificateProfileServer.swift
+
       - name: Verify core subscription compatibility and rejected switches
         working-directory: core
         env:
