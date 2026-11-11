@@ -44,7 +44,8 @@ class _CoreContainerState extends ConsumerState<CoreManager>
         if (!mounted || ref.read(currentProfileIdProvider) != next) return;
         final setup = ref.read(setupActionProvider.notifier);
         if (!await setup.inputsApplied() &&
-            mounted && ref.read(currentProfileIdProvider) == next) {
+            mounted &&
+            ref.read(currentProfileIdProvider) == next) {
           await setup.fullSetup();
         }
       });

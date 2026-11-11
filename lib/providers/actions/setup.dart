@@ -768,12 +768,7 @@ class SetupAction extends _$SetupAction {
     }
     final setupParams = _setupParams.copyWith(base: realProfile.base);
     final inputs = switch (setupState) {
-      final state? => (
-        state,
-        realPatchConfig,
-        networkSetting,
-        _appliedParams,
-      ),
+      final state? => (state, realPatchConfig, networkSetting, _appliedParams),
       _ => null,
     };
     final yamlString = realProfile.yaml;
@@ -812,8 +807,12 @@ class SetupAction extends _$SetupAction {
             final configFilePath = await appPath.configFilePath;
             final configFile = File(configFilePath);
             if (await configFile.exists()) {
-              backupDirectory = await configFile.parent.createTemp('.config-backup-');
-              previousConfig = await configFile.copy('${backupDirectory.path}/config.yaml');
+              backupDirectory = await configFile.parent.createTemp(
+                '.config-backup-',
+              );
+              previousConfig = await configFile.copy(
+                '${backupDirectory.path}/config.yaml',
+              );
             }
             writtenConfig = configFile;
             await configFile.writeAsStringAtomically(yamlString);
@@ -838,7 +837,8 @@ class SetupAction extends _$SetupAction {
               waitForConfig: system.isIOS,
             );
           } on CoreMethodException catch (error) {
-            if (error.code != 'config_rejected' && error.code != 'config_preserved') {
+            if (error.code != 'config_rejected' &&
+                error.code != 'config_preserved') {
               rethrow;
             }
             if (previousConfig != null && writtenConfig != null) {

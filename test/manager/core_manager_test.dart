@@ -19,6 +19,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../helpers/app_paths.dart';
@@ -149,6 +150,12 @@ void main() {
       ),
     );
     await AppLocalizations.load(const Locale('en'));
+    globalState.packageInfo = PackageInfo(
+      appName: 'FlClash',
+      packageName: 'com.follow.clash',
+      version: '0.0.0',
+      buildNumber: '0',
+    );
     profileSwitchTempDir = Directory.systemTemp.createTempSync(
       'core_manager_test',
     );
@@ -591,9 +598,9 @@ void main() {
         'reloading it', (tester) async {
       final coreInterface = _coreInterface();
       var setupCalls = 0;
-      when(() => coreInterface.getProfileBase(any())).thenAnswer(
-        (_) async => const ProfileBase(config: {}, digest: 'd'),
-      );
+      when(
+        () => coreInterface.getProfileBase(any()),
+      ).thenAnswer((_) async => const ProfileBase(config: {}, digest: 'd'));
       when(() => coreInterface.setupConfig(any())).thenAnswer((_) async {
         setupCalls++;
         if (setupCalls > 1) {
@@ -603,10 +610,12 @@ void main() {
           );
         }
       });
-      when(() => coreInterface.getProxies()).thenAnswer(
-        (_) async => const ProxiesData(all: [], proxies: {}),
-      );
-      when(() => coreInterface.getExternalProviders()).thenAnswer((_) async => []);
+      when(
+        () => coreInterface.getProxies(),
+      ).thenAnswer((_) async => const ProxiesData(all: [], proxies: {}));
+      when(
+        () => coreInterface.getExternalProviders(),
+      ).thenAnswer((_) async => []);
       final container = await _pumpCoreManager(
         tester,
         coreInterface,
@@ -614,19 +623,28 @@ void main() {
           initProvider.overrideWithBuild((_, _) => true),
           profilesProvider.overrideWith(() => TestProfiles([previous, next])),
           currentProfileIdProvider.overrideWithBuild((_, _) => previous.id),
-          setupStateProvider.overrideWith((_, id) =>
-              _nullProfileSetupState.copyWith(profileId: id)),
+          setupStateProvider.overrideWith(
+            (_, id) => _nullProfileSetupState.copyWith(profileId: id),
+          ),
         ],
       );
       globalState.container = container;
       await tester.runAsync(() async {
-        expect(await container.read(setupActionProvider.notifier)
-            .applyProfile(force: true), isTrue);
+        expect(
+          await container
+              .read(setupActionProvider.notifier)
+              .applyProfile(force: true),
+          isTrue,
+        );
       });
       final appliedMd5 = globalState.lastConfigMd5;
       container.read(currentProfileIdProvider.notifier).value = next.id;
-      await _waitForSetupToSettle(tester, () =>
-          setupCalls == 2 && container.read(currentProfileIdProvider) == previous.id);
+      await _waitForSetupToSettle(
+        tester,
+        () =>
+            setupCalls == 2 &&
+            container.read(currentProfileIdProvider) == previous.id,
+      );
       expect(container.read(currentProfileIdProvider), previous.id);
       expect(globalState.lastConfigMd5, appliedMd5);
       expect(setupCalls, 2);

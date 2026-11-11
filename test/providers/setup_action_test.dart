@@ -1221,15 +1221,21 @@ void main() {
           message: 'invalid config',
         ),
       );
-      final scoped = ProviderContainer(overrides: [
-        currentProfileProvider.overrideWithValue(null),
-        setupStateProvider.overrideWith((_, _) => nullProfileSetupState),
-        coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
-        setupActionProvider.overrideWith(SetupAction.new),
-      ]);
+      final scoped = ProviderContainer(
+        overrides: [
+          currentProfileProvider.overrideWithValue(null),
+          setupStateProvider.overrideWith((_, _) => nullProfileSetupState),
+          coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+          setupActionProvider.overrideWith(SetupAction.new),
+        ],
+      );
       addTearDown(scoped.dispose);
-      expect(await scoped.read(setupActionProvider.notifier)
-          .applyProfile(force: true), isFalse);
+      expect(
+        await scoped
+            .read(setupActionProvider.notifier)
+            .applyProfile(force: true),
+        isFalse,
+      );
       expect(await configFile.readAsString(), 'mixed-port: 7890\n');
     });
 
