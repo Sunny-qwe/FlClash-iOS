@@ -153,7 +153,7 @@ func applyConfig(params *SetupParams) error {
 		return &MethodError{Code: code, Message: err.Error()}
 	}
 
-	engine, err := prepareMitm()
+	engine, err := prepareMitm(params.Base)
 	if err != nil {
 		code := "config_rejected"
 		if currentConfig != nil {

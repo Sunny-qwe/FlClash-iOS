@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -37,6 +38,27 @@ type Engine struct {
 	log       func(string)
 	certMu    sync.Mutex
 	certs     map[string]*tls.Certificate
+	connMu    sync.Mutex
+	closed    bool
+	conns     map[net.Conn]struct{}
+}
+
+func Reconfigure(current *Engine, home string, cfg Config, dial DialFunc, logger func(string)) (*Engine, error) {
+	if current == nil || current.home != home || !reflect.DeepEqual(current.config, cfg) {
+		return New(home, cfg, dial, logger)
+	}
+	if cfg.Enable && cfg.DecryptTLS {
+		certificateMu.Lock()
+		ca, err := loadAuthority(home)
+		certificateMu.Unlock()
+		if err != nil {
+			return nil, fmt.Errorf("MITM CA: %w", err)
+		}
+		if current.ca == nil || !bytes.Equal(current.ca.cert.Raw, ca.cert.Raw) {
+			return New(home, cfg, dial, logger)
+		}
+	}
+	return current, nil
 }
 
 func New(home string, cfg Config, dial DialFunc, logger func(string)) (*Engine, error) {
@@ -139,6 +161,23 @@ func (e *Engine) Serve(conn net.Conn, host string, port uint16, id string) (hand
 		e.warn("MITM session limit reached; connection passed through")
 		return false
 	}
+	e.connMu.Lock()
+	if e.closed {
+		e.connMu.Unlock()
+		_ = conn.Close()
+		return true
+	}
+	if e.conns == nil {
+		e.conns = make(map[net.Conn]struct{})
+	}
+	e.conns[conn] = struct{}{}
+	e.connMu.Unlock()
+	originalConn := conn
+	defer func() {
+		e.connMu.Lock()
+		delete(e.conns, originalConn)
+		e.connMu.Unlock()
+	}()
 	defer func() {
 		if p := recover(); p != nil {
 			e.warn(fmt.Sprintf("MITM connection failed: %v", p))
@@ -209,6 +248,19 @@ func (e *Engine) CloseIdle() {
 	if e != nil && e.transport != nil {
 		e.transport.CloseIdleConnections()
 	}
+}
+
+func (e *Engine) Close() {
+	e.connMu.Lock()
+	e.closed = true
+	conns := e.conns
+	e.conns = nil
+	e.connMu.Unlock()
+	for conn := range conns {
+		_ = conn.Close()
+	}
+	e.SetCapture(false)
+	e.CloseIdle()
 }
 
 func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host string, port uint16, id string) {

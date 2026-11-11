@@ -113,7 +113,14 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         let mailbox = CoreMailboxServer(directory: self.sharedStateStore.appGroupDirectory()!) {
           [weak self] data, reply in
           self?.eventQueue.markCoreResponsive()
-          MobileInvokeMethod(String(data: data, encoding: .utf8), CoreResultHandler(reply))
+          let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+          let method = object?["method"] as? String
+          let stage = method.flatMap { $0 == "config.setup" || $0 == "config.update" ? "core-\($0)" : nil }
+          if let stage { self?.recordStartup(stage) }
+          MobileInvokeMethod(String(data: data, encoding: .utf8), CoreResultHandler { response in
+            if let stage { self?.recordStartup("\(stage)-replied") }
+            reply(response)
+          })
         }
         try mailbox.start()
         self.mailbox = mailbox

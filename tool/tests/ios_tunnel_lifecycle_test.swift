@@ -72,6 +72,19 @@ struct TunnelLifecycleTests {
     await settle()
     precondition(stops == 2 && !coordinator.isRunRequested)
     precondition(store.manager.connection.stopCount == 1)
+
+    coordinator.submitTunnelRequest(target: .running)
+    await settle()
+    store.manager.connection.deferDisconnectError = true
+    store.manager.connection.status = .disconnected
+    coordinator.handleTunnelStatusNotification(Notification(name: Notification.Name("status"), object: store.manager.connection))
+    await settle()
+    precondition(store.manager.connection.disconnectReply != nil)
+    coordinator.submitTunnelRequest(target: .stopped)
+    await settle()
+    store.manager.connection.disconnectReply?(NSError(domain: "BackgroundDisconnect", code: 12))
+    await settle()
+    precondition(diagnostics.contains { $0.contains("unexpected disconnect:") && $0.contains("BackgroundDisconnect") })
     print("Passed foreground deduplication, stale session rejection, reasserting, real disconnect diagnostics and explicit start/stop")
   }
 }

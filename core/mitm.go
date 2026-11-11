@@ -80,10 +80,16 @@ func dialMitm(ctx context.Context, network, address string) (net.Conn, error) {
 	return client, nil
 }
 
-func prepareMitm() (*mitm.Engine, error) {
-	data, err := os.ReadFile(runningConfigPath())
-	if err != nil {
-		return nil, err
+func prepareMitm(base *SetupBase) (*mitm.Engine, error) {
+	var data []byte
+	if base != nil {
+		data = []byte(base.Overlay)
+	} else {
+		var err error
+		data, err = os.ReadFile(runningConfigPath())
+		if err != nil {
+			return nil, err
+		}
 	}
 	var document struct {
 		MITM mitm.Config `yaml:"mitm"`
@@ -91,15 +97,14 @@ func prepareMitm() (*mitm.Engine, error) {
 	if err := yaml.Unmarshal(data, &document); err != nil {
 		return nil, err
 	}
-	return mitm.New(C.Path.HomeDir(), document.MITM, dialMitm, func(message string) { log.Warnln("%s", message) })
+	return mitm.Reconfigure(mitmEngine.Load(), C.Path.HomeDir(), document.MITM, dialMitm, func(message string) { log.Warnln("%s", message) })
 }
 
 func activateMitm(engine *mitm.Engine) {
 	engine.SetCapture(mitmCapture.Load())
 	old := mitmEngine.Swap(engine)
-	if old != nil {
-		old.SetCapture(false)
-		old.CloseIdle()
+	if old != nil && old != engine {
+		old.Close()
 	}
 }
 func activeMitm() (*mitm.Engine, error) {

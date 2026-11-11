@@ -14,14 +14,17 @@ public class NEVPNConnection {
   public var status: NEVPNStatus = .disconnected
   public var startCount = 0
   public var stopCount = 0
+  public var deferDisconnectError = false
+  public var disconnectReply: ((Error?) -> Void)?
   public init() {}
   public func startVPNTunnel(options: [String: NSObject]?) throws {
     startCount += 1
     status = .connected
   }
   public func stopVPNTunnel() { stopCount += 1; status = .disconnected }
-  public func fetchLastDisconnectError(completionHandler: (Error?) -> Void) {
-    completionHandler(NSError(domain: "TestDisconnect", code: 9))
+  public func fetchLastDisconnectError(completionHandler: @escaping (Error?) -> Void) {
+    if deferDisconnectError { disconnectReply = completionHandler }
+    else { completionHandler(NSError(domain: "TestDisconnect", code: 9)) }
   }
 }
 

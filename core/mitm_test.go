@@ -95,3 +95,60 @@ func TestMITMPreparationFailurePreservesAppliedEngine(t *testing.T) {
 		t.Fatal("rejected MITM config replaced working engine")
 	}
 }
+
+func TestMITMReloadPreservesCaptureUntilEngineIsReplaced(t *testing.T) {
+	previousEngine := mitmEngine.Load()
+	previousCapture := mitmCapture.Load()
+	t.Cleanup(func() { mitmEngine.Store(previousEngine); mitmCapture.Store(previousCapture) })
+	engine, err := mitm.New(t.TempDir(), mitm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer engine.Close()
+	mitmEngine.Store(engine)
+	mitmCapture.Store(true)
+	activateMitm(engine)
+	activateMitm(engine)
+	if !engine.Exchanges("").Capturing {
+		t.Fatal("same-engine activation turned capture off")
+	}
+	next, err := mitm.New(t.TempDir(), mitm.Config{}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer next.Close()
+	activateMitm(next)
+	if engine.Exchanges("").Capturing || !next.Exchanges("").Capturing {
+		t.Fatal("capture did not move to replacement module engine")
+	}
+}
+
+func TestMITMProfileOverlayMatchesPersistedConfiguration(t *testing.T) {
+	home := t.TempDir()
+	previousHome := C.Path.HomeDir()
+	previousEngine := mitmEngine.Load()
+	t.Cleanup(func() { C.SetHomeDir(previousHome); mitmEngine.Store(previousEngine) })
+	C.SetHomeDir(home)
+	mitmEngine.Store(nil)
+	profile := filepath.Join(home, "profile.yaml")
+	if err := os.WriteFile(profile, []byte("proxies: []\nproxy-groups: []\nrules: ['MATCH,DIRECT']\nmitm:\n  enable: true\n  hostname: ['old.example']\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	base := &SetupBase{Path: profile, Overlay: "mode: rule\nmitm:\n  enable: true\n  hostname: ['api.example']\n  url-rewrite: ['^http://api.example/ad reject-dict']\n"}
+	if _, err := loadConfigWithBase(base, runningConfigPath()); err != nil {
+		t.Fatal(err)
+	}
+	overlayEngine, err := prepareMitm(base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer overlayEngine.Close()
+	mitmEngine.Store(overlayEngine)
+	persistedEngine, err := prepareMitm(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if persistedEngine != overlayEngine || !overlayEngine.Matches("api.example") || overlayEngine.Matches("old.example") {
+		t.Fatal("overlay and persisted profile use different module rules")
+	}
+}

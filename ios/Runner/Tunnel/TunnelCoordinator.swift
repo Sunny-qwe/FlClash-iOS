@@ -352,8 +352,8 @@ final class TunnelCoordinator {
     }
   }
 
-  private func lastDisconnectError(_ connection: NEVPNConnection, starting: Bool = true) async -> Error {
-    let diagnostic = TunnelStartupDiagnostic.read(directory: NEHelper.appGroupDirectory, id: startupID)
+  private func lastDisconnectError(_ connection: NEVPNConnection, starting: Bool = true, id: String? = nil) async -> Error {
+    let diagnostic = TunnelStartupDiagnostic.read(directory: NEHelper.appGroupDirectory, id: id ?? startupID)
     if let diagnostic, let detail = diagnostic.detail {
       return NSError(domain: "FlClash.VPN", code: 2,
         userInfo: [NSLocalizedDescriptionKey: "VPN \(diagnostic.stage): \(detail)"])
@@ -377,7 +377,7 @@ final class TunnelCoordinator {
       domain: "FlClash.VPN", code: 1,
       userInfo: [NSLocalizedDescriptionKey: starting
         ? "VPN 扩展未能启动。请确认签名包含 Network Extension 和 App Group 权限，并保留 NECore 扩展。"
-        : "VPN 已停止，系统未提供具体断开错误。"]
+        : "VPN 已停止，系统未提供具体断开错误。" + (diagnostic.map { " (VPN stage: \($0.stage))" } ?? "")]
     )
   }
 
@@ -603,13 +603,12 @@ final class TunnelCoordinator {
       )
       if previousStatus?.tunnelState == .running, status.isTerminal,
         tunnelRequest == nil {
-        let generation = requestGeneration
+        let disconnectedID = startupID
         Task { [weak self] in
           guard let self,
             let manager = try? await self.managerStore.loadManager(createIfNeeded: false)
           else { return }
-          let error = await self.lastDisconnectError(manager.connection, starting: false)
-          guard generation == self.requestGeneration else { return }
+          let error = await self.lastDisconnectError(manager.connection, starting: false, id: disconnectedID)
           self.log("unexpected disconnect: \(error.localizedDescription)")
         }
       }
