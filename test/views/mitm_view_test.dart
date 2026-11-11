@@ -10,6 +10,7 @@ import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/ui/list_item.dart';
 import 'package:fl_clash/views/config/mitm.dart';
+import 'package:fl_clash/views/config/advanced.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,6 +68,13 @@ final _renewed = _certificate.copyWith(
 );
 
 void main() {
+  testWidgets('advanced settings keep module and certificate entries separate', (tester) async {
+    await tester.pumpWidget(const TestApp(child: AdvancedConfigView()));
+    await tester.pumpAndSettle();
+    expect(find.text('DNS'), findsOneWidget);
+    expect(find.text('Modules'), findsNothing);
+    expect(find.text('MITM certificates'), findsNothing);
+  });
   late ProviderContainer container;
   late _MockCore core;
 

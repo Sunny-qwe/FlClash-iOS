@@ -215,11 +215,8 @@ class _MitmViewState extends ConsumerState<MitmView> {
     MitmCertificate certificate,
   ) async {
     final saved = await globalState.safeRun<bool>(() async {
-      return await picker.saveFile(
-            'FlClash CA.mobileconfig',
-            utf8.encode(mitmIOSProfile(certificate)),
-          ) !=
-          null;
+      await IOSMitmTrustStore().install(certificate);
+      return true;
     }, title: context.appLocalizations.installCertificate);
     if (saved == true && context.mounted) {
       await _showIOSTrustGuide(context);
@@ -357,7 +354,7 @@ class _MitmViewState extends ConsumerState<MitmView> {
       if (system.isIOS) ...[
         ListItem(
           title: Text(appLocalizations.installCertificate),
-          subtitle: Text(appLocalizations.mitmTrustNotInstalled),
+          subtitle: Text(_trustLabel(appLocalizations, trust)),
           onTap: () => _installIOS(context, certificate),
         ),
         ListItem(

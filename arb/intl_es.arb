@@ -1,6 +1,6 @@
 {
   "mitmCertificateSettings": "Certificados MITM",
-  "mitmIOSGuide": "Exporte el certificado, instale su perfil en Ajustes de iOS y active la confianza total en General → Información → Ajustes de confianza de certificados. Vuelva aquí para comprobarla. Tras regenerarlo, instale el nuevo certificado.",
+  "mitmIOSGuide": "Pulse Instalar para abrir el navegador y permita descargar el perfil. En Ajustes → Perfil descargado (o General → VPN y gestión de dispositivos), instálelo e introduzca el código del dispositivo cuando se solicite. Active la confianza total en General → Información → Ajustes de confianza de certificados. Vuelva aquí para comprobarla. Tras regenerarlo, instale el nuevo certificado.",
   "mitmEngineCompatibility": "Admite HTTPS seleccionado, URL, cabeceras, cuerpo, respuestas locales, scripts de solicitud/respuesta, $httpClient, $task.fetch, temporizadores y almacenamiento persistente. Los scripts tienen límites de tiempo y tamaño. No admite programación, eventos ni modos binario o de cabeceras completas. Los cuerpos grandes pasan sin cambios. Compatibilidad parcial de módulos.",
   "localNetworkSettings": "Red local y bucle local",
   "localNetworkProtection": "Proteger el enlace local",

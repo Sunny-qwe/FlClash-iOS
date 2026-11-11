@@ -13,6 +13,11 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
   )
   private var memoryPressureSource: DispatchSourceMemoryPressure?
   private var mailbox: CoreMailboxServer?
+  private var startupID = ""
+
+  private func recordStartup(_ stage: String, error: Error? = nil) {
+    TunnelStartupDiagnostic.write(directory: sharedStateStore.appGroupDirectory(), id: startupID, stage: stage, error: error)
+  }
   private let logger = Logger(
     subsystem: PacketTunnelEnvironment.extensionBundleIdentifier,
     category: "PacketTunnelProvider"
@@ -23,6 +28,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     completionHandler: @escaping (Error?) -> Void
   ) {
     logger.info("startTunnel begin")
+    startupID = options?["startupID"] as? String ?? UUID().uuidString
+    recordStartup("extension-entered")
     mailbox?.stop()
     mailbox = nil
     sharedStateStore.clearRunTime()
@@ -54,6 +61,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
       let vpnOptions = sharedStateStore.loadVPNOptions(),
       let setupParams = sharedStateStore.loadSetupParams() else {
       logger.error("startTunnel failed: missing vpnOptions from shared state")
+      recordStartup("configuration", error: PacketTunnelProviderError.missingConfiguration)
       completionHandler(PacketTunnelProviderError.missingConfiguration)
       return
     }
@@ -61,61 +69,67 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
       "startTunnel stack=\(vpnOptions.stack, privacy: .public) ipv6=\(vpnOptions.ipv6, privacy: .public) dnsHijacking=\(vpnOptions.dnsHijacking, privacy: .public) systemProxy=\(vpnOptions.systemProxy, privacy: .public)"
     )
 
-    setTunnelNetworkSettings(
-      networkConfiguration.makeSettings(for: vpnOptions)
-    ) { error in
+    eventQueue.start()
+    watchMemoryPressure()
+    recordStartup("core-setup")
+    MobileQuickSetup(
+      sharedStateStore.makeInitParams(),
+      setupParams,
+      CoreResultHandler { result in
+        let message = String(data: result, encoding: .utf8) ?? ""
+        guard message.isEmpty else {
+          self.completeStart(PacketTunnelProviderError.setupFailed(message), completionHandler)
+          return
+        }
+        self.configureNetworkAndStartTun(vpnOptions, completionHandler)
+      }
+    )
+  }
+
+  private func configureNetworkAndStartTun(
+    _ vpnOptions: PacketTunnelVPNOptions,
+    _ completionHandler: @escaping (Error?) -> Void
+  ) {
+    // Keep working DNS/routes until the Core has finished loading providers.
+    recordStartup("network-settings")
+    setTunnelNetworkSettings(networkConfiguration.makeSettings(for: vpnOptions)) { error in
       if let error {
-        self.logger.error(
-          "setTunnelNetworkSettings failed: \(error.localizedDescription, privacy: .public)"
-        )
-        completionHandler(error)
+        self.completeStart(error, completionHandler)
         return
       }
       guard
         let fileDescriptor = self.networkConfiguration.tunnelFileDescriptor()
       else {
-        completionHandler(PacketTunnelProviderError.missingFileDescriptor)
+        self.completeStart(PacketTunnelProviderError.missingFileDescriptor, completionHandler)
         return
       }
-      self.eventQueue.start()
-      self.watchMemoryPressure()
-      MobileQuickSetup(
-        self.sharedStateStore.makeInitParams(),
-        setupParams,
-        CoreResultHandler { result in
-          let message = String(data: result, encoding: .utf8) ?? ""
-          guard message.isEmpty else {
-            self.logger.error(
-              "quickSetup failed: \(message, privacy: .public)"
-            )
-            self.completeStart(PacketTunnelProviderError.setupFailed(message), completionHandler)
-            return
-          }
-          if let error = self.startTun(fileDescriptor: fileDescriptor, options: vpnOptions) {
-            self.completeStart(error, completionHandler)
-            return
-          }
-          do {
-            let mailbox = CoreMailboxServer(directory: self.sharedStateStore.appGroupDirectory()!) {
-              [weak self] data, reply in
-              self?.eventQueue.markCoreResponsive()
-              MobileInvokeMethod(String(data: data, encoding: .utf8), CoreResultHandler(reply))
-            }
-            try mailbox.start()
-            self.mailbox = mailbox
-            self.completeStart(nil, completionHandler)
-          } catch {
-            self.completeStart(error, completionHandler)
-          }
+      self.recordStartup("tun-start")
+      if let error = self.startTun(fileDescriptor: fileDescriptor, options: vpnOptions) {
+        self.completeStart(error, completionHandler)
+        return
+      }
+      do {
+        self.recordStartup("mailbox-start")
+        let mailbox = CoreMailboxServer(directory: self.sharedStateStore.appGroupDirectory()!) {
+          [weak self] data, reply in
+          self?.eventQueue.markCoreResponsive()
+          MobileInvokeMethod(String(data: data, encoding: .utf8), CoreResultHandler(reply))
         }
-      )
+        try mailbox.start()
+        self.mailbox = mailbox
+        self.completeStart(nil, completionHandler)
+      } catch {
+        self.completeStart(error, completionHandler)
+      }
     }
   }
 
   private func completeStart(_ error: Error?, _ completionHandler: (Error?) -> Void) {
     if error != nil {
+      recordStartup("startup-failed", error: error)
       stopCore()
     } else {
+      recordStartup("running")
       sharedStateStore.saveRunTime()
       reloadControls()
     }
@@ -202,6 +216,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
       queue: .global(qos: .utility)
     )
     source.setEventHandler {
+      self.recordStartup("memory-pressure")
       MobileForceGC()
     }
     source.resume()

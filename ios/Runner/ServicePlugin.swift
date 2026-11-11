@@ -18,6 +18,7 @@ final class ServicePlugin {
   private let coreChannel: FlutterMethodChannel
   private let tileChannel: FlutterMethodChannel
   private let sharedStateStore = SharedStateStore()
+  private let certificateInstaller = CertificateProfileServer()
   private let router = CoreMessageRouter()
   private let eventRelay: CoreEventRelay
   private var tunnelController: TunnelController!
@@ -138,6 +139,23 @@ final class ServicePlugin {
 
   private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
+    case "installMitmProfile":
+      guard let profile = call.arguments as? String,
+        let data = profile.data(using: .utf8), data.count <= 65536,
+        let document = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any],
+        let payloads = document["PayloadContent"] as? [[String: Any]],
+        payloads.count == 1, payloads[0]["PayloadType"] as? String == "com.apple.security.root",
+        payloads[0]["PayloadContent"] is Data else {
+        result(FlutterError(code: "INVALID_PROFILE", message: "Expected a public CA profile", details: nil))
+        return
+      }
+      certificateInstaller.install(data) { error in
+        if let error {
+          result(FlutterError(code: "CERTIFICATE_DOWNLOAD", message: error.localizedDescription, details: nil))
+        } else {
+          result(nil)
+        }
+      }
     case "checkMitmTrust":
       guard let pem = call.arguments as? String else {
         result(false)

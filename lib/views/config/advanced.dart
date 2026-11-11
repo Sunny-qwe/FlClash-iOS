@@ -4,8 +4,6 @@ import 'package:fl_clash/ui/ui.dart';
 import 'package:fl_clash/views/config/dns.dart';
 import 'package:fl_clash/views/config/filters.dart';
 import 'package:fl_clash/views/config/icon_sets.dart';
-import 'package:fl_clash/views/config/mitm.dart';
-import 'package:fl_clash/views/config/mitm_modules.dart';
 import 'package:fl_clash/views/config/network.dart';
 import 'package:fl_clash/views/config/providers.dart';
 import 'package:fl_clash/views/config/scripts.dart';
@@ -44,18 +42,6 @@ class AdvancedConfigView extends StatelessWidget {
         leading: const GlyphIcon(AppGlyphs.code),
         widget: const ScriptsView(),
       ),
-      if (mitmFeature)
-        ListItem.open(
-          title: Text(appLocalizations.mitmModules),
-          leading: const GlyphIcon(AppGlyphs.resources),
-          widget: const MitmModulesView(),
-        ),
-      if (mitmFeature)
-        ListItem.open(
-          title: Text(appLocalizations.mitmCertificateSettings),
-          leading: const GlyphIcon(AppGlyphs.lockOpen),
-          widget: MitmView(isAndroid: system.isAndroid),
-        ),
     ];
     final customItems = [
       ListItem.open(

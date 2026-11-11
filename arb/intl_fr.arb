@@ -1,6 +1,6 @@
 {
   "mitmCertificateSettings": "Certificats MITM",
-  "mitmIOSGuide": "Exportez le certificat, installez son profil dans les réglages iOS, puis activez la confiance complète dans Général → Informations → Réglages des certificats. Revenez ici pour vérifier. Après régénération, installez le nouveau certificat.",
+  "mitmIOSGuide": "Touchez Installer et autorisez le téléchargement du profil dans le navigateur. Dans Réglages → Profil téléchargé (ou Général → VPN et gestion de l’appareil), installez-le et saisissez le code de l’appareil si demandé. Activez la confiance complète dans Général → Informations → Réglages des certificats. Revenez ici pour vérifier. Après régénération, installez le nouveau certificat.",
   "mitmEngineCompatibility": "Prend en charge HTTPS ciblé, URL, en-têtes, corps, réponses locales, scripts requête/réponse, $httpClient, $task.fetch, minuteries et stockage persistant. Durée et taille des scripts limitées. Planification, événements, modes binaire et en-têtes complets non pris en charge. Les corps volumineux sont transmis sans modification. Compatibilité partielle des modules.",
   "localNetworkSettings": "Réseau local et boucle locale",
   "localNetworkProtection": "Protéger le jumelage local",

@@ -26,6 +26,7 @@ final class TunnelCoordinator {
   // A start that supersedes a stop before it stopped anything must still
   // cycle the tunnel, or a restart meant to apply new options is lost.
   private var restartOwed = false
+  private var startupID = ""
 
   private var needsStatusRefresh = false
   private var statusRefreshShouldNotify = false
@@ -271,6 +272,9 @@ final class TunnelCoordinator {
 
       do {
         var startOptions: [String: NSObject] = [:]
+        startupID = UUID().uuidString
+        TunnelStartupDiagnostic.write(directory: NEHelper.appGroupDirectory, id: startupID, stage: "launch-requested")
+        startOptions["startupID"] = startupID as NSString
         if let url = NEHelper.sharedStateURL,
            let str = try? String(contentsOf: url, encoding: .utf8) {
           startOptions["sharedState"] = str as NSString
@@ -343,13 +347,25 @@ final class TunnelCoordinator {
   }
 
   private func lastDisconnectError(_ connection: NEVPNConnection) async -> Error {
+    let diagnostic = TunnelStartupDiagnostic.read(directory: NEHelper.appGroupDirectory, id: startupID)
+    if let diagnostic, let detail = diagnostic.detail {
+      return NSError(domain: "FlClash.VPN", code: 2,
+        userInfo: [NSLocalizedDescriptionKey: "VPN \(diagnostic.stage): \(detail)"])
+    }
     if #available(iOS 16.0, *) {
       let error: Error? = await withCheckedContinuation { continuation in
         connection.fetchLastDisconnectError { error in
           continuation.resume(returning: error)
         }
       }
-      if let error { return error }
+      if let error {
+        guard let diagnostic else { return error }
+        let ns = error as NSError
+        return NSError(domain: ns.domain, code: ns.code, userInfo: [
+          NSLocalizedDescriptionKey: "\(ns.localizedDescription) (VPN stage: \(diagnostic.stage))",
+          NSUnderlyingErrorKey: error,
+        ])
+      }
     }
     return NSError(
       domain: "FlClash.VPN", code: 1,

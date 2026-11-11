@@ -98,8 +98,10 @@ class IOSMitmTrustStore implements MitmTrustStore {
   }
 
   @override
-  Future<MitmInstallOutcome> install(MitmCertificate ca) async =>
-      MitmInstallOutcome.prompted;
+  Future<MitmInstallOutcome> install(MitmCertificate ca) async {
+    await _channel.invokeMethod<void>('installMitmProfile', mitmIOSProfile(ca));
+    return MitmInstallOutcome.prompted;
+  }
 
   @override
   Future<bool> remove(MitmCertificate ca) async => false;

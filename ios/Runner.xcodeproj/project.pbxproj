@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E0000203000000000000001 /* TunnelStartupDiagnostic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E0000213000000000000001 /* TunnelStartupDiagnostic.swift */; };
+		7E0000203000000000000002 /* TunnelStartupDiagnostic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E0000213000000000000001 /* TunnelStartupDiagnostic.swift */; };
+		7E0000103000000000000001 /* CertificateProfileServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E0000113000000000000001 /* CertificateProfileServer.swift */; };
 		7D0000303000000000000001 /* CoreMailbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0000313000000000000001 /* CoreMailbox.swift */; };
 		7D0000203000000000000001 /* AppGroupLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0000213000000000000001 /* AppGroupLocation.swift */; };
 		0573B366304032E200768CF4 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 0573B365304032E200768CF4 /* AppIcon.icon */; };
@@ -102,6 +105,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7E0000213000000000000001 /* TunnelStartupDiagnostic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/TunnelStartupDiagnostic.swift; sourceTree = SOURCE_ROOT; };
+		7E0000113000000000000001 /* CertificateProfileServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateProfileServer.swift; sourceTree = "<group>"; };
 		7D0000313000000000000001 /* CoreMailbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/CoreMailbox.swift; sourceTree = SOURCE_ROOT; };
 		7D0000213000000000000001 /* AppGroupLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/AppGroupLocation.swift; sourceTree = SOURCE_ROOT; };
 		0573B365304032E200768CF4 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
@@ -339,6 +344,7 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				0590E2612FFA576B00321CD8 /* ShortcutProvider.swift */,
 				7891A0002FF2266100620D82 /* ServicePlugin.swift */,
+				7E0000113000000000000001 /* CertificateProfileServer.swift */,
 				7D0000023000000000000001 /* Core */,
 				7C0000013000000000000001 /* Tunnel */,
 				7D0000033000000000000001 /* Storage */,
@@ -639,6 +645,7 @@
 			files = (
 				7D0000203000000000000001 /* AppGroupLocation.swift in Sources */,
 				7D0000303000000000000001 /* CoreMailbox.swift in Sources */,
+				7E0000203000000000000001 /* TunnelStartupDiagnostic.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -672,6 +679,8 @@
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				7891A0012FF2266100620D82 /* ServicePlugin.swift in Sources */,
+				7E0000203000000000000002 /* TunnelStartupDiagnostic.swift in Sources */,
+				7E0000103000000000000001 /* CertificateProfileServer.swift in Sources */,
 				7C0000123000000000000001 /* TunnelController.swift in Sources */,
 				7C0000133000000000000001 /* TunnelCoordinator.swift in Sources */,
 				7C0000143000000000000001 /* TunnelManagerStore.swift in Sources */,
