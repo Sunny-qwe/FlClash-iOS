@@ -436,10 +436,6 @@ class SetupAction extends _$SetupAction {
         );
   }
 
-  // False means building the profile, the config write, or the Core setup
-  // step failed; a profile that fails to build is still pushed to the Core
-  // as the empty config so it never keeps serving the previous one.
-  // authorizeCore failures still throw.
   Future<bool> applyProfile({
     bool silence = false,
     bool force = false,
@@ -725,6 +721,15 @@ class SetupAction extends _$SetupAction {
     return fallback;
   }
 
+  void _restoreAppliedSelection(int? attemptedId) {
+    final previousId = _appliedInputs?.$1.profileId;
+    if (previousId != null &&
+        ref.read(currentProfileIdProvider) == attemptedId &&
+        ref.read(profilesProvider).getProfile(previousId) != null) {
+      ref.read(currentProfileIdProvider.notifier).value = previousId;
+    }
+  }
+
   Future<_SetupTaskResult> _setupConfig({
     bool force = false,
     bool silence = false,
@@ -757,10 +762,13 @@ class SetupAction extends _$SetupAction {
       setupState = state;
       return getProfile(setupState: state, patchConfig: realPatchConfig);
     }, title: 'build profile');
-    final profileFailed = realProfile == null;
-    final setupParams = _setupParams.copyWith(base: realProfile?.base);
+    if (realProfile == null) {
+      _restoreAppliedSelection(profile?.id);
+      return _SetupTaskResult.failed;
+    }
+    final setupParams = _setupParams.copyWith(base: realProfile.base);
     final inputs = switch (setupState) {
-      final state? when !profileFailed => (
+      final state? => (
         state,
         realPatchConfig,
         networkSetting,
@@ -768,16 +776,17 @@ class SetupAction extends _$SetupAction {
       ),
       _ => null,
     };
-    final yamlString = realProfile?.yaml ?? '';
-    final yamlMd5 = realProfile?.md5 ?? '';
-    if (!profileFailed && yamlMd5 == globalState.lastConfigMd5 && !force) {
+    final yamlString = realProfile.yaml;
+    final yamlMd5 = realProfile.md5;
+    if (yamlMd5 == globalState.lastConfigMd5 && !force) {
       _appliedInputs = inputs;
       globalState.lastConfigCounts = realProfile.counts;
       await preloadInvoke?.call();
       return _SetupTaskResult.completed;
     }
-    // Go answers a config it rejects by running its built-in default, which
-    // has no proxies, so until this push succeeds no applied config is known.
+    final previousInputs = _appliedInputs;
+    final previousMd5 = globalState.lastConfigMd5;
+    final previousCounts = globalState.lastConfigCounts;
     _appliedInputs = null;
     globalState.lastConfigMd5 = null;
     globalState.lastConfigCounts = null;
@@ -785,7 +794,7 @@ class SetupAction extends _$SetupAction {
       await ref.read(vpnOptionsProvider.future);
       await preferences.saveShareState(ref.read(sharedStateProvider));
       await preferences.saveAppliedConfigMd5(null);
-    } else if (system.isIOS) {
+    } else if (system.isIOS && preloadInvoke != null) {
       // The Network Extension sets its own Core up from this state.
       await ref.read(vpnOptionsProvider.future);
       await service?.syncState(ref.read(sharedStateProvider));
@@ -795,10 +804,19 @@ class SetupAction extends _$SetupAction {
     var setupFailed = false;
     await globalState.loadingRun(
       () async {
+        Directory? backupDirectory;
+        File? previousConfig;
+        File? writtenConfig;
         try {
           if (setupParams.base == null) {
             final configFilePath = await appPath.configFilePath;
-            await File(configFilePath).writeAsStringAtomically(yamlString);
+            final configFile = File(configFilePath);
+            if (await configFile.exists()) {
+              backupDirectory = await configFile.parent.createTemp('.config-backup-');
+              previousConfig = await configFile.copy('${backupDirectory.path}/config.yaml');
+            }
+            writtenConfig = configFile;
+            await configFile.writeAsStringAtomically(yamlString);
           }
           final profileId = profile?.id;
           if (profileId != null) {
@@ -820,11 +838,18 @@ class SetupAction extends _$SetupAction {
               waitForConfig: system.isIOS,
             );
           } on CoreMethodException catch (error) {
-            if (error.code != 'config_rejected') {
+            if (error.code != 'config_rejected' && error.code != 'config_preserved') {
               rethrow;
             }
-            globalState.lastConfigCounts = configCountsOf(const {});
-            await globalState.safeRun(() => onUpdated?.call());
+            if (previousConfig != null && writtenConfig != null) {
+              await previousConfig.rename(writtenConfig.path);
+            }
+            if (error.code == 'config_preserved') {
+              _appliedInputs = previousInputs;
+              globalState.lastConfigMd5 = previousMd5;
+              globalState.lastConfigCounts = previousCounts;
+              _restoreAppliedSelection(profile?.id);
+            }
             throw MessageException(error.message);
           }
         } catch (e, s) {
@@ -833,10 +858,16 @@ class SetupAction extends _$SetupAction {
             handoffFailure = (e, s);
           }
           rethrow;
+        } finally {
+          if (backupDirectory != null) {
+            await backupDirectory.delete(recursive: true);
+          }
+        }
+        if (system.isIOS && preloadInvoke == null) {
+          await service?.syncState(ref.read(sharedStateProvider));
         }
         globalState.lastConfigMd5 = yamlMd5;
-        globalState.lastConfigCounts =
-            realProfile?.counts ?? configCountsOf(const {});
+        globalState.lastConfigCounts = realProfile.counts;
         _appliedInputs = inputs;
         if (system.isAndroid) {
           await preferences.saveAppliedConfigMd5(yamlMd5);
@@ -850,7 +881,7 @@ class SetupAction extends _$SetupAction {
     if (handoffFailure != null) {
       Error.throwWithStackTrace(handoffFailure!.$1, handoffFailure!.$2);
     }
-    if (setupFailed || profileFailed) {
+    if (setupFailed) {
       return _SetupTaskResult.failed;
     }
     return _SetupTaskResult.completed;

@@ -366,8 +366,9 @@ travels only in `error`, never as a message in `result`, and a list validation a
 the entries it refuses. `CoreHandlerInterface` returns the decoded result or throws: a `CoreMethodException` for what
 the Core reports, for a Core out of reach (`core_unavailable`, `transport_*`, `no_response`) or for a query that
 answered nothing (`empty_result`), and a `TimeoutException` for no answer in time; `isUnansweredCoreError` tells a Core
-that never answered from one that refused. `config.setup` on a profile the Core cannot load applies the default config
-and answers `config_rejected`, which `SetupAction` reports as that profile's error.
+that never answered from one that refused. `config.setup` validates before applying. A rejected profile leaves a running
+configuration intact and answers `config_preserved`; without an applied configuration it answers `config_rejected`.
+`SetupAction` restores its applied metadata and selection only for `config_preserved`, and reports the profile error.
 
 A response over 1 MiB goes to a file under `<home>/responses/`, and the envelope carries only its `file`
 (`core/spill.go`). Sent inline, Android copies it into the Java heap three times (the gomobile `byte[]`, the codec and a

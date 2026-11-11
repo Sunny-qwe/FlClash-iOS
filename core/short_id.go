@@ -10,11 +10,16 @@ import (
 // mihomo decodes an unquoted REALITY short-id as a YAML number (0123 is 83, 00
 // is 0); the scalar keeps its literal text, so retagging it restores the id.
 func unmarshalRawConfig(buf []byte) (*config.RawConfig, error) {
-	if !bytes.Contains(buf, []byte("short-id")) {
+	if !bytes.Contains(buf, []byte("short-id")) && !bytes.Contains(buf, []byte("reality-opts")) {
 		return config.UnmarshalRawConfig(buf)
 	}
 	var document yaml.Node
-	if yaml.Unmarshal(buf, &document) != nil || !retagShortIDs(&document) {
+	if yaml.Unmarshal(buf, &document) != nil {
+		return config.UnmarshalRawConfig(buf)
+	}
+	retagged := retagShortIDs(&document)
+	normalized := normalizeRealityProxies(&document)
+	if !retagged && !normalized {
 		return config.UnmarshalRawConfig(buf)
 	}
 	rawConfig := config.DefaultRawConfig()

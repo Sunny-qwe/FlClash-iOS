@@ -217,11 +217,26 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
   }
 }
 
-private enum PacketTunnelProviderError: LocalizedError {
+private enum PacketTunnelProviderError: LocalizedError, CustomNSError {
   case missingConfiguration
   case missingFileDescriptor
   case setupFailed(String)
   case tunRejected
+
+  static var errorDomain: String { "FlClash.PacketTunnel" }
+
+  var errorCode: Int {
+    switch self {
+    case .missingConfiguration: return 1
+    case .missingFileDescriptor: return 2
+    case .setupFailed: return 3
+    case .tunRejected: return 4
+    }
+  }
+
+  var errorUserInfo: [String: Any] {
+    [NSLocalizedDescriptionKey: errorDescription ?? "VPN startup failed."]
+  }
 
   var errorDescription: String? {
     switch self {

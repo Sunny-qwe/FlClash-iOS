@@ -1173,7 +1173,7 @@ void main() {
     );
 
     test(
-      'a profile that fails to build still pushes the empty config to core',
+      'a profile that fails to build leaves the running config alone',
       () async {
         final profile = Profile.normal(label: 'p');
         final core = _MockCoreHandlerInterface();
@@ -1205,10 +1205,33 @@ void main() {
             .applyProfile(force: true);
 
         expect(succeeded, isFalse);
-        expect(pushedConfig, isEmpty);
+        expect(pushedConfig, isNull);
+        verifyNever(() => core.setupConfig(any()));
         expect(scoped.read(currentProfileIdProvider), profile.id);
       },
     );
+
+    test('a rejected direct config restores the saved startup file', () async {
+      final configFile = File(await appPath.configFilePath);
+      await configFile.writeAsString('mixed-port: 7890\n');
+      final core = _MockCoreHandlerInterface();
+      when(() => core.setupConfig(any())).thenAnswer(
+        (_) async => throw const CoreMethodException(
+          code: 'config_preserved',
+          message: 'invalid config',
+        ),
+      );
+      final scoped = ProviderContainer(overrides: [
+        currentProfileProvider.overrideWithValue(null),
+        setupStateProvider.overrideWith((_, _) => nullProfileSetupState),
+        coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+        setupActionProvider.overrideWith(SetupAction.new),
+      ]);
+      addTearDown(scoped.dispose);
+      expect(await scoped.read(setupActionProvider.notifier)
+          .applyProfile(force: true), isFalse);
+      expect(await configFile.readAsString(), 'mixed-port: 7890\n');
+    });
 
     test(
       'a config write failure reports setup as failed without calling core',
@@ -1444,8 +1467,8 @@ void main() {
       verify(() => core.setupConfig(any())).called(1);
     });
 
-    test('a config the Core rejected is pushed again once reverted, and the '
-        'groups follow the Core through both', () async {
+    test('a rejected settings change preserves groups and reverting does not '
+        'reload the running config', () async {
       final profile = Profile.normal(label: 'p');
       final core = _MockCoreHandlerInterface();
       Map<String, dynamic> global(List<String> all) => {
@@ -1467,13 +1490,6 @@ void main() {
           'GLOBAL': global(['Proxy']),
         },
       );
-      final fallbackProxies = ProxiesData(
-        all: const ['GLOBAL'],
-        proxies: {
-          'DIRECT': <String, dynamic>{'name': 'DIRECT', 'type': 'Direct'},
-          'GLOBAL': global(['DIRECT']),
-        },
-      );
       var rejecting = false;
       var coreProxies = profileProxies;
       when(
@@ -1483,9 +1499,8 @@ void main() {
       when(() => core.getProxies()).thenAnswer((_) async => coreProxies);
       when(() => core.setupConfig(any())).thenAnswer((_) async {
         if (rejecting) {
-          coreProxies = fallbackProxies;
           throw const CoreMethodException(
-            code: 'config_rejected',
+            code: 'config_preserved',
             message: 'invalid hosts',
           );
         }
@@ -1522,12 +1537,12 @@ void main() {
       rejecting = true;
       setHosts({'example.com': 'not-an-address'});
       expect(await setupAction.applyProfile(), isFalse);
-      expect(shownGroups(), isEmpty);
+      expect(shownGroups(), ['Proxy']);
 
       rejecting = false;
       setHosts(originalHosts);
       expect(await setupAction.applyProfile(), isTrue);
-      verify(() => core.setupConfig(any())).called(3);
+      verify(() => core.setupConfig(any())).called(2);
       expect(shownGroups(), ['Proxy']);
     });
 
@@ -1595,7 +1610,7 @@ void main() {
       );
       digest = 'third';
       expect(await setupAction.applyProfile(), isFalse);
-      expect(globalState.lastConfigCounts, (groups: 0, proxies: 0, rules: 0));
+      expect(globalState.lastConfigCounts, isNull);
     });
 
     test('the preview shows the config the Core merges', () async {

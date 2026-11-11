@@ -270,12 +270,10 @@ leaving a repo-wide policy as a comment reaches only the reader of that one file
   scheduler needs its in-flight guard on the FlClash side. `updater.UpdateMMDB` and its siblings have none — only the
   batch `UpdateGeoDatabases` does — and two concurrent runs close the mmap'd database twice, so `handleUpdateGeoData`
   claims per resource and `updater.GeoUpdateHook` releases.
-- A failed `applyConfig` rolls the tunnel back to the default config, and that rollback is the whole recovery:
-  `handleSetupConfig` returns the error and stops there. Do not add a teardown on top of it — stopping the listeners
-  takes the app offline over a profile the user can still switch away from, and the error already reaches the host,
-  which is what surfaces the failure (`MessageException` on the Flutter side, the config-error toast on Android). Keep
-  an empty `config.yaml` out of the failure path — it is how the app says "no profile selected", and `loadConfig`
-  resolves it to the defaults.
+- A failed `applyConfig` preserves the applied configuration and returns `config_preserved`; without one it returns
+  `config_rejected`. Validate before applying options, replacing the startup file, or updating listeners. The host
+  reports the failure and restores its applied metadata and selection only when preservation is confirmed. Never
+  stop the listeners or push an empty configuration as recovery for a rejected profile.
 - Package `init` in the Android library runs while the `.so` is being loaded, so a panic there takes the application
   down before it can report anything. `platform/limit.go` arms an fd-pressure probe and degrades to never blocking when
   it cannot; keep that shape for anything else `init` sets up that correctness does not depend on.

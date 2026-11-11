@@ -550,7 +550,7 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     });
 
-    testWidgets('rapid A -> B -> C settles on C even when both are rejected', (
+    testWidgets('rapid A -> B -> C applies only C when it is rejected', (
       tester,
     ) async {
       final coreInterface = _coreInterface();
@@ -579,11 +579,57 @@ void main() {
 
       container.read(currentProfileIdProvider.notifier).value = b.id;
       container.read(currentProfileIdProvider.notifier).value = c.id;
-      await _waitForSetupToSettle(tester, () => setupCalls >= 2);
+      await _waitForSetupToSettle(tester, () => setupCalls >= 1);
 
       expect(container.read(currentProfileIdProvider), c.id);
-      expect(setupCalls, 2);
+      expect(setupCalls, 1);
 
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    testWidgets('a rejected switch restores the applied selection without '
+        'reloading it', (tester) async {
+      final coreInterface = _coreInterface();
+      var setupCalls = 0;
+      when(() => coreInterface.getProfileBase(any())).thenAnswer(
+        (_) async => const ProfileBase(config: {}, digest: 'd'),
+      );
+      when(() => coreInterface.setupConfig(any())).thenAnswer((_) async {
+        setupCalls++;
+        if (setupCalls > 1) {
+          throw const CoreMethodException(
+            code: 'config_preserved',
+            message: 'invalid new subscription',
+          );
+        }
+      });
+      when(() => coreInterface.getProxies()).thenAnswer(
+        (_) async => const ProxiesData(all: [], proxies: {}),
+      );
+      when(() => coreInterface.getExternalProviders()).thenAnswer((_) async => []);
+      final container = await _pumpCoreManager(
+        tester,
+        coreInterface,
+        overrides: [
+          initProvider.overrideWithBuild((_, _) => true),
+          profilesProvider.overrideWith(() => TestProfiles([previous, next])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => previous.id),
+          setupStateProvider.overrideWith((_, id) =>
+              _nullProfileSetupState.copyWith(profileId: id)),
+        ],
+      );
+      globalState.container = container;
+      await tester.runAsync(() async {
+        expect(await container.read(setupActionProvider.notifier)
+            .applyProfile(force: true), isTrue);
+      });
+      final appliedMd5 = globalState.lastConfigMd5;
+      container.read(currentProfileIdProvider.notifier).value = next.id;
+      await _waitForSetupToSettle(tester, () =>
+          setupCalls == 2 && container.read(currentProfileIdProvider) == previous.id);
+      expect(container.read(currentProfileIdProvider), previous.id);
+      expect(globalState.lastConfigMd5, appliedMd5);
+      expect(setupCalls, 2);
       await tester.pumpWidget(const SizedBox.shrink());
     });
 

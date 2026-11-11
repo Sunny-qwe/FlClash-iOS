@@ -107,11 +107,11 @@ func loadConfigWithBase(base *SetupBase, configPath string) (*config.Config, err
 	if err := document.Decode(raw); err != nil {
 		return nil, err
 	}
-	if err := writeConfigDocument(configPath, document); err != nil {
-		return nil, err
-	}
 	cfg, err := config.ParseRawConfig(raw)
 	if err != nil {
+		return nil, err
+	}
+	if err := writeConfigDocument(configPath, document); err != nil {
 		return nil, err
 	}
 	return withPlatformLimits(cfg), nil
@@ -156,6 +156,7 @@ func mergeProfileBase(base *SetupBase) (*yaml.Node, error) {
 	if retag {
 		retagShortIDs(root)
 	}
+	normalizeRealityProxies(root)
 	return &yaml.Node{Kind: yaml.DocumentNode, Content: []*yaml.Node{root}}, nil
 }
 

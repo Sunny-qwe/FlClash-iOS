@@ -38,12 +38,15 @@ class _CoreContainerState extends ConsumerState<CoreManager>
     super.initState();
     coreEventManager.addListener(this);
     ref.read(updatingActionProvider.notifier);
-    // A rejected profile stays selected on purpose: silently reverting to
-    // the previous one hides the error and looks like the switch was lost.
     ref.listenManual(currentProfileIdProvider, (prev, next) {
       if (prev == next) return;
-      runAfterFrame(() {
-        unawaited(ref.read(setupActionProvider.notifier).fullSetup());
+      runAfterFrame(() async {
+        if (!mounted || ref.read(currentProfileIdProvider) != next) return;
+        final setup = ref.read(setupActionProvider.notifier);
+        if (!await setup.inputsApplied() &&
+            mounted && ref.read(currentProfileIdProvider) == next) {
+          await setup.fullSetup();
+        }
       });
     });
     ref.listenManual(updateParamsProvider, (prev, next) {
