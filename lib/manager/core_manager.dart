@@ -76,9 +76,7 @@ class _CoreContainerState extends ConsumerState<CoreManager>
       },
     );
     ref.listenManual(mitmModulesProvider, (prev, next) {
-      if (mitmFeature &&
-          prev?.value != null &&
-          next.hasValue) {
+      if (mitmFeature && prev?.value != null && next.hasValue) {
         ref
             .read(setupActionProvider.notifier)
             .applyProfileDebounce(silence: true);
