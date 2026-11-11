@@ -1,4 +1,7 @@
 {
+  "mitmCertificateSettings": "MITM certificates",
+  "mitmIOSGuide": "Export the certificate, install its profile in iOS Settings, then enable full trust under Settings → General → About → Certificate Trust Settings. Return here to check trust. Regenerating the certificate requires installing the new one.",
+  "mitmEngineCompatibility": "Supports selected-host HTTPS, redirects/rejects, header/body rewrites, local responses, request/response scripts, $httpClient, $task.fetch, timers and persistent storage. Scripts have short runtime and size limits. Scheduled/event scripts and binary/full-header script modes are not supported. Oversized bodies pass through unchanged. Module compatibility is partial.",
   "localNetworkSettings": "Local network and loopback",
   "localNetworkProtection": "Protect local pairing",
   "localNetworkProtectionDesc": "Exclude 127.0.0.0/8, 10.7.0.0/24 and ::1/128 from the tunnel for local pairing. This does not enable JIT or another app's VPN. Reconnect the VPN after changing routes.",

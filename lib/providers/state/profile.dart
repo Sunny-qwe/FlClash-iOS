@@ -71,10 +71,7 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
         );
   final allProfileProviders = ref.watch(profileProvidersProvider);
   final mitmModules =
-      mitmFeature &&
-          ref.watch(
-            patchClashConfigProvider.select((state) => state.mitm.enable),
-          )
+      mitmFeature
       ? ref.watch(mitmModulesProvider.future)
       : null;
   List<ProxyGroup> proxyGroups = [];

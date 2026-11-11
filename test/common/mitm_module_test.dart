@@ -77,6 +77,21 @@ hostname = *.example.com
 ''';
 
 void main() {
+  test('skips whole logical rules with unsupported HTTP conditions', () {
+    final content = parseMitmModule(r'''
+[Rule]
+AND,((URL-REGEX,"^http:\/\/.+\/amdc\/mobileDispatch"),(USER-AGENT,"Example*")),REJECT
+OR,((DOMAIN,ads.example.com),(USER-AGENT,Example*)),REJECT
+NOT,((URL-REGEX,^https://example.com/ad)),REJECT
+AND,((DOMAIN-SUFFIX,example.com),(PROTOCOL,UDP)),REJECT
+''');
+    expect(content.rules, [
+      'AND,((DOMAIN-SUFFIX,example.com),(NETWORK,UDP)),REJECT',
+    ]);
+    expect(content.skipped, hasLength(3));
+    expect(content.skipped.every((item) => item.reason == MitmModuleSkipReason.rule), isTrue);
+  });
+
   group('a Surge module', () {
     final content = parseMitmModule(
       _surge,

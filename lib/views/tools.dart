@@ -15,6 +15,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'config/advanced.dart';
+import 'config/mitm.dart';
+import 'config/mitm_modules.dart';
 import 'developer.dart';
 import 'disclaimer.dart';
 import 'theme.dart';
@@ -82,6 +84,18 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         if (system.isAndroid) const _AccessItem(),
         const _BackupItem(),
         const _AdvancedConfigItem(),
+        if (mitmFeature)
+          ListItem.open(
+            title: Text(context.appLocalizations.mitmModules),
+            leading: const GlyphIcon(AppGlyphs.resources),
+            widget: const MitmModulesView(),
+          ),
+        if (mitmFeature)
+          ListItem.open(
+            title: Text(context.appLocalizations.mitmCertificateSettings),
+            leading: const GlyphIcon(AppGlyphs.lockOpen),
+            widget: MitmView(isAndroid: system.isAndroid),
+          ),
         const _GeneralItem(),
         if (system.isIOS) const _LoopbackItem(),
       ],

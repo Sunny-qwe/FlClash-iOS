@@ -2258,10 +2258,20 @@ const _desktopMitmCaptureOptions = [500, 1000, 2000, 5000, 10000, 20000];
 const _androidMitmCaptureOptions = [200, 500, 1000, 2000, 5000];
 
 List<int> mitmCaptureOptions({required bool isAndroid}) =>
-    isAndroid ? _androidMitmCaptureOptions : _desktopMitmCaptureOptions;
+    system.isIOS ? const [16, 32, 64] : isAndroid ? _androidMitmCaptureOptions : _desktopMitmCaptureOptions;
 
 Map<String, Object> _mitmLimits({required bool isAndroid}) =>
-    isAndroid ? _androidMitmLimits : _desktopMitmLimits;
+    system.isIOS ? _iosMitmLimits : isAndroid ? _androidMitmLimits : _desktopMitmLimits;
+
+const _iosMitmLimits = {
+  'max-body-size': 256 << 10,
+  'body-buffer': 4 << 20,
+  'certificate-cache': 32,
+  'max-sessions': 16,
+  'script-concurrency': 1,
+  'capture-entries': 64,
+  'capture-bytes': 1 << 20,
+};
 
 int mitmCaptureBytes({required bool isAndroid}) =>
     _mitmLimits(isAndroid: isAndroid)['capture-bytes']! as int;

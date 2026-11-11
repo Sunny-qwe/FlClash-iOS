@@ -33,6 +33,10 @@ final class CoreMessageRouter: @unchecked Sendable {
     "ruleSet.dump",
     "ruleSet.compile",
     "geo.update",
+    "mitm.certificate",
+    "mitm.generateCertificate",
+    "mitm.issueCertificate",
+    "mitm.validate",
   ]
 
   private static let configurationMethods: Set<String> = [

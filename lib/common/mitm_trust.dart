@@ -10,7 +10,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
-import 'package:flutter/services.dart' show PlatformException;
+import 'package:flutter/services.dart' show PlatformException, MethodChannel;
 import 'package:path/path.dart';
 
 /// The name of the leaf the Core signs for a trust store to verify.
@@ -62,6 +62,9 @@ abstract interface class MitmTrustStore {
 }
 
 MitmTrustStore? mitmTrustStoreForPlatform() {
+  if (system.isIOS) {
+    return IOSMitmTrustStore();
+  }
   if (system.isMacOS) {
     return MacOSMitmTrustStore(home: Platform.environment['HOME'] ?? '');
   }
@@ -80,6 +83,23 @@ MitmTrustStore? mitmTrustStoreForPlatform() {
   return null;
 }
 
+class IOSMitmTrustStore implements MitmTrustStore {
+  static const _channel = MethodChannel('com.follow.clash/service');
+
+  @override
+  Future<MitmTrustCheck> check(MitmCertificate ca, Future<String> Function() issueLeaf) async {
+    final leaf = await issueLeaf();
+    final trusted = await _channel.invokeMethod<bool>('checkMitmTrust', leaf) ?? false;
+    return MitmTrustCheck(trusted ? MitmTrust.ready : MitmTrust.untrusted);
+  }
+
+  @override
+  Future<MitmInstallOutcome> install(MitmCertificate ca) async => MitmInstallOutcome.prompted;
+
+  @override
+  Future<bool> remove(MitmCertificate ca) async => false;
+}
+
 List<int> mitmCertificateDer(MitmCertificate ca) {
   final body = const LineSplitter()
       .convert(ca.pem)
@@ -96,6 +116,31 @@ String mitmSha1Hex(MitmCertificate ca) =>
 
 String mitmSha256Hex(MitmCertificate ca) =>
     ca.fingerprint.replaceAll(':', '').toUpperCase();
+
+String mitmIOSProfile(MitmCertificate ca) {
+  String uuid(String suffix) {
+    final hex = sha256.convert(utf8.encode('${ca.fingerprint}:$suffix')).toString();
+    return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20, 32)}';
+  }
+  final title = const HtmlEscape(HtmlEscapeMode.element).convert(ca.subject);
+  final certificate = base64.encode(mitmCertificateDer(ca));
+  return '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>PayloadType</key><string>Configuration</string>
+<key>PayloadVersion</key><integer>1</integer>
+<key>PayloadIdentifier</key><string>com.follow.clash.mitm.${uuid('profile')}</string>
+<key>PayloadUUID</key><string>${uuid('profile')}</string>
+<key>PayloadDisplayName</key><string>$title</string>
+<key>PayloadContent</key><array><dict>
+<key>PayloadType</key><string>com.apple.security.root</string>
+<key>PayloadVersion</key><integer>1</integer>
+<key>PayloadIdentifier</key><string>com.follow.clash.mitm.${uuid('certificate')}</string>
+<key>PayloadUUID</key><string>${uuid('certificate')}</string>
+<key>PayloadDisplayName</key><string>$title</string>
+<key>PayloadContent</key><data>$certificate</data>
+</dict></array></dict></plist>''';
+}
 
 typedef TempFileWriter = Future<String> Function(String content);
 

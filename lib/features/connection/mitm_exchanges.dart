@@ -168,6 +168,41 @@ class _MitmExchangeItem extends ConsumerWidget {
   }
 }
 
+class MitmCaptureListView extends ConsumerWidget {
+  const MitmCaptureListView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(mitmExchangesProvider(''));
+    final list = state.value;
+    final exchanges = list?.exchanges ?? const <MitmExchangeSummary>[];
+    return Scaffold(
+      title: context.appLocalizations.httpRequests,
+      body: NullStatusSwitcher(
+        isLoading: state.isLoading && !state.hasValue,
+        isEmpty: exchanges.isEmpty,
+        nullStatus: NullStatus(
+          label: state.error != null
+              ? compactError(state.error!)
+              : list?.capturing == false
+              ? context.appLocalizations.httpCaptureOff
+              : context.appLocalizations.nullTip(context.appLocalizations.httpRequests),
+          illustration: NullStatusIllustration.requests,
+        ),
+        child: ListView(
+          padding: _detailPadding(context),
+          children: [
+            generateSection(items: [
+              for (final exchange in exchanges.reversed)
+                _MitmExchangeItem(exchange: exchange),
+            ]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class MitmExchangeView extends ConsumerWidget {
   final int id;
 

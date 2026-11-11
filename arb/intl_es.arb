@@ -1,4 +1,7 @@
 {
+  "mitmCertificateSettings": "Certificados MITM",
+  "mitmIOSGuide": "Exporte el certificado, instale su perfil en Ajustes de iOS y active la confianza total en General → Información → Ajustes de confianza de certificados. Vuelva aquí para comprobarla. Tras regenerarlo, instale el nuevo certificado.",
+  "mitmEngineCompatibility": "Admite HTTPS seleccionado, URL, cabeceras, cuerpo, respuestas locales, scripts de solicitud/respuesta, $httpClient, $task.fetch, temporizadores y almacenamiento persistente. Los scripts tienen límites de tiempo y tamaño. No admite programación, eventos ni modos binario o de cabeceras completas. Los cuerpos grandes pasan sin cambios. Compatibilidad parcial de módulos.",
   "localNetworkSettings": "Red local y bucle local",
   "localNetworkProtection": "Proteger el enlace local",
   "localNetworkProtectionDesc": "Excluye 127.0.0.0/8, 10.7.0.0/24 y ::1/128 del túnel para el enlace local. No activa JIT ni la VPN de otra app. Vuelva a conectar la VPN tras cambiar las rutas.",

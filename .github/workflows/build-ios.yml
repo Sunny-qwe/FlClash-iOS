@@ -51,8 +51,15 @@ jobs:
           CGO_ENABLED: '0'
         run: |
           test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go)"
-          go test .
-          go vet .
+          go test . ./mitm
+          go test -tags=with_low_memory . ./mitm
+          go vet . ./mitm
+
+      - name: Verify modules and MITM execution
+        run: |
+          dart format lib/common/mitm_module.dart lib/common/mitm_trust.dart lib/common/constant.dart lib/common/common.dart lib/models/clash_config.dart lib/providers/mitm.dart lib/providers/state/profile.dart lib/providers/actions/core.dart lib/providers/actions/mitm_modules.dart lib/views/config/mitm.dart lib/views/config/advanced.dart lib/views/config/network.dart lib/features/connection/mitm_exchanges.dart test/common/mitm_module_test.dart test/common/mitm_trust_test.dart
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib/common/mitm_module.dart lib/common/mitm_trust.dart lib/providers/mitm.dart lib/providers/state/profile.dart lib/providers/actions/core.dart lib/providers/actions/mitm_modules.dart lib/views/config/mitm.dart lib/views/config/advanced.dart lib/views/config/network.dart lib/features/connection/mitm_exchanges.dart
+          flutter test test/common/mitm_module_test.dart test/common/mitm_trust_test.dart test/providers/mitm_modules_action_test.dart test/providers/mitm_exchanges_test.dart test/views/mitm_view_test.dart test/views/mitm_modules_view_test.dart test/lint/typography_test.dart test/lint/design_package_test.dart
 
       - name: Verify signing compatibility
         run: |
@@ -82,6 +89,21 @@ jobs:
           path: |
             lib/l10n/
             lib/providers/generated/
+            lib/models/generated/
+            lib/common/mitm_module.dart
+            lib/common/mitm_trust.dart
+            lib/common/constant.dart
+            lib/models/clash_config.dart
+            lib/providers/mitm.dart
+            lib/providers/state/profile.dart
+            lib/providers/actions/core.dart
+            lib/providers/actions/mitm_modules.dart
+            lib/views/config/mitm.dart
+            lib/views/config/advanced.dart
+            lib/views/config/network.dart
+            lib/features/connection/mitm_exchanges.dart
+            test/common/mitm_module_test.dart
+            test/common/mitm_trust_test.dart
             lib/providers/actions/proxies.dart
             lib/providers/actions/setup.dart
             lib/manager/core_manager.dart

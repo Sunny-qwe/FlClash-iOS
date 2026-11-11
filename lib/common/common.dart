@@ -50,6 +50,5 @@ export 'system_fonts.dart';
 export 'task.dart';
 export 'task_pool.dart';
 export 'webdav.dart';
-export 'mitm_store.dart';
 export 'mitm_trust.dart';
 export 'yaml.dart';

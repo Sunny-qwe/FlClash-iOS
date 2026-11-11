@@ -432,9 +432,14 @@ func handleUDPConn(packet C.PacketAdapter) {
 	}
 	fixMetadata(metadata) // fix some metadata not set via metadata.SetRemoteAddr or metadata.SetRemoteAddress
 
-	if err := preHandleMetadata(metadata.Clone()); err != nil { // precheck without modify metadata
+	checkedMetadata := metadata.Clone()
+	if err := preHandleMetadata(checkedMetadata); err != nil { // precheck without modify metadata
 		packet.Drop()
 		log.Debugln("[Metadata PreHandle] error: %s", err)
+		return
+	}
+	if interceptUDP(checkedMetadata) {
+		packet.Drop()
 		return
 	}
 
@@ -501,6 +506,10 @@ func handleUDPConn(packet C.PacketAdapter) {
 }
 
 func handleTCPConn(connCtx C.ConnContext) {
+	handleTCPConnWithInterception(connCtx, true)
+}
+
+func handleTCPConnWithInterception(connCtx C.ConnContext, intercept bool) {
 	if !isHandle(connCtx.Metadata().Type) {
 		_ = connCtx.Conn().Close()
 		return
@@ -538,6 +547,10 @@ func handleTCPConn(connCtx C.ConnContext) {
 	if preHandleFailed {
 		log.Debugln("[Metadata PreHandle] failed to sniff a domain for connection %s --> %s, give up",
 			metadata.SourceDetail(), metadata.RemoteAddress())
+		return
+	}
+
+	if intercept && interceptTCP(connCtx) {
 		return
 	}
 

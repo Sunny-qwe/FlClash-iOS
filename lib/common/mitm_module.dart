@@ -543,8 +543,6 @@ const _ruleTypes = {
   'GEOIP': 'GEOIP',
   'IP-ASN': 'IP-ASN',
   'ASN': 'IP-ASN',
-  'USER-AGENT': 'USER-AGENT',
-  'URL-REGEX': 'URL-REGEX',
 };
 
 const _loonContentTypes = {
@@ -1320,7 +1318,7 @@ class _ModuleParser {
         if (!_validPorts(value)) {
           return null;
         }
-      case 'GEOIP' || 'IP-ASN' || 'USER-AGENT' || 'URL-REGEX':
+      case 'GEOIP' || 'IP-ASN':
         if (value.isEmpty) {
           return null;
         }

@@ -218,17 +218,19 @@ re-applies the profile; keep-alive is forced off on Android, and only Linux hono
 
 ## HTTPS Decryption
 
-The bundled core has no MITM: it stays private, on `feature/mitm` in FlClash-internal and `feature/mitm-latest` in
-Clash.Meta-internal, with the architecture notes of that version. The core keeps the `mitm.*` method names and answers
-them `not_implemented`, and `SetMitmPressure` does nothing. The app keeps its pages, modules and trust stores behind
-`mitmFeature` (`FEATURE_MITM`, off by default), which closes every entry and sends the core no modules or capture.
-Turn it on only with a core that has MITM.
+This iOS fork implements hostname-scoped HTTP/TLS processing in `core/mitm`. A narrow tunnel interceptor lets the
+wrapper handle HTTP while mihomo retains outbound routing. The outbound path explicitly skips interception, so
+rewritten requests cannot recurse into the engine or bypass the selected proxy. An immutable engine is prepared
+before applying the config and swapped only after a successful apply. Rejected configs preserve the current engine.
+Certificate IPC reads or generates an ECDSA keypair in the shared home; the private key never leaves that directory.
+iOS checks trust using Security.framework with system anchors, and exports a root-certificate mobileconfig.
+Modules contribute supported routing rules independently of HTTPS decryption. Script, body, session, certificate
+and capture bounds are enforced by the wrapper. Cron/event and binary/full-header script modes remain unsupported;
+validation returns per-line diagnostics and runtime failures preserve the original request or response.
 
 Consent to a module's scripts covers `mitmScriptScope`: every line declaring a script, as written, and every line run
 now, which names its script by a hash of the content. An update that adds to that scope turns the module off until the
-user accepts again, whether it comes by hand, which asks at once, or by auto update, which says so in a banner. None of
-this has met users: settle its interaction, listed in the MITM section of the core integration notes
-(`docs/rust-core/integration.md`, local only), before turning the flag on.
+user accepts again, whether it comes by hand, which asks at once, or by auto update, which says so in a banner.
 
 ## Lifecycle Ownership And Convergence
 

@@ -387,9 +387,12 @@ func ForceGC() {
 	})
 }
 
-// SetMitmPressure stays for the Android service, which reports memory pressure
-// whatever the core; this core keeps nothing to release.
-func SetMitmPressure(level int32) {}
+func SetMitmPressure(level int32) {
+	if engine := mitmEngine.Load(); engine != nil && level > 0 {
+		engine.TrimCapture()
+		engine.CloseIdle()
+	}
+}
 
 func UpdateDns(value string) {
 	defer recoverExport("updateDns")

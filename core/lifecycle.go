@@ -30,6 +30,8 @@ func handleInit(params *InitParams) error {
 	defer configMu.Unlock()
 	sdkVersion.Store(int32(params.Version))
 	constant.SetHomeDir(params.HomeDir)
+	constant.Path.GeoSite()
+	constant.Path.GeoIP()
 	initOwnership(params.HomeDir)
 	clearSpilledResponses()
 	isInit.Store(true)
@@ -99,6 +101,9 @@ func handleShutdown() {
 	updater.StopGeoUpdater()
 	executor.Shutdown()
 	currentConfig = nil
+	if engine := mitmEngine.Swap(nil); engine != nil {
+		engine.CloseIdle()
+	}
 	isInit.Store(false)
 	configMu.Unlock()
 

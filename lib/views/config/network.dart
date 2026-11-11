@@ -489,7 +489,7 @@ class VpnSections extends ConsumerWidget {
           items: [
             const VpnSystemProxyItem(),
             BypassDomainItem(),
-            AllowBypassItem(),
+            if (!isIOS) const AllowBypassItem(),
             Ipv6Item(),
             DNSHijackingItem(),
           ],

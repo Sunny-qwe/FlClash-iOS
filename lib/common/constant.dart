@@ -32,7 +32,6 @@ const watchExecution = false;
 
 const safeModeBuild = bool.fromEnvironment('SAFE_MODE');
 
-/// The bundled core has no MITM, so this stays off until one that has it ships.
 /// Not const so tests can cover both states.
 bool mitmFeature = true;
 

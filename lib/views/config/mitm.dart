@@ -5,6 +5,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/mitm_trust.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/features/form/form.dart';
+import 'package:fl_clash/features/connection/mitm_exchanges.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
@@ -13,7 +14,6 @@ import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/providers/database.dart';
 import 'package:fl_clash/providers/mitm.dart';
 import 'package:fl_clash/state.dart';
-import 'package:fl_clash/views/config/mitm_modules.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,7 +96,7 @@ class _MitmViewState extends ConsumerState<MitmView> {
     required MitmTrustCheck? check,
   }) {
     if (system.isIOS) {
-      return '在 iOS 上安装证书后，请务必前往【设置 › 通用 › 关于本机 › 证书信任设置】中启用完全信任，MITM 脚本及重写规则方可生效。';
+      return appLocalizations.mitmIOSGuide;
     }
     if (!canTrust) {
       return appLocalizations.mitmCertificateExportTip;
@@ -214,48 +214,21 @@ class _MitmViewState extends ConsumerState<MitmView> {
     BuildContext context,
     MitmCertificate certificate,
   ) async {
-    await _export(context, certificate);
-    if (context.mounted) {
+    final saved = await globalState.safeRun<bool>(() async {
+      return await picker.saveFile(
+        'FlClash CA.mobileconfig',
+        utf8.encode(mitmIOSProfile(certificate)),
+      ) != null;
+    }, title: context.appLocalizations.installCertificate);
+    if (saved == true && context.mounted) {
       await _showIOSTrustGuide(context);
     }
   }
 
   Future<void> _showIOSTrustGuide(BuildContext context) async {
     await dialogs.showMessage(
-      title: 'iOS 证书安装与信任指引',
-      message: const TextSpan(
-        children: [
-          TextSpan(
-            text: '第一步：下载证书\n',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          TextSpan(
-            text: '点击“导出/安装证书”将【FlClash CA.crt】保存到 iPhone“文件”APP 或在 Safari 中打开。\n\n',
-          ),
-          TextSpan(
-            text: '第二步：安装描述文件\n',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          TextSpan(
-            text: '打开 iPhone 系统【设置】，在最上方点击【已下载描述文件】，点击右上角【安装】。\n\n',
-          ),
-          TextSpan(
-            text: '第三步：信任根证书（关键步骤）\n',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          TextSpan(
-            text: '进入系统【设置】›【通用】›【关于本机】› 滑到最底部【证书信任设置】。\n\n',
-          ),
-          TextSpan(
-            text: '第四步：开启完全信任\n',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          TextSpan(
-            text: '在“针对根证书启用完全信任”列表中，找到 “FlClash CA”，将开关打开为绿色（已开启）即可！',
-          ),
-        ],
-      ),
-      confirmText: '我知道了',
+      title: context.appLocalizations.trustCertificate,
+      message: TextSpan(text: context.appLocalizations.mitmIOSGuide),
     );
   }
 
@@ -378,21 +351,18 @@ class _MitmViewState extends ConsumerState<MitmView> {
       ListItem(
         title: Text(certificate.subject),
         subtitle: Text(
-          system.isIOS
-              ? '有效期至 ${certificate.notAfter.year}-${certificate.notAfter.month.toString().padLeft(2, '0')}-${certificate.notAfter.day.toString().padLeft(2, '0')}'
-              : _trustLabel(appLocalizations, trust),
+          _trustLabel(appLocalizations, trust),
         ),
         onTap: () => _showDetails(context, certificate),
       ),
       if (system.isIOS) ...[
         ListItem(
           title: Text(appLocalizations.installCertificate),
-          subtitle: const Text('安装证书并在设置中信任'),
+          subtitle: Text(appLocalizations.mitmTrustNotInstalled),
           onTap: () => _installIOS(context, certificate),
         ),
         ListItem(
-          title: const Text('证书信任操作指引'),
-          subtitle: const Text('查看 iOS 详细安装与完全信任步骤'),
+          title: Text(appLocalizations.trustCertificate),
           onTap: () => _showIOSTrustGuide(context),
         ),
       ] else if (installable)
@@ -427,7 +397,7 @@ class _MitmViewState extends ConsumerState<MitmView> {
         ? null
         : ref.watch(mitmTrustStateProvider).value;
     return Scaffold(
-      title: appLocalizations.mitm,
+      title: appLocalizations.mitmCertificateSettings,
       isLoading: ref.watch(loadingProvider(LoadingTag.mitm)),
       body: NullStatusSwitcher(
         isLoading: certificate.isLoading && !certificate.hasValue,
@@ -448,6 +418,10 @@ class _MitmViewState extends ConsumerState<MitmView> {
                           items: [
                             const _MitmEnableItem(),
                             _MitmCaptureItem(isAndroid: isAndroid),
+                            ListItem.open(
+                              title: Text(appLocalizations.httpRequests),
+                              widget: const MitmCaptureListView(),
+                            ),
                           ],
                         ),
                         generateSection(
@@ -470,9 +444,9 @@ class _MitmViewState extends ConsumerState<MitmView> {
                   SliverToBoxAdapter(
                     child: Column(
                       children: [
-                        generateSection(
-                          title: appLocalizations.mitmModules,
-                          items: const [MitmModulesItem()],
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(appLocalizations.mitmEngineCompatibility),
                         ),
                         generateSection(
                           items: const [_MitmHostnameItem()],

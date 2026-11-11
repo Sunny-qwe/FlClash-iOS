@@ -153,9 +153,18 @@ func applyConfig(params *SetupParams) error {
 		return &MethodError{Code: code, Message: err.Error()}
 	}
 
+	engine, err := prepareMitm()
+	if err != nil {
+		code := "config_rejected"
+		if currentConfig != nil {
+			code = "config_preserved"
+		}
+		return &MethodError{Code: code, Message: err.Error()}
+	}
 	applyOptions(params.Options)
 	currentConfig = cfg
 	hub.ApplyConfig(cfg)
+	activateMitm(engine)
 	patchSelectGroup(params.SelectedMap)
 	bumpRouteEpoch()
 	updateListeners(cfg)
@@ -234,6 +243,10 @@ func updateConfig(params *UpdateParams) error {
 }
 
 func applyOptions(options CoreOptions) {
+	mitmCapture.Store(options.MITMCapture)
+	if engine := mitmEngine.Load(); engine != nil {
+		engine.SetCapture(options.MITMCapture)
+	}
 	setTestURL(options.TestURL)
 	provider.SetDefaultTestTimeout(timeoutFromMillis(options.DelayTestTimeout, 0))
 	skipCertVerify.Store(options.SkipCertVerify)

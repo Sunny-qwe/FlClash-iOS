@@ -1,6 +1,7 @@
 package core
 
 import (
+	"core/mitm"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -151,6 +152,10 @@ func withFallible[P, R any](run func(P) (R, error)) methodHandler {
 	}
 }
 
+func withoutFallible[R any](run func() (R, error)) methodHandler {
+	return func(*MethodCall) (any, error) { return run() }
+}
+
 func withoutArguments[R any](run func() R) methodHandler {
 	return func(*MethodCall) (any, error) {
 		return run(), nil
@@ -182,10 +187,18 @@ func action(run func()) methodHandler {
 }
 
 var methodHandlers = map[CoreMethod]methodHandler{
-	coreInitMethod:        command(handleInit),
-	coreInitializedMethod: withoutArguments(handleInitialized),
-	coreGCMethod:          action(handleForceGC),
-	coreMemoryMethod:      withoutArguments(handleGetMemoryStats),
+	mitmCertificateMethod:         withoutFallible(handleMitmCertificate),
+	mitmGenerateCertificateMethod: withoutFallible(handleMitmGenerateCertificate),
+	mitmIssueCertificateMethod:    withFallible(handleMitmIssueCertificate),
+	mitmValidateMethod:            withArguments(mitm.Validate),
+	mitmRunScriptMethod:           withFallible(handleMitmRunScript),
+	mitmExchangesMethod:           withArguments(handleMitmExchanges),
+	mitmExchangeMethod:            withArguments(handleMitmExchange),
+	mitmBodyMethod:                withArguments(handleMitmBody),
+	coreInitMethod:                command(handleInit),
+	coreInitializedMethod:         withoutArguments(handleInitialized),
+	coreGCMethod:                  action(handleForceGC),
+	coreMemoryMethod:              withoutArguments(handleGetMemoryStats),
 
 	configSetupMethod:    command(handleSetupConfig),
 	configUpdateMethod:   command(updateConfig),

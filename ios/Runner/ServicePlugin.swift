@@ -1,6 +1,7 @@
 import Flutter
 import Foundation
 import NetworkExtension
+import Security
 import Shared
 import os
 
@@ -137,6 +138,27 @@ final class ServicePlugin {
 
   private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
+    case "checkMitmTrust":
+      guard let pem = call.arguments as? String else {
+        result(false)
+        return
+      }
+      let encoded = pem.split(separator: "\n")
+        .filter { !$0.hasPrefix("-----") }
+        .joined()
+      guard let data = Data(base64Encoded: encoded, options: .ignoreUnknownCharacters),
+        let certificate = SecCertificateCreateWithData(nil, data as CFData)
+      else {
+        result(false)
+        return
+      }
+      DispatchQueue.global(qos: .userInitiated).async {
+        let policy = SecPolicyCreateSSL(true, "mitm-check.flclash.invalid" as CFString)
+        var trust: SecTrust?
+        let created = SecTrustCreateWithCertificates(certificate, policy, &trust) == errSecSuccess
+        let trusted = created && trust.map { SecTrustEvaluateWithError($0, nil) } == true
+        DispatchQueue.main.async { result(trusted) }
+      }
     case "init":
       eventRelay.start { [weak self] event, delivered in
         self?.channel.invokeMethod(

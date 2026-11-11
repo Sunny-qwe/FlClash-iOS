@@ -1,4 +1,7 @@
 {
+  "mitmCertificateSettings": "MITM 证书",
+  "mitmIOSGuide": "导出证书，在 iOS 设置中安装描述文件，再进入“设置 → 通用 → 关于本机 → 证书信任设置”启用完全信任。返回此页面检查信任状态。重新生成证书后需要重新安装。",
+  "mitmEngineCompatibility": "支持指定域名的 HTTPS 解密、URL 跳转/拦截、请求头和正文重写、本地响应、请求/响应脚本、$httpClient、$task.fetch、计时器与持久存储。脚本有较短的运行时间和大小限制。暂不支持定时/事件脚本、二进制/完整头脚本模式，超大正文原样传输。模块为部分兼容。",
   "localNetworkSettings": "本地网络与回环",
   "localNetworkProtection": "保护本地配对通信",
   "localNetworkProtectionDesc": "将 127.0.0.0/8、10.7.0.0/24 和 ::1/128 排除在隧道外，用于本地配对通信。这不会启用 JIT 或其他应用的 VPN。修改路由后请重新连接 VPN。",

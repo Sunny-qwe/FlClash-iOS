@@ -87,6 +87,15 @@ class _Processes {
 }
 
 void main() {
+  test('iOS profile exports the public CA with a certificate payload', () {
+    final profile = mitmIOSProfile(_ca.copyWith(subject: 'CA & test'));
+    expect(profile, contains('com.apple.security.root'));
+    expect(profile, contains('<string>CA &amp; test</string>'));
+    expect(profile, isNot(contains('PRIVATE KEY')));
+    expect(profile, isNot(contains('BEGIN CERTIFICATE')));
+    expect(profile, contains('<data>MIIBxj'));
+    expect(mitmIOSProfile(_ca), mitmIOSProfile(_ca));
+  });
   late Directory root;
   late _Processes processes;
   late List<String> written;

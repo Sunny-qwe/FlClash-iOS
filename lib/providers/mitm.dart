@@ -28,15 +28,11 @@ const _exchangesRefreshInterval = Duration(seconds: 2);
 class MitmCa extends _$MitmCa {
   @override
   Future<MitmCertificate?> build() async {
-    try {
-      return await MitmStore.getOrCreateCertificate();
-    } catch (_) {
-      return MitmStore.defaultCertificate;
-    }
+    return ref.watch(coreHandlerProvider).getMitmCertificate();
   }
 
   Future<void> generate() async {
-    final certificate = await MitmStore.regenerateCertificate();
+    final certificate = await ref.read(coreHandlerProvider).generateMitmCertificate();
     if (!ref.mounted) {
       return;
     }
