@@ -52,6 +52,8 @@ jobs:
           python3 -m unittest discover -s tool/tests -p 'test_prepare_ios_icons.py'
           swiftc ios/Shared/AppGroupLocation.swift ios/NECore/PacketTunnelSharedStateStore.swift ios/NECore/PacketTunnelNetworkConfiguration.swift tool/tests/ios_network_configuration_test.swift -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker tool/tests/fixtures/ios_network_test_info.plist -o /tmp/flclash-network-tests
           /tmp/flclash-network-tests
+          swiftc ios/Shared/CoreMailbox.swift tool/tests/ios_core_mailbox_test.swift -o /tmp/flclash-mailbox-tests
+          /tmp/flclash-mailbox-tests
 
       - name: Verify Dart changes and startup ordering
         run: |

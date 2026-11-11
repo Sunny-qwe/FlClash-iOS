@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D0000303000000000000001 /* CoreMailbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0000313000000000000001 /* CoreMailbox.swift */; };
 		7D0000203000000000000001 /* AppGroupLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0000213000000000000001 /* AppGroupLocation.swift */; };
 		0573B366304032E200768CF4 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 0573B365304032E200768CF4 /* AppIcon.icon */; };
 		0590E25F2FFA555500321CD8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0590E25C2FFA53B300321CD8 /* Localizable.xcstrings */; };
@@ -101,6 +102,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7D0000313000000000000001 /* CoreMailbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/CoreMailbox.swift; sourceTree = SOURCE_ROOT; };
 		7D0000213000000000000001 /* AppGroupLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/AppGroupLocation.swift; sourceTree = SOURCE_ROOT; };
 		0573B365304032E200768CF4 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		0590E25C2FFA53B300321CD8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -636,6 +638,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D0000203000000000000001 /* AppGroupLocation.swift in Sources */,
+				7D0000303000000000000001 /* CoreMailbox.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

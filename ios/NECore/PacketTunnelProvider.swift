@@ -12,6 +12,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     sharedStateStore: sharedStateStore
   )
   private var memoryPressureSource: DispatchSourceMemoryPressure?
+  private var mailbox: CoreMailboxServer?
   private let logger = Logger(
     subsystem: PacketTunnelEnvironment.extensionBundleIdentifier,
     category: "PacketTunnelProvider"
@@ -22,6 +23,8 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     completionHandler: @escaping (Error?) -> Void
   ) {
     logger.info("startTunnel begin")
+    mailbox?.stop()
+    mailbox = nil
     sharedStateStore.clearRunTime()
     // A Network Extension process can be reused after a failed start. Do not
     // let a previous attempt's in-memory state override the fresh start data.
@@ -85,19 +88,38 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
             self.logger.error(
               "quickSetup failed: \(message, privacy: .public)"
             )
-            self.eventQueue.stop()
-            self.memoryPressureSource?.cancel()
-            self.memoryPressureSource = nil
-            MobileStopTun()
-            completionHandler(PacketTunnelProviderError.setupFailed(message))
+            self.completeStart(PacketTunnelProviderError.setupFailed(message), completionHandler)
             return
           }
-          completionHandler(
-            self.startTun(fileDescriptor: fileDescriptor, options: vpnOptions)
-          )
+          if let error = self.startTun(fileDescriptor: fileDescriptor, options: vpnOptions) {
+            self.completeStart(error, completionHandler)
+            return
+          }
+          do {
+            let mailbox = CoreMailboxServer(directory: self.sharedStateStore.appGroupDirectory()!) {
+              [weak self] data, reply in
+              self?.eventQueue.markCoreResponsive()
+              MobileInvokeMethod(String(data: data, encoding: .utf8), CoreResultHandler(reply))
+            }
+            try mailbox.start()
+            self.mailbox = mailbox
+            self.completeStart(nil, completionHandler)
+          } catch {
+            self.completeStart(error, completionHandler)
+          }
         }
       )
     }
+  }
+
+  private func completeStart(_ error: Error?, _ completionHandler: (Error?) -> Void) {
+    if error != nil {
+      stopCore()
+    } else {
+      sharedStateStore.saveRunTime()
+      reloadControls()
+    }
+    completionHandler(error)
   }
 
   private func startTun(
@@ -130,8 +152,6 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     guard started else {
       return PacketTunnelProviderError.tunRejected
     }
-    sharedStateStore.saveRunTime()
-    reloadControls()
     return nil
   }
 
@@ -140,13 +160,19 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     completionHandler: @escaping () -> Void
   ) {
     logger.info("stopTunnel reason=\(reason.rawValue, privacy: .public)")
+    stopCore()
+    completionHandler()
+  }
+
+  private func stopCore() {
+    mailbox?.stop()
+    mailbox = nil
     sharedStateStore.clearRunTime()
     memoryPressureSource?.cancel()
     memoryPressureSource = nil
     eventQueue.stop()
     MobileStopTun()
     reloadControls()
-    completionHandler()
   }
 
   override func handleAppMessage(

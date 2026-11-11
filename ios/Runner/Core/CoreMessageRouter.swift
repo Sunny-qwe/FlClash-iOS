@@ -1,6 +1,7 @@
 import ClashCore
 import Foundation
 import NetworkExtension
+import Shared
 import os
 
 /// While the tunnel runs the Network Extension holds the live Core, so runtime
@@ -42,12 +43,10 @@ final class CoreMessageRouter: @unchecked Sendable {
   private static let invalidCallResponse =
     #"{"result":null,"error":{"code":"invalid_method_call","message":"invalid method call","details":null}}"#
 
-  private static let unavailableResponse =
-    #"{"result":null,"error":{"code":"core_unavailable","message":"The VPN core is not responding. Reconnect the VPN and try again.","details":null}}"#
-
   var onEvent: ((Data) -> Void)?
 
   private let lock = NSLock()
+  private let mailbox = CoreMailboxClient(directory: { NEHelper.appGroupDirectory })
   private var route = Route.app
   private var logRunning = false
   private var routeWatch: Data?
@@ -91,6 +90,7 @@ final class CoreMessageRouter: @unchecked Sendable {
         break
       }
       let from = route
+      mailbox.cancel()
       route = session.map(Route.networkExtension) ?? .app
       return (from, route, subscriptionCalls())
     }
@@ -211,17 +211,33 @@ final class CoreMessageRouter: @unchecked Sendable {
     session: NETunnelProviderSession,
     reply: @escaping (Data) -> Void
   ) {
-    do {
-      try session.sendProviderMessage(call.data) { response in
-        guard let response, !response.isEmpty else {
-          reply(Data(Self.unavailableResponse.utf8))
-          return
-        }
-        reply(response)
+    let sent = lock.withLock {
+      guard case .networkExtension(let current) = route, current === session else {
+        return false
       }
-    } catch {
-      reply(Data(Self.unavailableResponse.utf8))
+      mailbox.send(call.data) { result in
+        switch result {
+        case .success(let response): reply(response)
+        case .failure(let error):
+          reply(Self.unavailableResponse(for: call, error: error))
+        }
+      }
+      return true
     }
+    if !sent { reply(Self.unavailableResponse(for: call, error: CoreMailboxError.stopped)) }
+  }
+
+  private static func unavailableResponse(for call: MethodCall, error: Error) -> Data {
+    let error = error as NSError
+    let object: [String: Any] = [
+      "result": NSNull(),
+      "error": [
+        "code": "core_unavailable",
+        "message": error.localizedDescription,
+        "details": ["method": call.method, "domain": error.domain, "code": error.code],
+      ],
+    ]
+    return try! JSONSerialization.data(withJSONObject: object)
   }
 
   private static func isCommandSuccess(_ response: Data) -> Bool {
