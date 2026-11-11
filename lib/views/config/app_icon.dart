@@ -127,16 +127,22 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
       await sp.setString(_selectedIconPrefKey, option.id);
       if (!mounted) return;
       setState(() => _currentIconId = option.id);
-      dialogs.showBanner('已切换应用图标为【${option.name}】', level: BannerLevel.success);
+      dialogs.showBanner(
+        '已切换应用图标为【${option.name}】',
+        level: BannerLevel.success,
+      );
     } catch (error) {
       if (!mounted) return;
-      final denied = error is PlatformException &&
+      final denied =
+          error is PlatformException &&
           error.details is Map &&
           (error.details as Map)['domain'] == 'NSOSStatusErrorDomain' &&
           (error.details as Map)['code'] == -54;
       final message = denied
           ? context.appLocalizations.appIconAccessDenied
-          : error is PlatformException ? error.message : error.toString();
+          : error is PlatformException
+          ? error.message
+          : error.toString();
       dialogs.showBanner('切换图标失败: $message', level: BannerLevel.error);
     } finally {
       _isSwitching = false;
@@ -162,7 +168,9 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
                   padding: const EdgeInsets.all(14),
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    color: colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.5,
+                    ),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -195,10 +203,14 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? colorScheme.primaryContainer.withValues(alpha: 0.35)
+                              ? colorScheme.primaryContainer.withValues(
+                                  alpha: 0.35,
+                                )
                               : colorScheme.surfaceContainer,
                           border: Border.all(
-                            color: isSelected ? colorScheme.primary : const Color(0x00000000),
+                            color: isSelected
+                                ? colorScheme.primary
+                                : const Color(0x00000000),
                             width: 1.8,
                           ),
                           borderRadius: BorderRadius.circular(20),
@@ -235,8 +247,12 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
                                     opt.name,
                                     style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                                      color: isSelected ? colorScheme.primary : colorScheme.onSurface,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.w600,
+                                      color: isSelected
+                                          ? colorScheme.primary
+                                          : colorScheme.onSurface,
                                     ),
                                   ),
                                   const SizedBox(height: 4),

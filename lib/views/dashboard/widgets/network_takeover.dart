@@ -209,9 +209,9 @@ class VpnTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     final metrics = _tileMetricsOf(DashboardDensityScope.of(context));
-    final enabled = system.isIOS || ref.watch(
-      vpnSettingProvider.select((state) => state.enable),
-    );
+    final enabled =
+        system.isIOS ||
+        ref.watch(vpnSettingProvider.select((state) => state.enable));
     return DashboardCard(
       padding: EdgeInsets.zero,
       child: DashboardSwitchRow(
@@ -244,9 +244,9 @@ class VpnCard extends ConsumerWidget {
     final appLocalizations = context.appLocalizations;
     final colorScheme = context.colorScheme;
     final colors = DashboardColors.of(context);
-    final enabled = system.isIOS || ref.watch(
-      vpnSettingProvider.select((state) => state.enable),
-    );
+    final enabled =
+        system.isIOS ||
+        ref.watch(vpnSettingProvider.select((state) => state.enable));
     void change(bool value) => _setVpn(ref, value);
     return DashboardCard(
       semanticLabel: 'VPN',

@@ -357,6 +357,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "App access control",
     ),
+    "appIconAccessDenied": MessageLookupByLibrary.simpleMessage(
+      "iOS refused access to the app icon (-54). Check that signing preserves the app\'s bundle identifier and its matching application identifier. Re-signing or reinstalling may be required.",
+    ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("App icon design"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("No local proxies"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage(
@@ -1048,9 +1051,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Certificate installed",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "This system hides the installed app list until the permission is granted. Authorize it to configure the per-app proxy.",
     ),
@@ -1188,6 +1192,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "localImage": MessageLookupByLibrary.simpleMessage("Local image"),
     "localNetworkDeniedTip": MessageLookupByLibrary.simpleMessage(
       "Local network permission denied: using the gvisor stack, LAN is unreachable.",
+    ),
+    "localNetworkProtection": MessageLookupByLibrary.simpleMessage(
+      "Protect local pairing",
+    ),
+    "localNetworkProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "Exclude 127.0.0.0/8, 10.7.0.0/24 and ::1/128 from the tunnel for local pairing. This does not enable JIT or another app\'s VPN. Reconnect the VPN after changing routes.",
+    ),
+    "localNetworkSettings": MessageLookupByLibrary.simpleMessage(
+      "Local network and loopback",
     ),
     "localProxies": MessageLookupByLibrary.simpleMessage("Local proxies"),
     "locationPermission": MessageLookupByLibrary.simpleMessage(

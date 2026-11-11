@@ -202,10 +202,7 @@ class SetupAction extends _$SetupAction {
         );
       } catch (e) {
         applied = false;
-        dialogs.showBanner(
-          e.toString(),
-          level: BannerLevel.error,
-        );
+        dialogs.showBanner(e.toString(), level: BannerLevel.error);
       }
       if (!applied && _isCurrent(request)) {
         await globalState.safeRun(() => setRunning(false));

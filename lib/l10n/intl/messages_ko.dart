@@ -312,6 +312,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "answers": MessageLookupByLibrary.simpleMessage("응답"),
     "app": MessageLookupByLibrary.simpleMessage("앱"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("앱 접근 제어"),
+    "appIconAccessDenied": MessageLookupByLibrary.simpleMessage(
+      "iOS가 앱 아이콘 접근을 거부했습니다(-54). 서명 후 번들 ID와 application-identifier가 일치하는지 확인하세요. 재서명 또는 재설치가 필요할 수 있습니다.",
+    ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("앱 아이콘 디자인"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("로컬 프록시 없음"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("시스템 DNS 추가"),
@@ -1004,6 +1007,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "localImage": MessageLookupByLibrary.simpleMessage("로컬 이미지"),
     "localNetworkDeniedTip": MessageLookupByLibrary.simpleMessage(
       "로컬 네트워크 권한이 거부되었습니다. gvisor 스택을 사용하므로 LAN에 연결할 수 없습니다.",
+    ),
+    "localNetworkProtection": MessageLookupByLibrary.simpleMessage("로컬 페어링 보호"),
+    "localNetworkProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "로컬 페어링을 위해 127.0.0.0/8, 10.7.0.0/24, ::1/128을 터널에서 제외합니다. JIT 또는 다른 앱의 VPN을 활성화하지 않습니다. 경로 변경 후 VPN을 다시 연결하세요.",
+    ),
+    "localNetworkSettings": MessageLookupByLibrary.simpleMessage(
+      "로컬 네트워크 및 루프백",
     ),
     "localProxies": MessageLookupByLibrary.simpleMessage("로컬 프록시"),
     "locationPermission": MessageLookupByLibrary.simpleMessage("위치 권한"),

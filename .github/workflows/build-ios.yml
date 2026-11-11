@@ -82,6 +82,10 @@ jobs:
             test/providers/outbound_ip_test.dart
             test/views/local_network_test.dart
 
+      - name: Analyze complete Flutter project
+        continue-on-error: true
+        run: flutter analyze --no-fatal-infos
+
       - name: Build iOS IPA (Unsigned)
         run: dart setup.dart ios --no-codesign -v
 

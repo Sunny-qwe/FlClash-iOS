@@ -365,6 +365,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Контроль доступа приложений",
     ),
+    "appIconAccessDenied": MessageLookupByLibrary.simpleMessage(
+      "iOS отказала в доступе к значку (-54). Проверьте соответствие bundle ID и application-identifier после подписи. Может потребоваться повторная подпись или установка.",
+    ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage(
       "Дизайн значка приложения",
     ),
@@ -1096,9 +1099,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Сертификат установлен",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Эта система не выдаёт список установленных приложений без разрешения. Предоставьте его, чтобы настроить прокси для отдельных приложений.",
     ),
@@ -1240,6 +1244,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "localImage": MessageLookupByLibrary.simpleMessage("Локальное изображение"),
     "localNetworkDeniedTip": MessageLookupByLibrary.simpleMessage(
       "Доступ к локальной сети запрещён: используется стек gvisor, локальная сеть недоступна.",
+    ),
+    "localNetworkProtection": MessageLookupByLibrary.simpleMessage(
+      "Защита локального сопряжения",
+    ),
+    "localNetworkProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "Исключает 127.0.0.0/8, 10.7.0.0/24 и ::1/128 из туннеля для локального сопряжения. Это не включает JIT или VPN других приложений. После изменения маршрутов переподключите VPN.",
+    ),
+    "localNetworkSettings": MessageLookupByLibrary.simpleMessage(
+      "Локальная сеть и loopback",
     ),
     "localProxies": MessageLookupByLibrary.simpleMessage("Локальные прокси"),
     "locationPermission": MessageLookupByLibrary.simpleMessage(

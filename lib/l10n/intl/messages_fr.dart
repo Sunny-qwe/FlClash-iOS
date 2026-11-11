@@ -376,6 +376,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Contrôle d’accès des apps",
     ),
+    "appIconAccessDenied": MessageLookupByLibrary.simpleMessage(
+      "iOS a refusé l’accès à l’icône (-54). Vérifiez la correspondance entre l’identifiant du paquet et application-identifier après signature. Une nouvelle signature ou installation peut être nécessaire.",
+    ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage(
       "Conception de l’icône de l’app",
     ),
@@ -1127,9 +1130,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Certificat installé",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "L’autorisation de la liste des apps a été refusée ; les apps installées ne peuvent donc pas être listées. Veuillez l’accorder manuellement dans les réglages du système.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Ce système masque la liste des apps installées tant que l’autorisation n’est pas accordée. Accordez-la pour configurer le proxy par app.",
     ),
@@ -1279,6 +1283,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "localImage": MessageLookupByLibrary.simpleMessage("Image locale"),
     "localNetworkDeniedTip": MessageLookupByLibrary.simpleMessage(
       "Autorisation du réseau local refusée : la pile gvisor est utilisée, le LAN est inaccessible.",
+    ),
+    "localNetworkProtection": MessageLookupByLibrary.simpleMessage(
+      "Protéger le jumelage local",
+    ),
+    "localNetworkProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "Exclut 127.0.0.0/8, 10.7.0.0/24 et ::1/128 du tunnel pour le jumelage local. Cela n’active ni JIT ni le VPN d’une autre app. Reconnectez le VPN après modification des routes.",
+    ),
+    "localNetworkSettings": MessageLookupByLibrary.simpleMessage(
+      "Réseau local et boucle locale",
     ),
     "localProxies": MessageLookupByLibrary.simpleMessage("Proxys locaux"),
     "locationPermission": MessageLookupByLibrary.simpleMessage(

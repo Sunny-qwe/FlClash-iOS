@@ -284,7 +284,6 @@ class _DeveloperItem extends StatelessWidget {
   }
 }
 
-
 class _LoopbackItem extends StatelessWidget {
   const _LoopbackItem();
 

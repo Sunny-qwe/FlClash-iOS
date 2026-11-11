@@ -312,6 +312,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "answers": MessageLookupByLibrary.simpleMessage("応答"),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリアクセス制御"),
+    "appIconAccessDenied": MessageLookupByLibrary.simpleMessage(
+      "iOS がアプリアイコンへのアクセスを拒否しました（-54）。署名後のバンドル ID と application-identifier の一致を確認してください。再署名や再インストールが必要な場合があります。",
+    ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("アプリアイコンのデザイン"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("ローカルプロキシがありません"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("システムDNSを追加"),
@@ -1020,6 +1023,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "localImage": MessageLookupByLibrary.simpleMessage("ローカル画像"),
     "localNetworkDeniedTip": MessageLookupByLibrary.simpleMessage(
       "ローカルネットワークの権限が拒否されたため gvisor スタックを使用します。LAN にはアクセスできません。",
+    ),
+    "localNetworkProtection": MessageLookupByLibrary.simpleMessage(
+      "ローカルペアリングを保護",
+    ),
+    "localNetworkProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "ローカルペアリング用に 127.0.0.0/8、10.7.0.0/24、::1/128 をトンネルから除外します。JIT や他のアプリの VPN は有効になりません。ルート変更後は VPN を再接続してください。",
+    ),
+    "localNetworkSettings": MessageLookupByLibrary.simpleMessage(
+      "ローカルネットワークとループバック",
     ),
     "localProxies": MessageLookupByLibrary.simpleMessage("ローカルプロキシ"),
     "locationPermission": MessageLookupByLibrary.simpleMessage("位置情報の権限"),

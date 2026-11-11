@@ -374,6 +374,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Control de acceso de apps",
     ),
+    "appIconAccessDenied": MessageLookupByLibrary.simpleMessage(
+      "iOS denegó el acceso al icono (-54). Compruebe que el identificador del paquete y application-identifier coincidan tras firmar. Puede ser necesario firmar o instalar de nuevo.",
+    ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage(
       "Diseño del icono de la app",
     ),
@@ -1125,9 +1128,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "installCertificateSuccess": MessageLookupByLibrary.simpleMessage(
       "Certificado instalado",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "Se denegó el permiso de lista de apps, por lo que no se pueden mostrar las apps instaladas. Concédelo manualmente en los ajustes del sistema.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "Se denegó el permiso de lista de apps, por lo que no se pueden mostrar las apps instaladas. Concédelo manualmente en los ajustes del sistema.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Este sistema oculta la lista de apps instaladas hasta que se concede el permiso. Autorízalo para configurar el proxy por app.",
     ),
@@ -1277,6 +1281,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "localImage": MessageLookupByLibrary.simpleMessage("Imagen local"),
     "localNetworkDeniedTip": MessageLookupByLibrary.simpleMessage(
       "Permiso de red local denegado: con la pila gvisor, la LAN no es accesible.",
+    ),
+    "localNetworkProtection": MessageLookupByLibrary.simpleMessage(
+      "Proteger el enlace local",
+    ),
+    "localNetworkProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "Excluye 127.0.0.0/8, 10.7.0.0/24 y ::1/128 del túnel para el enlace local. No activa JIT ni la VPN de otra app. Vuelva a conectar la VPN tras cambiar las rutas.",
+    ),
+    "localNetworkSettings": MessageLookupByLibrary.simpleMessage(
+      "Red local y bucle local",
     ),
     "localProxies": MessageLookupByLibrary.simpleMessage("Proxies locales"),
     "locationPermission": MessageLookupByLibrary.simpleMessage(

@@ -1,4 +1,5 @@
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/features/form/form.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
@@ -29,7 +30,9 @@ class LocalNetworkView extends ConsumerWidget {
               ConfigToggleItem(
                 title: (l) => l.localNetworkProtection,
                 selector: patchClashConfigProvider.select(
-                  (state) => _localRoutes.every(state.tun.routeExcludeAddress.contains),
+                  (state) => _localRoutes.every(
+                    state.tun.routeExcludeAddress.contains,
+                  ),
                 ),
                 onChanged: (ref, value) {
                   ref.read(patchClashConfigProvider.notifier).update((state) {
@@ -37,7 +40,9 @@ class LocalNetworkView extends ConsumerWidget {
                     return state.copyWith.tun(
                       routeExcludeAddress: value
                           ? {...routes, ..._localRoutes}.toList()
-                          : routes.where((route) => !_localRoutes.contains(route)).toList(),
+                          : routes
+                                .where((route) => !_localRoutes.contains(route))
+                                .toList(),
                     );
                   });
                 },
@@ -52,7 +57,9 @@ class LocalNetworkView extends ConsumerWidget {
                 ),
                 onChanged: (ref, value) => ref
                     .read(patchClashConfigProvider.notifier)
-                    .update((state) => state.copyWith.tun(routeExcludeAddress: value)),
+                    .update(
+                      (state) => state.copyWith.tun(routeExcludeAddress: value),
+                    ),
               ),
             ],
             footer: l.localNetworkProtectionDesc,

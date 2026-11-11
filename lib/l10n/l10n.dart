@@ -55,6 +55,46 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `Local network and loopback`
+  String get localNetworkSettings {
+    return Intl.message(
+      'Local network and loopback',
+      name: 'localNetworkSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Protect local pairing`
+  String get localNetworkProtection {
+    return Intl.message(
+      'Protect local pairing',
+      name: 'localNetworkProtection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exclude 127.0.0.0/8, 10.7.0.0/24 and ::1/128 from the tunnel for local pairing. This does not enable JIT or another app's VPN. Reconnect the VPN after changing routes.`
+  String get localNetworkProtectionDesc {
+    return Intl.message(
+      'Exclude 127.0.0.0/8, 10.7.0.0/24 and ::1/128 from the tunnel for local pairing. This does not enable JIT or another app\'s VPN. Reconnect the VPN after changing routes.',
+      name: 'localNetworkProtectionDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `iOS refused access to the app icon (-54). Check that signing preserves the app's bundle identifier and its matching application identifier. Re-signing or reinstalling may be required.`
+  String get appIconAccessDenied {
+    return Intl.message(
+      'iOS refused access to the app icon (-54). Check that signing preserves the app\'s bundle identifier and its matching application identifier. Re-signing or reinstalling may be required.',
+      name: 'appIconAccessDenied',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Rule`
   String get rule {
     return Intl.message('Rule', name: 'rule', desc: '', args: []);
@@ -7663,8 +7703,7 @@ class AppLocalizations {
   String customImportDroppedSubRules(num count, Object label) {
     return Intl.plural(
       count,
-      one:
-          '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
+      one: '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
       other:
           '$label SUB-RULE rules were dropped, since custom profiles do not support sub-rules',
       name: 'customImportDroppedSubRules',

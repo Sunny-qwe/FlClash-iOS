@@ -304,6 +304,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "answers": MessageLookupByLibrary.simpleMessage("应答"),
     "app": MessageLookupByLibrary.simpleMessage("应用"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("应用访问控制"),
+    "appIconAccessDenied": MessageLookupByLibrary.simpleMessage(
+      "iOS 拒绝访问应用图标（-54）。请检查签名后包名与 application-identifier 是否匹配；可能需要重新签名或重新安装。",
+    ),
     "appIconDesign": MessageLookupByLibrary.simpleMessage("应用图标设计"),
     "appProxiesEmpty": MessageLookupByLibrary.simpleMessage("暂无本地代理"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("追加系统DNS"),
@@ -927,6 +930,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "localNetworkDeniedTip": MessageLookupByLibrary.simpleMessage(
       "本地网络权限被拒绝：已改用 gvisor 栈，局域网无法访问。",
     ),
+    "localNetworkProtection": MessageLookupByLibrary.simpleMessage("保护本地配对通信"),
+    "localNetworkProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "将 127.0.0.0/8、10.7.0.0/24 和 ::1/128 排除在隧道外，用于本地配对通信。这不会启用 JIT 或其他应用的 VPN。修改路由后请重新连接 VPN。",
+    ),
+    "localNetworkSettings": MessageLookupByLibrary.simpleMessage("本地网络与回环"),
     "localProxies": MessageLookupByLibrary.simpleMessage("本地代理"),
     "locationPermission": MessageLookupByLibrary.simpleMessage("位置权限"),
     "locationPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
