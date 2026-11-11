@@ -79,9 +79,8 @@ final class PacketTunnelNetworkConfiguration {
       ? [ipv4DNS, ipv6DNS]
       : [ipv4DNS]
     let dnsSettings = NEDNSSettings(servers: dnsServers)
-    if options.dnsHijacking {
-      dnsSettings.matchDomains = [""]
-    }
+    dnsSettings.matchDomains = [""]
+    dnsSettings.matchDomainsNoSearch = true
     settings.dnsSettings = dnsSettings
 
     if options.systemProxy {
@@ -97,6 +96,7 @@ final class PacketTunnelNetworkConfiguration {
         port: options.port
       )
       proxySettings.exceptionList = options.bypassDomain
+      proxySettings.matchDomains = [""]
       settings.proxySettings = proxySettings
     }
 

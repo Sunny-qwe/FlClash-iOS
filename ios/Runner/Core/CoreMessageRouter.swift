@@ -42,6 +42,9 @@ final class CoreMessageRouter: @unchecked Sendable {
   private static let invalidCallResponse =
     #"{"result":null,"error":{"code":"invalid_method_call","message":"invalid method call","details":null}}"#
 
+  private static let unavailableResponse =
+    #"{"result":null,"error":{"code":"core_unavailable","message":"The VPN core is not responding. Reconnect the VPN and try again.","details":null}}"#
+
   var onEvent: ((Data) -> Void)?
 
   private let lock = NSLock()
@@ -178,9 +181,7 @@ final class CoreMessageRouter: @unchecked Sendable {
       if call.method == "config.update" {
         extensionCall = call.replacingArgument("geo-auto-update", with: false)
       }
-      self.sendToExtension(extensionCall, session: session, reply: reply) {
-        reply(response)
-      }
+      self.sendToExtension(extensionCall, session: session, reply: reply)
     }
   }
 
@@ -193,9 +194,7 @@ final class CoreMessageRouter: @unchecked Sendable {
     case .app:
       sendToApp(call.data, reply: reply)
     case .networkExtension(let session):
-      sendToExtension(call, session: session, reply: reply) { [weak self] in
-        self?.sendToApp(call.data, reply: reply)
-      }
+      sendToExtension(call, session: session, reply: reply)
     }
   }
 
@@ -210,19 +209,18 @@ final class CoreMessageRouter: @unchecked Sendable {
   private func sendToExtension(
     _ call: MethodCall,
     session: NETunnelProviderSession,
-    reply: @escaping (Data) -> Void,
-    unavailable: @escaping () -> Void
+    reply: @escaping (Data) -> Void
   ) {
     do {
       try session.sendProviderMessage(call.data) { response in
         guard let response, !response.isEmpty else {
-          unavailable()
+          reply(Data(Self.unavailableResponse.utf8))
           return
         }
         reply(response)
       }
     } catch {
-      unavailable()
+      reply(Data(Self.unavailableResponse.utf8))
     }
   }
 

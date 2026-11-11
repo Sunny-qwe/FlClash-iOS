@@ -192,9 +192,14 @@ class NetworkTakeoverTile extends StatelessWidget {
   }
 }
 
-void _setVpn(WidgetRef ref, bool value) => ref
-    .read(vpnSettingProvider.notifier)
-    .update((state) => state.copyWith(enable: value));
+void _setVpn(WidgetRef ref, bool value) {
+  if (system.isIOS) {
+    return;
+  }
+  ref
+      .read(vpnSettingProvider.notifier)
+      .update((state) => state.copyWith(enable: value));
+}
 
 /// The VPN switch in the grid's control row, in place of the takeover tiles.
 class VpnTile extends ConsumerWidget {
@@ -204,7 +209,7 @@ class VpnTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     final metrics = _tileMetricsOf(DashboardDensityScope.of(context));
-    final enabled = ref.watch(
+    final enabled = system.isIOS || ref.watch(
       vpnSettingProvider.select((state) => state.enable),
     );
     return DashboardCard(
@@ -239,7 +244,7 @@ class VpnCard extends ConsumerWidget {
     final appLocalizations = context.appLocalizations;
     final colorScheme = context.colorScheme;
     final colors = DashboardColors.of(context);
-    final enabled = ref.watch(
+    final enabled = system.isIOS || ref.watch(
       vpnSettingProvider.select((state) => state.enable),
     );
     void change(bool value) => _setVpn(ref, value);

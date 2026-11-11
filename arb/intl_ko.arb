@@ -1,4 +1,8 @@
 {
+  "localNetworkSettings": "로컬 네트워크 및 루프백",
+  "localNetworkProtection": "로컬 페어링 보호",
+  "localNetworkProtectionDesc": "로컬 페어링을 위해 127.0.0.0/8, 10.7.0.0/24, ::1/128을 터널에서 제외합니다. JIT 또는 다른 앱의 VPN을 활성화하지 않습니다. 경로 변경 후 VPN을 다시 연결하세요.",
+  "appIconAccessDenied": "iOS가 앱 아이콘 접근을 거부했습니다(-54). 서명 후 번들 ID와 application-identifier가 일치하는지 확인하세요. 재서명 또는 재설치가 필요할 수 있습니다.",
   "rule": "규칙",
   "rules": "규칙",
   "global": "전역",

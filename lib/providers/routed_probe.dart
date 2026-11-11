@@ -113,6 +113,9 @@ mixin RoutedProbe<K, V>
   Duration get throttleDuration => probeThrottleDuration;
 
   @protected
+  bool supersedeOnRouteVersion(K target) => false;
+
+  @protected
   Future<RouteCheck> checkRoutes(List<List<RouteHit>> routes) => ref
       .read(coreHandlerProvider)
       .checkRoutes(CheckRoutesParams(routes: routes));
@@ -386,7 +389,10 @@ mixin RoutedProbe<K, V>
     }
     for (final MapEntry(key: target, value: entry) in state.entries.entries) {
       if (_inFlight.containsKey(target)) {
-        if (moved) {
+        if (moved ||
+            (previous != null &&
+                next.routeVersion != previous.routeVersion &&
+                supersedeOnRouteVersion(target))) {
           _invalidate(target, entries);
         }
         continue;

@@ -1,4 +1,5 @@
 import ClashCore
+import Darwin
 import Foundation
 import NetworkExtension
 import WidgetKit
@@ -112,8 +113,13 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     else {
       return PacketTunnelProviderError.tunRejected
     }
+    // Go owns and closes the descriptor it receives; NetworkExtension owns utun.
+    let ownedDescriptor = dup(fileDescriptor)
+    guard ownedDescriptor >= 0 else {
+      return PacketTunnelProviderError.missingFileDescriptor
+    }
     let started = MobileStartTun(
-      fileDescriptor,
+      ownedDescriptor,
       CoreTunHandler(),
       options.stack,
       networkConfiguration.tunAddress(for: options),

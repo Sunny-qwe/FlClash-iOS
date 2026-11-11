@@ -207,6 +207,7 @@ class ProxiesAction extends _$ProxiesAction {
     if (!result.changed) {
       return;
     }
+    ref.read(routeTrackerProvider.notifier).resync();
     try {
       if (ref.read(appSettingProvider).closeConnections) {
         await _core.closeConnections();

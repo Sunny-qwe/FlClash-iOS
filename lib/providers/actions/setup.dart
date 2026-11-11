@@ -154,9 +154,11 @@ class SetupAction extends _$SetupAction {
     } else if (ref.read(appSettingProvider).autoRun) {
       await setRunning(true, initialize: true);
     } else {
-      ref
-          .read(vpnSettingProvider.notifier)
-          .update((state) => state.copyWith(enable: false));
+      if (!system.isIOS) {
+        ref
+            .read(vpnSettingProvider.notifier)
+            .update((state) => state.copyWith(enable: false));
+      }
       ref
           .read(patchClashConfigProvider.notifier)
           .update((state) => state.copyWith.tun(enable: false));

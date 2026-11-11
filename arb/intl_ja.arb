@@ -1,4 +1,8 @@
 {
+  "localNetworkSettings": "ローカルネットワークとループバック",
+  "localNetworkProtection": "ローカルペアリングを保護",
+  "localNetworkProtectionDesc": "ローカルペアリング用に 127.0.0.0/8、10.7.0.0/24、::1/128 をトンネルから除外します。JIT や他のアプリの VPN は有効になりません。ルート変更後は VPN を再接続してください。",
+  "appIconAccessDenied": "iOS がアプリアイコンへのアクセスを拒否しました（-54）。署名後のバンドル ID と application-identifier の一致を確認してください。再署名や再インストールが必要な場合があります。",
   "rule": "ルール",
   "rules": "ルール",
   "global": "グローバル",

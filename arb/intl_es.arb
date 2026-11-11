@@ -1,4 +1,8 @@
 {
+  "localNetworkSettings": "Red local y bucle local",
+  "localNetworkProtection": "Proteger el enlace local",
+  "localNetworkProtectionDesc": "Excluye 127.0.0.0/8, 10.7.0.0/24 y ::1/128 del túnel para el enlace local. No activa JIT ni la VPN de otra app. Vuelva a conectar la VPN tras cambiar las rutas.",
+  "appIconAccessDenied": "iOS denegó el acceso al icono (-54). Compruebe que el identificador del paquete y application-identifier coincidan tras firmar. Puede ser necesario firmar o instalar de nuevo.",
   "rule": "Regla",
   "rules": "Reglas",
   "global": "Global",

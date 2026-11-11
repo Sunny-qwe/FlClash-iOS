@@ -1,4 +1,8 @@
 {
+  "localNetworkSettings": "Local network and loopback",
+  "localNetworkProtection": "Protect local pairing",
+  "localNetworkProtectionDesc": "Exclude 127.0.0.0/8, 10.7.0.0/24 and ::1/128 from the tunnel for local pairing. This does not enable JIT or another app's VPN. Reconnect the VPN after changing routes.",
+  "appIconAccessDenied": "iOS refused access to the app icon (-54). Check that signing preserves the app's bundle identifier and its matching application identifier. Re-signing or reinstalling may be required.",
   "rule": "Rule",
   "rules": "Rules",
   "global": "Global",

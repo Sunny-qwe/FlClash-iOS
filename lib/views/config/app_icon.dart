@@ -130,7 +130,13 @@ class _AppIconViewState extends ConsumerState<AppIconView> {
       dialogs.showBanner('已切换应用图标为【${option.name}】', level: BannerLevel.success);
     } catch (error) {
       if (!mounted) return;
-      final message = error is PlatformException ? error.message : error.toString();
+      final denied = error is PlatformException &&
+          error.details is Map &&
+          (error.details as Map)['domain'] == 'NSOSStatusErrorDomain' &&
+          (error.details as Map)['code'] == -54;
+      final message = denied
+          ? context.appLocalizations.appIconAccessDenied
+          : error is PlatformException ? error.message : error.toString();
       dialogs.showBanner('切换图标失败: $message', level: BannerLevel.error);
     } finally {
       _isSwitching = false;

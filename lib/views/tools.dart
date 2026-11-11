@@ -8,6 +8,7 @@ import 'package:fl_clash/views/about.dart';
 import 'package:fl_clash/views/access.dart';
 import 'package:fl_clash/views/backup_and_restore.dart';
 import 'package:fl_clash/views/config/general.dart';
+import 'package:fl_clash/views/config/local_network.dart';
 import 'package:fl_clash/views/hotkey.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
@@ -82,7 +83,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         const _BackupItem(),
         const _AdvancedConfigItem(),
         const _GeneralItem(),
-        const _LoopbackItem(),
+        if (system.isIOS) const _LoopbackItem(),
       ],
     );
   }
@@ -289,22 +290,10 @@ class _LoopbackItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = context.appLocalizations;
-    return ListItem(
+    return ListItem.open(
       leading: const GlyphIcon(AppGlyphs.shuffle),
-      title: Text(localizations.loopback.isNotEmpty ? localizations.loopback : '本地回环'),
-      subtitle: const Text('LiveContainer / SideStore / TUN 回环保护'),
-      onTap: () {
-        dialogs.showAlert(
-          title: '本地回环 (Loopback)',
-          message: const TextSpan(
-            text: '已为进阶版配置全自动本地回环保护：\n\n'
-                '• iOS TUN 回环排除：已将 127.0.0.0/8、10.7.0.0/24 (SideStore/LiveContainer 通信网段) 及 ::1/128 写入 VPN 排除路由。\n\n'
-                '• 保护效果：开启代理时不会劫持 LiveContainer / SideStore 的设备端本地配对服务与 JIT 通信，彻底避免 "Reject loopback" 错误与冲突。\n\n'
-                '• 代理例外列表：127.0.0.1、localhost、10.7.0.1 已自动加入系统代理豁免名单。',
-          ),
-        );
-      },
+      title: Text(context.appLocalizations.localNetworkSettings),
+      widget: const LocalNetworkView(),
     );
   }
 }

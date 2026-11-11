@@ -1,4 +1,8 @@
 {
+  "localNetworkSettings": "Réseau local et boucle locale",
+  "localNetworkProtection": "Protéger le jumelage local",
+  "localNetworkProtectionDesc": "Exclut 127.0.0.0/8, 10.7.0.0/24 et ::1/128 du tunnel pour le jumelage local. Cela n’active ni JIT ni le VPN d’une autre app. Reconnectez le VPN après modification des routes.",
+  "appIconAccessDenied": "iOS a refusé l’accès à l’icône (-54). Vérifiez la correspondance entre l’identifiant du paquet et application-identifier après signature. Une nouvelle signature ou installation peut être nécessaire.",
   "rule": "Règle",
   "rules": "Règles",
   "global": "Global",

@@ -37,6 +37,11 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Generate localized settings
+        run: |
+          dart run intl_utils:generate
+          dart run build_runner build --delete-conflicting-outputs
+
       - name: Verify alternate icon sources
         run: python3 tool/verify_ios_bundle.py --assets ios/Runner/Assets.xcassets
 
@@ -45,6 +50,8 @@ jobs:
           swiftc ios/Shared/AppGroupLocation.swift tool/tests/ios_app_group_test.swift -o /tmp/flclash-group-tests
           /tmp/flclash-group-tests
           python3 -m unittest discover -s tool/tests -p 'test_prepare_ios_icons.py'
+          swiftc ios/Shared/AppGroupLocation.swift ios/NECore/PacketTunnelSharedStateStore.swift ios/NECore/PacketTunnelNetworkConfiguration.swift tool/tests/ios_network_configuration_test.swift -o /tmp/flclash-network-tests
+          /tmp/flclash-network-tests
 
       - name: Verify Dart changes and startup ordering
         run: |
@@ -52,6 +59,27 @@ jobs:
           flutter analyze --no-fatal-infos --no-fatal-warnings lib/common/path.dart lib/core/controller.dart lib/providers/actions/setup.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart
           flutter test test/common/path_test.dart test/core/controller_test.dart test/views/dashboard/current_outbound_test.dart test/views/dashboard/status_reference_test.dart
           flutter test test/setup_test.dart --plain-name 'iOS'
+          dart format lib/providers/actions/proxies.dart lib/providers/outbound_ip.dart lib/providers/routed_probe.dart lib/views/config/local_network.dart lib/views/tools.dart lib/views/dashboard/widgets/network_takeover.dart test/providers/outbound_ip_test.dart test/views/local_network_test.dart
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib/providers/actions/proxies.dart lib/providers/outbound_ip.dart lib/providers/routed_probe.dart lib/views/config/local_network.dart lib/views/tools.dart lib/views/dashboard/widgets/network_takeover.dart
+          flutter test test/providers/routed_probe_test.dart test/providers/outbound_ip_test.dart test/providers/proxies_action_test.dart test/providers/setup_action_test.dart test/views/local_network_test.dart test/l10n test/lint/dynamic_message_key_test.dart
+
+      - name: Upload generated and formatted sources
+        uses: actions/upload-artifact@v4
+        with:
+          name: verified-generated-sources
+          path: |
+            lib/l10n/
+            lib/providers/generated/
+            lib/providers/actions/proxies.dart
+            lib/providers/actions/setup.dart
+            lib/providers/outbound_ip.dart
+            lib/providers/routed_probe.dart
+            lib/views/config/local_network.dart
+            lib/views/config/app_icon.dart
+            lib/views/tools.dart
+            lib/views/dashboard/widgets/network_takeover.dart
+            test/providers/outbound_ip_test.dart
+            test/views/local_network_test.dart
 
       - name: Build iOS IPA (Unsigned)
         run: dart setup.dart ios --no-codesign -v

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fl_clash/common/service_probe.dart';
 import 'package:fl_clash/core/controller.dart';
 import 'package:fl_clash/core/interface.dart';
@@ -80,6 +82,45 @@ void main() {
     container.read(outboundIpProbeProvider.notifier).watch(routedOutbound);
 
     expect((await asked()).proxyName, directOutbound);
+  });
+
+  testWidgets('a new pick overtakes an unfinished dashboard IP lookup', (tester) async {
+    final first = Completer<OutboundIpResult>();
+    var calls = 0;
+    when(() => core.outboundIp(any())).thenAnswer((_) {
+      calls++;
+      return calls == 1 ? first.future : Future.value(_answer.copyWith(routeVersion: 2));
+    });
+    final container = build();
+    container.read(outboundIpProbeProvider.notifier).watch(routedOutbound);
+    await tester.pump();
+    expect(calls, 1);
+
+    container.read(routeTrackerProvider.notifier).applySnapshot(
+      const RouteSnapshot(coreEpoch: 1, routeVersion: 2),
+    );
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(calls, 2);
+    expect(container.read(outboundIpProbeProvider).valueOf(routedOutbound)?.ip, '2.2.2.2');
+
+    first.complete(_answer.copyWith(body: 'ip=1.1.1.1\nloc=US\n'));
+    await tester.pump();
+    expect(container.read(outboundIpProbeProvider).valueOf(routedOutbound)?.ip, '2.2.2.2');
+  });
+
+  testWidgets('a new pick keeps an unfinished lookup pinned to another node', (tester) async {
+    final pending = Completer<OutboundIpResult>();
+    when(() => core.outboundIp(any())).thenAnswer((_) => pending.future);
+    final container = build();
+    container.read(outboundIpProbeProvider.notifier).watch('HK-01');
+    await tester.pump();
+    container.read(routeTrackerProvider.notifier).applySnapshot(
+      const RouteSnapshot(coreEpoch: 1, routeVersion: 2),
+    );
+    await tester.pump(const Duration(milliseconds: 350));
+    verify(() => core.outboundIp(any())).called(1);
+    pending.complete(_answer.copyWith(routeVersion: 2));
+    await tester.pump();
   });
 
   test('looks a node up through itself', () async {

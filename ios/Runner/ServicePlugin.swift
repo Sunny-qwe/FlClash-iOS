@@ -200,7 +200,7 @@ final class ServicePlugin {
           if let error = error {
             let error = error as NSError
             DispatchQueue.main.async {
-              result(FlutterError(code: "SET_ICON_ERROR", message: "\(error.localizedDescription) [\(error.domain):\(error.code)]", details: nil))
+              result(FlutterError(code: "SET_ICON_ERROR", message: "\(error.localizedDescription) [\(error.domain):\(error.code)]", details: ["domain": error.domain, "code": error.code]))
             }
           } else {
             DispatchQueue.main.async { result(true) }

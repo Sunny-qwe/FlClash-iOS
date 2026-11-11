@@ -1,4 +1,5 @@
 import 'package:fl_clash/common/service_probe.dart';
+import 'package:fl_clash/common/constant.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,6 +16,15 @@ class OutboundIpProbe extends _$OutboundIpProbe
     with RoutedProbe<String, IpInfo> {
   @override
   RoutedProbeState<String, IpInfo> build() => buildProbe();
+
+  @override
+  bool supersedeOnRouteVersion(String target) => target == routedOutbound;
+
+  @override
+  Duration get settleDuration => probeMoveSettleDuration;
+
+  @override
+  Duration get throttleDuration => Duration.zero;
 
   @override
   Future<Map<String, ProbeAnswer<IpInfo>>> probe(
