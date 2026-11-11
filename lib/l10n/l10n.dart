@@ -65,10 +65,10 @@ class AppLocalizations {
     );
   }
 
-  /// `Export the certificate, install its profile in iOS Settings, then enable full trust under Settings → General → About → Certificate Trust Settings. Return here to check trust. Regenerating the certificate requires installing the new one.`
+  /// `Tap Install to open the browser and allow the profile download. In iOS Settings → Profile Downloaded (or General → VPN & Device Management), install the profile and enter your device passcode when asked. Then enable full trust under General → About → Certificate Trust Settings. Return here to check trust. After regeneration, install the new certificate.`
   String get mitmIOSGuide {
     return Intl.message(
-      'Export the certificate, install its profile in iOS Settings, then enable full trust under Settings → General → About → Certificate Trust Settings. Return here to check trust. Regenerating the certificate requires installing the new one.',
+      'Tap Install to open the browser and allow the profile download. In iOS Settings → Profile Downloaded (or General → VPN & Device Management), install the profile and enter your device passcode when asked. Then enable full trust under General → About → Certificate Trust Settings. Return here to check trust. After regeneration, install the new certificate.',
       name: 'mitmIOSGuide',
       desc: '',
       args: [],

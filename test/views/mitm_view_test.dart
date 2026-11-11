@@ -68,13 +68,24 @@ final _renewed = _certificate.copyWith(
 );
 
 void main() {
-  testWidgets('advanced settings keep module and certificate entries separate', (tester) async {
-    await tester.pumpWidget(const TestApp(child: AdvancedConfigView()));
-    await tester.pumpAndSettle();
-    expect(find.text('DNS'), findsOneWidget);
-    expect(find.text('Modules'), findsNothing);
-    expect(find.text('MITM certificates'), findsNothing);
-  });
+  testWidgets(
+    'advanced settings keep module and certificate entries separate',
+    (tester) async {
+      final scope = ProviderContainer();
+      addTearDown(scope.dispose);
+      scope.read(viewSizeProvider.notifier).update((_) => const Size(1000, 2000));
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: scope,
+          child: const TestApp(child: AdvancedConfigView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('DNS'), findsOneWidget);
+      expect(find.text('Modules'), findsNothing);
+      expect(find.text('MITM certificates'), findsNothing);
+    },
+  );
   late ProviderContainer container;
   late _MockCore core;
 
@@ -178,9 +189,9 @@ void main() {
 
   testWidgets('the capture list reports when recording is off', (tester) async {
     await pumpView(tester);
-    when(() => core.getMitmExchanges('')).thenAnswer(
-      (_) async => const MitmExchangeList(closed: true),
-    );
+    when(
+      () => core.getMitmExchanges(''),
+    ).thenAnswer((_) async => const MitmExchangeList(closed: true));
     await tester.tap(find.text(currentAppLocalizations.httpRequests));
     await tester.pumpAndSettle();
 
@@ -192,7 +203,10 @@ void main() {
     await pumpView(tester);
     when(() => core.getMitmExchanges('')).thenAnswer(
       (_) => Future.error(
-        const CoreMethodException(code: 'core_error', message: 'capture failure'),
+        const CoreMethodException(
+          code: 'core_error',
+          message: 'capture failure',
+        ),
       ),
     );
     await tester.tap(find.text(currentAppLocalizations.httpRequests));

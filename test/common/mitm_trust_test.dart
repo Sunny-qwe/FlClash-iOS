@@ -90,21 +90,27 @@ class _Processes {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   const service = MethodChannel('com.follow.clash/service');
-  test('iOS installation sends a public profile to the browser installer', () async {
-    final calls = <MethodCall>[];
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(service, (call) async {
-          calls.add(call);
-          return null;
-        });
-    addTearDown(() {
+  test(
+    'iOS installation sends a public profile to the browser installer',
+    () async {
+      final calls = <MethodCall>[];
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(service, null);
-    });
-    expect(await IOSMitmTrustStore().install(_ca), MitmInstallOutcome.prompted);
-    expect(calls.single.method, 'installMitmProfile');
-    expect(calls.single.arguments, mitmIOSProfile(_ca));
-  });
+          .setMockMethodCallHandler(service, (call) async {
+            calls.add(call);
+            return null;
+          });
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(service, null);
+      });
+      expect(
+        await IOSMitmTrustStore().install(_ca),
+        MitmInstallOutcome.prompted,
+      );
+      expect(calls.single.method, 'installMitmProfile');
+      expect(calls.single.arguments, mitmIOSProfile(_ca));
+    },
+  );
   test('iOS installation propagates browser failure', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(service, (_) async {
@@ -114,7 +120,10 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(service, null);
     });
-    await expectLater(IOSMitmTrustStore().install(_ca), throwsA(isA<PlatformException>()));
+    await expectLater(
+      IOSMitmTrustStore().install(_ca),
+      throwsA(isA<PlatformException>()),
+    );
   });
   test('iOS profile exports the public CA with a certificate payload', () {
     final profile = mitmIOSProfile(_ca.copyWith(subject: 'CA & test'));

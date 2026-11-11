@@ -1423,7 +1423,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Un - en tête exclut un hôte, et la première correspondance l’emporte.",
     ),
     "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
-      "Exportez le certificat, installez son profil dans les réglages iOS, puis activez la confiance complète dans Général → Informations → Réglages des certificats. Revenez ici pour vérifier. Après régénération, installez le nouveau certificat.",
+      "Touchez Installer et autorisez le téléchargement du profil dans le navigateur. Dans Réglages → Profil téléchargé (ou Général → VPN et gestion de l’appareil), installez-le et saisissez le code de l’appareil si demandé. Activez la confiance complète dans Général → Informations → Réglages des certificats. Revenez ici pour vérifier. Après régénération, installez le nouveau certificat.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("Lignes ignorées"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

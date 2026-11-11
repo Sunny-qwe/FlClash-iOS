@@ -1322,7 +1322,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "A leading - excludes a host, and the first match decides.",
     ),
     "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
-      "Export the certificate, install its profile in iOS Settings, then enable full trust under Settings → General → About → Certificate Trust Settings. Return here to check trust. Regenerating the certificate requires installing the new one.",
+      "Tap Install to open the browser and allow the profile download. In iOS Settings → Profile Downloaded (or General → VPN & Device Management), install the profile and enter your device passcode when asked. Then enable full trust under General → About → Certificate Trust Settings. Return here to check trust. After regeneration, install the new certificate.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("Ignored lines"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

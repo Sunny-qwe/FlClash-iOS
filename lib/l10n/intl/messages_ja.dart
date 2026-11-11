@@ -1131,7 +1131,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "先頭の - は除外を表し、最初に一致した項目が優先されます。",
     ),
     "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
-      "証明書をエクスポートし、iOS の設定でプロファイルをインストールしてから、「一般 → 情報 → 証明書信頼設定」で完全な信頼を有効にしてください。この画面に戻ると信頼を確認します。再生成後は新しい証明書のインストールが必要です。",
+      "インストールを押してブラウザを開き、プロファイルのダウンロードを許可してください。設定 → ダウンロード済みのプロファイル（または一般 → VPNとデバイス管理）でインストールし、求められたら端末のパスコードを入力します。一般 → 情報 → 証明書信頼設定で完全な信頼を有効にし、この画面に戻って確認してください。再生成後は新しい証明書をインストールしてください。",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("無視された行"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

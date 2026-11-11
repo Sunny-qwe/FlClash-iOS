@@ -1111,7 +1111,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "앞에 -를 붙이면 제외하며, 처음 일치하는 항목이 적용됩니다.",
     ),
     "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
-      "인증서를 내보내고 iOS 설정에서 프로파일을 설치한 다음 일반 → 정보 → 인증서 신뢰 설정에서 완전한 신뢰를 활성화하세요. 이 화면으로 돌아오면 신뢰를 확인합니다. 다시 생성한 경우 새 인증서를 설치해야 합니다.",
+      "설치를 눌러 브라우저를 열고 프로파일 다운로드를 허용하세요. 설정 → 프로파일이 다운로드됨(또는 일반 → VPN 및 기기 관리)에서 설치하고 요청 시 기기 암호를 입력하세요. 일반 → 정보 → 인증서 신뢰 설정에서 완전한 신뢰를 활성화한 후 이 화면으로 돌아와 확인하세요. 다시 생성한 경우 새 인증서를 설치하세요.",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("무시된 줄"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(

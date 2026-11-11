@@ -1027,7 +1027,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "以 - 开头表示排除，第一条匹配的生效。",
     ),
     "mitmIOSGuide": MessageLookupByLibrary.simpleMessage(
-      "导出证书，在 iOS 设置中安装描述文件，再进入“设置 → 通用 → 关于本机 → 证书信任设置”启用完全信任。返回此页面检查信任状态。重新生成证书后需要重新安装。",
+      "点击安装后会打开浏览器，请允许下载描述文件。进入“设置 → 已下载描述文件”（或“通用 → VPN 与设备管理”），点击安装，按提示输入手机锁屏密码。再到“通用 → 关于本机 → 证书信任设置”启用完全信任。返回此页面检查信任状态；重新生成证书后需重新安装。",
     ),
     "mitmIgnoredLines": MessageLookupByLibrary.simpleMessage("忽略的行"),
     "mitmInstallSystemCaTip": MessageLookupByLibrary.simpleMessage(
