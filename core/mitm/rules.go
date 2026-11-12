@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -214,6 +215,14 @@ func parseRule(kind, line string) (rule, error) {
 			case "reject", "reject-200", "reject-dict", "reject-array", "reject-img", "reject-tinygif":
 			default:
 				return r, errors.New("unsupported reject action")
+			}
+		} else if len(parts) == 3 && parts[2] == "header" {
+			target, parseErr := url.Parse(parts[1])
+			if parseErr != nil || target.Scheme == "" || target.Host == "" || target.Scheme != "http" && target.Scheme != "https" {
+				if parseErr == nil {
+					parseErr = errors.New("target must be an absolute HTTP URL")
+				}
+				return r, fmt.Errorf("invalid URL rewrite target: %w", parseErr)
 			}
 		} else {
 			code, e := strconv.Atoi(parts[len(parts)-1])

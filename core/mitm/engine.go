@@ -293,6 +293,22 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 		parts := rule.fields
 		if len(parts) == 2 {
 			response = rejectResponse(parts[1], r)
+		} else if len(parts) == 3 && parts[2] == "header" {
+			var location string
+			location, err = rule.match.replace(original, parts[1])
+			if err == nil {
+				target, parseErr := url.Parse(location)
+				if parseErr != nil || target.Scheme == "" || target.Host == "" || target.Scheme != "http" && target.Scheme != "https" {
+					if parseErr == nil {
+						parseErr = errors.New("target must be an absolute HTTP URL")
+					}
+					err = fmt.Errorf("invalid URL rewrite target: %w", parseErr)
+				} else {
+					r.URL = target
+					r.RequestURI = ""
+					r.Host = target.Host
+				}
+			}
 		} else {
 			var location string
 			location, err = rule.match.replace(original, parts[1])

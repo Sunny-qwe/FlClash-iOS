@@ -1,6 +1,7 @@
 package mitm
 
 import (
+	"bufio"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
@@ -61,6 +62,43 @@ func TestCertificateRegenerationSignsRealLeaf(t *testing.T) {
 func TestHTTPSRewriteScriptAndCapture(t *testing.T) {
 	for _, h2 := range []bool{false, true} {
 		t.Run(fmt.Sprintf("http2=%t", h2), func(t *testing.T) { exerciseHTTPSRewrite(t, h2) })
+	}
+}
+
+func TestURLRewriteHeaderActionUsesUpstreamTarget(t *testing.T) {
+	home := t.TempDir()
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Host != "mock.example" || r.URL.Path != "/reven/receipts" {
+			t.Fatalf("upstream request = %s %s", r.Host, r.URL)
+		}
+		io.WriteString(w, "rewritten")
+	}))
+	defer upstream.Close()
+	_, port, _ := net.SplitHostPort(upstream.Listener.Addr().String())
+	engine, err := New(home, Config{Enable: true, Rules: Rules{
+		Hostname:   []string{"api.example"},
+		URLRewrite: []string{`^http://api\.example/(.+) http://mock.example/$1 header`},
+	}}, func(ctx context.Context, network, address string) (net.Conn, error) {
+		return (&net.Dialer{}).DialContext(ctx, network, net.JoinHostPort("127.0.0.1", port))
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer engine.Close()
+	client, server := net.Pipe()
+	defer client.Close()
+	go func() { defer server.Close(); engine.Serve(server, "api.example", 80, "header-rewrite") }()
+	if _, err := fmt.Fprint(client, "GET /reven/receipts HTTP/1.1\r\nHost: api.example\r\n\r\n"); err != nil {
+		t.Fatal(err)
+	}
+	response, err := http.ReadResponse(bufio.NewReader(client), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, err := io.ReadAll(response.Body)
+	response.Body.Close()
+	if err != nil || string(body) != "rewritten" {
+		t.Fatalf("response = %q, %v", body, err)
 	}
 }
 
