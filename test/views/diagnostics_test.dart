@@ -116,6 +116,9 @@ void main() {
     verify(() => core.outboundIp(any())).called(2);
     verify(() => core.serviceCheck(any())).called(2);
     expect(find.textContaining('203.0.113.24'), findsWidgets);
+    container.read(appSettingProvider.notifier).update((settings) => settings.copyWith(hideIp: true));
+    await tester.pump();
+    expect(find.textContaining('203.0.113.24'), findsNothing);
     container.read(routeTrackerProvider.notifier).applySnapshot(const RouteSnapshot(coreEpoch: 1, routeVersion: 2));
     await tester.pump();
     expect(find.textContaining('Connection or routing changed'), findsWidgets);
@@ -144,6 +147,10 @@ void main() {
     expect(find.text('Configuration parsed successfully.'), findsOneWidget);
     verify(() => core.validateConfig(any())).called(1);
     expect(container.read(currentProfileIdProvider), 1);
+    final profile = container.read(currentProfileProvider)!;
+    container.read(profilesProvider.notifier).put(profile.copyWith(label: 'changed'));
+    await tester.pump();
+    expect(find.textContaining('Connection or routing changed'), findsWidgets);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 

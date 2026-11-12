@@ -19,7 +19,7 @@ class NetworkHealthView extends ConsumerStatefulWidget {
 }
 
 class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
-  final _results = <({String title, String detail, bool passed})>[];
+  final _results = <({String title, String detail, bool passed, String? ip})>[];
   bool _busy = false;
   bool _stale = false;
   String? _error;
@@ -66,14 +66,14 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
           );
           final ip = parseOutboundIp(result);
           if (!mounted) return;
-          final hide = ref.read(appSettingProvider).hideIp;
           setState(
             () => _results.add((
               title: title,
               detail: ip == null
                   ? l.serviceFailed
-                  : '${hide ? '••••••••' : ip.ip}${result.chains.isEmpty ? '' : '\n${result.chains.join(' → ')}'}',
+                  : result.chains.join(' → '),
               passed: ip != null,
+              ip: ip?.ip,
             )),
           );
         } catch (error) {
@@ -83,6 +83,7 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
               title: title,
               detail: redactDiagnostic(compactError(error)),
               passed: false,
+              ip: null,
             )),
           );
         }
@@ -104,6 +105,7 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
                   ? l.serviceFailed
                   : '${result.status == ServiceProbeStatus.available ? l.serviceAvailable : result.status.id}${result.delay == null ? '' : ' · ${result.delay} ms'}${result.chains.isEmpty ? '' : '\n${result.chains.join(' → ')}'}',
               passed: result?.status == ServiceProbeStatus.available,
+              ip: null,
             )),
           );
         } catch (error) {
@@ -113,6 +115,7 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
               title: target.label,
               detail: redactDiagnostic(compactError(error)),
               passed: false,
+              ip: null,
             )),
           );
         }
@@ -135,6 +138,7 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
   Widget build(BuildContext context) {
     final l = context.appLocalizations;
     final running = ref.watch(isStartProvider);
+    final hideIp = ref.watch(appSettingProvider.select((settings) => settings.hideIp));
     final stale =
         _stale ||
         _checkedRoute != null &&
@@ -184,7 +188,7 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
               for (final result in _results)
                 ListItem(
                   title: Text(result.title),
-                  subtitle: Text(stale ? l.healthRouteChanged : result.detail),
+                  subtitle: Text(stale ? l.healthRouteChanged : result.ip == null ? result.detail : '${hideIp ? '••••••••' : result.ip}${result.detail.isEmpty ? '' : '\n${result.detail}'}'),
                   trailing: Text(
                     stale
                         ? '—'
@@ -214,7 +218,7 @@ class ConfigPreflightView extends ConsumerStatefulWidget {
 class _ConfigPreflightViewState extends ConsumerState<ConfigPreflightView> {
   bool _busy = false;
   String? _result;
-  int? _profileId;
+  Object? _checkedInputs;
 
   Future<void> _check() async {
     if (_busy) return;
@@ -224,7 +228,7 @@ class _ConfigPreflightViewState extends ConsumerState<ConfigPreflightView> {
     setState(() {
       _busy = true;
       _result = null;
-      _profileId = profile.id;
+      _checkedInputs = (profile, ref.read(patchClashConfigProvider), ref.read(mitmModulesProvider).value);
     });
     try {
       final yaml = await ref
@@ -253,6 +257,7 @@ class _ConfigPreflightViewState extends ConsumerState<ConfigPreflightView> {
   Widget build(BuildContext context) {
     final l = context.appLocalizations;
     final profile = ref.watch(currentProfileProvider);
+    final inputs = (profile, ref.watch(patchClashConfigProvider), ref.watch(mitmModulesProvider).value);
     return Scaffold(
       title: l.configPreflight,
       isLoading: _busy,
@@ -279,7 +284,7 @@ class _ConfigPreflightViewState extends ConsumerState<ConfigPreflightView> {
                 ListItem(
                   title: Text(l.status),
                   subtitle: Text(
-                    _profileId == profile?.id ? _result! : l.healthRouteChanged,
+                    _checkedInputs == inputs ? _result! : l.healthRouteChanged,
                   ),
                 ),
             ],
