@@ -144,16 +144,17 @@ AND,((DOMAIN-SUFFIX,example.com),(PROTOCOL,UDP)),REJECT
       ]);
     });
 
-    test('passes Surge rewrites on and skips jq ones', () {
+    test('passes Surge regex and jq rewrites to the core', () {
       expect(content.headerRewrite, [
         r'http-request ^https://example\.com header-del Cookie',
       ]);
       expect(content.bodyRewrite, [
         r'http-response ^https://example\.com/api "ad":true "ad":false',
+        r"http-response-jq ^https://example\.com/api 'del(.ad)'",
       ]);
       expect(
         content.skipped.where((skip) => skip.reason == MitmModuleSkipReason.jq),
-        hasLength(1),
+        isEmpty,
       );
     });
 
@@ -506,6 +507,7 @@ some text that is not a line of a snippet
       expect(content.bodyRewrite, [
         r'http-request ^https?://a\.com/api "\"ad\":true" "\"ad\":false"',
         r'http-response ^https?://a\.com/feed "\"ad\":\[.+\]" "\"ad\":[]"',
+        r"http-response-jq ^https?://a\.com/jq '.ads=[]'",
       ]);
       expect(content.mapLocal, [
         r'^https?://a\.com/page data-type="file" data="page0.html" header="Content-Type:text/html|X-Mock:1"',
@@ -531,7 +533,6 @@ some text that is not a line of a snippet
           ('filter_local', MitmModuleSkipReason.policy),
           ('filter_local', MitmModuleSkipReason.rule),
           ('rewrite_local', MitmModuleSkipReason.rawHeader),
-          ('rewrite_local', MitmModuleSkipReason.jq),
           ('rewrite_local', MitmModuleSkipReason.conditional),
           ('task_local', MitmModuleSkipReason.scriptType),
           ('task_local', MitmModuleSkipReason.disabled),
@@ -699,6 +700,7 @@ dns:
       ]);
       expect(content.bodyRewrite, [
         r'http-response ^https?://a\.com/api "ad":true "ad":false',
+        r'http-response-jq ^https?://a\.com/api del(.ads)',
       ]);
       expect(content.mapLocal, [
         r'^https?://a\.com/empty data-type="text" data="{}" status-code="200" header="Content-Type:application/json"',
@@ -735,7 +737,6 @@ dns:
         [for (final skip in content.skipped) (skip.section, skip.reason)],
         [
           ('http', MitmModuleSkipReason.setting),
-          ('body-rewrite', MitmModuleSkipReason.jq),
           ('body-rewrite', MitmModuleSkipReason.jsonBody),
           ('script', MitmModuleSkipReason.relativeData),
           ('script', MitmModuleSkipReason.scriptType),

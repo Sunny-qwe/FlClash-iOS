@@ -32,36 +32,47 @@ func scriptBinaryBody(params map[string]string) bool {
 	return strings.EqualFold(strings.TrimSpace(params["binary-body-mode"]), "true")
 }
 
-func scriptBodyValue(body []byte, binary bool) string {
+func scriptBodyValue(vm *goja.Runtime, body []byte, binary bool) any {
 	if binary {
-		return base64.StdEncoding.EncodeToString(body)
+		constructor, _ := goja.AssertConstructor(vm.Get("Uint8Array"))
+		value, err := constructor(nil, vm.ToValue(vm.NewArrayBuffer(append([]byte{}, body...))))
+		if err != nil {
+			panic(err)
+		}
+		return value
 	}
 	return string(body)
 }
 
-func scriptBodyBytes(value string, binary bool) ([]byte, error) {
-	if !binary {
+func scriptBodyBytes(value any) ([]byte, error) {
+	switch value := value.(type) {
+	case string:
 		return []byte(value), nil
+	case []byte:
+		return append([]byte{}, value...), nil
+	case goja.ArrayBuffer:
+		return append([]byte{}, value.Bytes()...), nil
 	}
-	return base64.StdEncoding.DecodeString(value)
+	return nil, errors.New("body must be a string, Uint8Array or ArrayBuffer")
+}
+
+func scriptHeaderValue(vm *goja.Runtime, header http.Header, full bool) any {
+	if full {
+		out := vm.NewObject()
+		for key, values := range header {
+			items := make([]any, len(values))
+			for i, value := range values {
+				items[i] = value
+			}
+			_ = out.Set(key, vm.NewArray(items...))
+		}
+		return out
+	}
+	return scriptHeaders(header)
 }
 
 func (e *Engine) runScript(r rule, request *http.Request, response *http.Response, body []byte) (result map[string]any, output ScriptOutput) {
 	output.Logs = []string{}
-	select {
-	case scriptBudget <- struct{}{}:
-		defer func() { <-scriptBudget }()
-	default:
-		output.Error = "script concurrency limit reached"
-		return
-	}
-	source, err := readResource(e.home, r.params["script-path"], 256<<10)
-	if err != nil {
-		output.Error = err.Error()
-		return
-	}
-	vm := goja.New()
-	vm.SetMaxCallStackSize(256)
 	timeout := 500 * time.Millisecond
 	if seconds, err := strconv.ParseFloat(r.params["timeout"], 64); err == nil && seconds > 0 {
 		timeout = time.Duration(seconds * float64(time.Second))
@@ -75,8 +86,22 @@ func (e *Engine) runScript(r rule, request *http.Request, response *http.Respons
 	}
 	ctx, cancel := context.WithTimeout(parent, timeout)
 	defer cancel()
-	timer := time.AfterFunc(timeout, func() { vm.Interrupt("script time limit exceeded") })
-	defer timer.Stop()
+	select {
+	case scriptBudget <- struct{}{}:
+		defer func() { <-scriptBudget }()
+	case <-ctx.Done():
+		output.Error = "script wait time limit exceeded"
+		return
+	}
+	source, err := readResource(e.home, r.params["script-path"], 256<<10)
+	if err != nil {
+		output.Error = err.Error()
+		return
+	}
+	vm := goja.New()
+	vm.SetMaxCallStackSize(256)
+	stopInterrupt := context.AfterFunc(ctx, func() { vm.Interrupt("script time limit exceeded") })
+	defer stopInterrupt()
 	defer func() {
 		if p := recover(); p != nil {
 			output.Error = fmt.Sprint(p)
@@ -130,16 +155,22 @@ func (e *Engine) runScript(r rule, request *http.Request, response *http.Respons
 	_ = vm.Set("btoa", func(value string) string { return base64.StdEncoding.EncodeToString([]byte(value)) })
 	timers := e.installScriptHost(vm, ctx, r.name)
 	if request != nil {
-		object := map[string]any{"url": request.URL.String(), "method": request.Method, "headers": scriptHeaders(request.Header)}
+		object := map[string]any{"url": request.URL.String(), "method": request.Method, "headers": scriptHeaderValue(vm, request.Header, r.params["full-header-mode"] == "true")}
 		if r.params["requires-body"] == "true" && response == nil && body != nil {
-			object["body"] = scriptBodyValue(body, scriptBinaryBody(r.params))
+			object["body"] = scriptBodyValue(vm, body, scriptBinaryBody(r.params))
+			if scriptBinaryBody(r.params) {
+				object["bodyBytes"] = object["body"]
+			}
 		}
 		_ = vm.Set("$request", object)
 	}
 	if response != nil {
-		object := map[string]any{"status": response.StatusCode, "statusCode": response.StatusCode, "headers": scriptHeaders(response.Header)}
+		object := map[string]any{"status": response.StatusCode, "statusCode": response.StatusCode, "headers": scriptHeaderValue(vm, response.Header, r.params["full-header-mode"] == "true")}
 		if body != nil {
-			object["body"] = scriptBodyValue(body, scriptBinaryBody(r.params))
+			object["body"] = scriptBodyValue(vm, body, scriptBinaryBody(r.params))
+			if scriptBinaryBody(r.params) {
+				object["bodyBytes"] = object["body"]
+			}
 		}
 		_ = vm.Set("$response", object)
 	}
@@ -158,6 +189,20 @@ func (e *Engine) runScript(r rule, request *http.Request, response *http.Respons
 		return
 	}
 	if result != nil {
+		bodies := []map[string]any{result}
+		if nested, ok := result["response"].(map[string]any); ok {
+			bodies = append(bodies, nested)
+		}
+		for _, object := range bodies {
+			if value, ok := scriptResultBody(object); ok {
+				data, err := scriptBodyBytes(value)
+				if err != nil || int64(len(data)) > e.maxBody {
+					output.Error = "script returned invalid or oversized body"
+					result = nil
+					return
+				}
+			}
+		}
 		data, err := json.Marshal(result)
 		if err != nil || int64(len(data)) > e.maxBody {
 			output.Error = "script output exceeds size limit"
@@ -208,8 +253,8 @@ func (e *Engine) applyScripts(phase string, request *http.Request, response *htt
 			if headers, ok := result["headers"].(map[string]any); ok {
 				request.Header = exportHeaders(headers)
 			}
-			if text, ok := result["body"].(string); ok {
-				decoded, decodeErr := scriptBodyBytes(text, scriptBinaryBody(r.params))
+			if value, ok := scriptResultBody(result); ok {
+				decoded, decodeErr := scriptBodyBytes(value)
 				if decodeErr != nil {
 					e.warn("MITM script " + r.name + " returned invalid binary body")
 					continue
@@ -221,8 +266,8 @@ func (e *Engine) applyScripts(phase string, request *http.Request, response *htt
 			if headers, ok := result["headers"].(map[string]any); ok {
 				response.Header = exportHeaders(headers)
 			}
-			if text, ok := result["body"].(string); ok {
-				decoded, decodeErr := scriptBodyBytes(text, scriptBinaryBody(r.params))
+			if value, ok := scriptResultBody(result); ok {
+				decoded, decodeErr := scriptBodyBytes(value)
 				if decodeErr != nil {
 					e.warn("MITM script " + r.name + " returned invalid binary body")
 					continue
@@ -239,10 +284,27 @@ func (e *Engine) applyScripts(phase string, request *http.Request, response *htt
 	return nil
 }
 
+func scriptResultBody(result map[string]any) (any, bool) {
+	if body, ok := result["bodyBytes"]; ok {
+		return body, true
+	}
+	body, ok := result["body"]
+	return body, ok
+}
+
 func exportHeaders(values map[string]any) http.Header {
 	out := http.Header{}
 	for key, value := range values {
-		out.Set(key, fmt.Sprint(value))
+		switch value := value.(type) {
+		case []any:
+			for _, item := range value {
+				out.Add(key, fmt.Sprint(item))
+			}
+		case []string:
+			out[key] = append([]string{}, value...)
+		default:
+			out.Set(key, fmt.Sprint(value))
+		}
 	}
 	return out
 }
@@ -269,8 +331,9 @@ func scriptResponse(result map[string]any, request *http.Request) *http.Response
 	if h, ok := result["headers"].(map[string]any); ok {
 		headers = exportHeaders(h)
 	}
-	body, _ := result["body"].(string)
-	return localResponse(code, []byte(body), headers, request)
+	value, _ := scriptResultBody(result)
+	body, _ := scriptBodyBytes(value)
+	return localResponse(code, body, headers, request)
 }
 func (e *Engine) RunScript(name string) (ScriptOutput, error) {
 	for _, r := range e.rules["script"] {

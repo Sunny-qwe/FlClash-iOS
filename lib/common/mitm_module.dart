@@ -1060,11 +1060,7 @@ class _ModuleParser {
       case 'header rewrite':
         _headerRewrite.add(line);
       case 'body rewrite':
-        if (RegExp(r'^http-(request|response)-jq\s').hasMatch(line)) {
-          _skip(section, line, MitmModuleSkipReason.jq);
-        } else {
-          _bodyRewrite.add(line);
-        }
+        _bodyRewrite.add(line);
       case 'map local':
         _readMapLocal(section, line);
       case 'rewrite':
@@ -1573,7 +1569,10 @@ class _ModuleParser {
       case 'request-header' || 'response-header':
         _skip(section, line, MitmModuleSkipReason.rawHeader);
       case 'jsonjq-request-body' || 'jsonjq-response-body':
-        _skip(section, line, MitmModuleSkipReason.jq);
+        _bodyRewrite.add(
+          'http-${type == 'jsonjq-request-body' ? 'request' : 'response'}-jq '
+          '${_field(pattern)} $rest',
+        );
       case 'echo-response' when repeated > 0:
         final headers = rest.substring(0, repeated).trim().split(r'\r\n');
         _addMapLocal(section, line, pattern, {
@@ -1881,7 +1880,10 @@ class _ModuleParser {
           '${match.group(4)}',
         );
       case 'jq':
-        _skip(section, line, MitmModuleSkipReason.jq);
+        _bodyRewrite.add(
+          'http-${match!.group(2)}-jq ${_field(match.group(1)!)} '
+          '${_field(_unquote(match.group(4)!))}',
+        );
       case final action? when action.startsWith('json-'):
         _skip(section, line, MitmModuleSkipReason.jsonBody);
       default:

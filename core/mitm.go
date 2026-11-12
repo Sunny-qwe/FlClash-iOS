@@ -45,7 +45,7 @@ func init() {
 			}
 			_ = connection.SetReadDeadline(time.Time{})
 		}
-		if !engine.Matches(metadata.Host) || metadata.DstPort != 80 && metadata.DstPort != 443 {
+		if !engine.MatchesEndpoint(metadata.Host, metadata.DstPort) || metadata.DstPort != 80 && metadata.DstPort != 443 {
 			return false
 		}
 		tracker := newMitmTracker(conn)

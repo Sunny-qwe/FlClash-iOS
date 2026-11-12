@@ -111,6 +111,10 @@ func (e *Engine) warn(message string) {
 }
 
 func (e *Engine) Matches(host string) bool {
+	return e.MatchesEndpoint(host, 443)
+}
+
+func (e *Engine) MatchesEndpoint(host string, port uint16) bool {
 	if !e.config.Enable {
 		return false
 	}
@@ -119,6 +123,12 @@ func (e *Engine) Matches(host string) bool {
 		line = strings.ToLower(strings.TrimSpace(line))
 		excluded := strings.HasPrefix(line, "-")
 		line = strings.TrimPrefix(line, "-")
+		if before, after, ok := strings.Cut(line, ":"); ok {
+			if after != strconv.Itoa(int(port)) {
+				continue
+			}
+			line = before
+		}
 		matched, _ := path.Match(line, host)
 		if matched || line == host {
 			return !excluded
@@ -151,7 +161,7 @@ func (e *Engine) certificate(host string) (*tls.Certificate, error) {
 }
 
 func (e *Engine) Serve(conn net.Conn, host string, port uint16, id string) (handled bool) {
-	if !e.Matches(host) || port != 80 && port != 443 || port == 443 && e.ca == nil {
+	if !e.MatchesEndpoint(host, port) || port != 80 && port != 443 || port == 443 && e.ca == nil {
 		return false
 	}
 	select {
@@ -349,8 +359,14 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 	if err == nil && response == nil {
 		e.rewriteHeaders("http-request", original, r.Header, &actions)
 		requestNeedsBody := e.needsBody("http-request", original) || e.capture.Load()
-		if requestNeedsBody && (r.Header.Get("Content-Encoding") == "" || e.binaryBodyScript("http-request", original)) {
-			reqBody, _ = readBoundedBody(&r.Body, e.maxBody)
+		if requestNeedsBody {
+			encoded := r.Header.Get("Content-Encoding") != ""
+			wrapper := &http.Response{Header: r.Header, Body: r.Body}
+			reqBody, _ = e.responseBody(wrapper)
+			r.Body = wrapper.Body
+			if encoded && reqBody != nil {
+				setRequestBody(r, reqBody)
+			}
 		}
 		if reqBody != nil {
 			rewritten := e.rewriteBody("http-request", original, reqBody, &actions)
@@ -515,6 +531,17 @@ func (e *Engine) rewriteBody(phase, rawURL string, data []byte, actions *[]actio
 		if parts[0] != phase || !rule.match.matches(rawURL) {
 			continue
 		}
+		if rule.jq != nil {
+			rewritten, err := e.rewriteJSON(rule, data)
+			if err != nil {
+				e.warn("MITM jq rewrite failed; original body preserved: " + err.Error())
+				*actions = append(*actions, action{Kind: "body-rewrite-error", Phase: phase, Detail: err.Error()})
+				continue
+			}
+			data = rewritten
+			*actions = append(*actions, action{Kind: "body-rewrite", Phase: phase})
+			continue
+		}
 		p, err := compilePattern(parts[2])
 		if err != nil {
 			continue
@@ -537,18 +564,6 @@ func (e *Engine) needsBody(phase, rawURL string) bool {
 	}
 	for _, r := range e.rules["script"] {
 		if r.params["type"] == phase && r.params["requires-body"] == "true" && r.match.matches(rawURL) {
-			return true
-		}
-	}
-	return false
-}
-
-func (e *Engine) binaryBodyScript(phase, rawURL string) bool {
-	for _, r := range e.rules["script"] {
-		if r.params["type"] == phase &&
-			r.params["requires-body"] == "true" &&
-			scriptBinaryBody(r.params) &&
-			r.match.matches(rawURL) {
 			return true
 		}
 	}

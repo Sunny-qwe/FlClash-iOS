@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/dlclark/regexp2"
+	"github.com/itchyny/gojq"
 )
 
 type Rules struct {
@@ -76,6 +77,7 @@ type rule struct {
 	fields []string
 	name   string
 	params map[string]string
+	jq     *gojq.Code
 }
 
 // Quotes delimit fields; regex backslashes must survive the module conversion.
@@ -152,6 +154,12 @@ func parseRule(kind, line string) (rule, error) {
 	var r rule
 	if kind == "hostname" {
 		host := strings.TrimPrefix(strings.ToLower(strings.TrimSpace(line)), "-")
+		if before, after, ok := strings.Cut(host, ":"); ok {
+			if after != "80" && after != "443" {
+				return r, errors.New("supported hostname ports: 80, 443")
+			}
+			host = before
+		}
 		if host == "" || strings.ContainsAny(host, " /\\\t\r\n:@") {
 			return r, errors.New("expected a hostname or wildcard hostname")
 		}
@@ -185,6 +193,23 @@ func parseRule(kind, line string) (rule, error) {
 	}
 	parts, err := fields(line, ' ')
 	if err != nil {
+		return r, err
+	}
+	if kind == "body-rewrite" && len(parts) > 0 && (parts[0] == "http-request-jq" || parts[0] == "http-response-jq") {
+		if len(parts) != 3 {
+			return r, errors.New("expected phase-jq URL-pattern quoted-query")
+		}
+		query, err := gojq.Parse(parts[2])
+		if err != nil {
+			return r, fmt.Errorf("invalid jq query: %w", err)
+		}
+		r.jq, err = gojq.Compile(query)
+		if err != nil {
+			return r, err
+		}
+		r.match, err = compilePattern(parts[1])
+		parts[0] = strings.TrimSuffix(parts[0], "-jq")
+		r.fields = parts
 		return r, err
 	}
 	minimum := map[string]int{"url-rewrite": 2, "header-rewrite": 4, "body-rewrite": 4, "map-local": 2}[kind]
