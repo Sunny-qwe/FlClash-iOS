@@ -746,7 +746,12 @@ dns:
           ('dns', MitmModuleSkipReason.section),
         ],
       );
-      expect(content.skipped[7].line, r'DOMAIN,keep.a.com,$${args.policy}');
+      expect(
+        content.skipped
+            .singleWhere((skip) => skip.reason == MitmModuleSkipReason.policy)
+            .line,
+        r'DOMAIN,keep.a.com,$${args.policy}',
+      );
     });
 
     test('is not taken for a Surge module or a snippet', () {
