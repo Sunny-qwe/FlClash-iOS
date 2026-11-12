@@ -54,6 +54,11 @@ struct TunnelLifecycleTests {
     await settle()
     precondition(starts == 0 && stops == 0 && coordinator.isRunRequested)
 
+    store.manager.connection.status = .disconnecting
+    coordinator.handleTunnelStatusNotification(Notification(name: Notification.Name("status"), object: store.manager.connection))
+    await settle()
+    precondition(stops == 0 && reports == [.running])
+    precondition(!diagnostics.contains { $0.contains("unexpected disconnect:") })
     store.manager.connection.status = .disconnected
     coordinator.requestStatusRefresh(notifyExternal: true)
     await settle()
@@ -62,6 +67,7 @@ struct TunnelLifecycleTests {
     coordinator.requestStatusRefresh(notifyExternal: true)
     await settle()
     precondition(stops == 1)
+    precondition(diagnostics.filter { $0.contains("unexpected disconnect:") }.count == 1)
 
     coordinator.submitTunnelRequest(target: .running)
     await settle()
@@ -72,6 +78,7 @@ struct TunnelLifecycleTests {
     await settle()
     precondition(stops == 2 && !coordinator.isRunRequested)
     precondition(store.manager.connection.stopCount == 1)
+    precondition(diagnostics.filter { $0.contains("unexpected disconnect:") }.count == 1)
 
     coordinator.submitTunnelRequest(target: .running)
     await settle()

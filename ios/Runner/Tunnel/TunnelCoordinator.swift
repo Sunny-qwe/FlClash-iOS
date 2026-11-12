@@ -601,7 +601,7 @@ final class TunnelCoordinator {
       log(
         "status changed \(statusDescription(previousStatus ?? .invalid)) -> \(statusDescription(status)) target=\(tunnelRequest?.target.description ?? "none")"
       )
-      if previousStatus?.tunnelState == .running, status.isTerminal,
+      if reportedTunnelState == .running, status.isTerminal,
         tunnelRequest == nil {
         let disconnectedID = startupID
         Task { [weak self] in
