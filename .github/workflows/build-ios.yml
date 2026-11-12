@@ -113,6 +113,9 @@ jobs:
             lib/common/vpn_diagnostics.dart
             lib/common/mitm_module_audit.dart
             lib/views/diagnostics/
+            test/views/diagnostics_test.dart
+            test/common/vpn_diagnostics_test.dart
+            test/common/mitm_module_audit_test.dart
             lib/providers/generated/
             lib/models/generated/
             lib/common/mitm_module.dart

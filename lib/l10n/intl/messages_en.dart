@@ -505,6 +505,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "columns": MessageLookupByLibrary.simpleMessage("Columns"),
     "compact": MessageLookupByLibrary.simpleMessage("Compact"),
     "compatible": MessageLookupByLibrary.simpleMessage("Compatibility mode"),
+    "configPreflight": MessageLookupByLibrary.simpleMessage(
+      "Configuration preflight",
+    ),
+    "configPreflightDesc": MessageLookupByLibrary.simpleMessage(
+      "Build and parse the selected configuration without applying it.",
+    ),
+    "configPreflightLimits": MessageLookupByLibrary.simpleMessage(
+      "Preflight checks parsing, not node reachability. Resource files are checked separately. The Core still validates full routing when applying the configuration.",
+    ),
+    "configPreflightPassed": MessageLookupByLibrary.simpleMessage(
+      "Configuration parsed successfully.",
+    ),
+    "configProtection": MessageLookupByLibrary.simpleMessage(
+      "Rejected configuration protection",
+    ),
+    "configProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "If the Core rejects a replacement before applying it, the existing running configuration is preserved and the previous profile selection is restored when available. This does not recover from system termination or replace a backup.",
+    ),
     "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
     "confirmClearAllData": MessageLookupByLibrary.simpleMessage(
       "Are you sure you want to clear all data?",
@@ -651,6 +669,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialerProxyLoopStopped": m25,
     "dialog": MessageLookupByLibrary.simpleMessage("Dialog"),
     "direct": MessageLookupByLibrary.simpleMessage("Direct"),
+    "directExitCheck": MessageLookupByLibrary.simpleMessage("Direct exit"),
     "directNameserverDesc": MessageLookupByLibrary.simpleMessage(
       "Resolves domains for connections that go direct.",
     ),
@@ -907,6 +926,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Generate certificate",
     ),
     "geoResources": MessageLookupByLibrary.simpleMessage("Geo"),
+    "geoResourcesCheck": MessageLookupByLibrary.simpleMessage(
+      "Geographic data files",
+    ),
+    "geoResourcesCheckDesc": MessageLookupByLibrary.simpleMessage(
+      "Check that data files exist and are nonempty. A present file can still be corrupt; open Resources to update it if loading fails.",
+    ),
     "geoSkipped": m30,
     "geoUpdated": m31,
     "geodataLoader": MessageLookupByLibrary.simpleMessage(
@@ -934,6 +959,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "headerRewrite": MessageLookupByLibrary.simpleMessage("Header rewrite"),
     "healthCheck": MessageLookupByLibrary.simpleMessage("Health check"),
+    "healthRequiresVpn": MessageLookupByLibrary.simpleMessage(
+      "Start the VPN before testing.",
+    ),
+    "healthRouteChanged": MessageLookupByLibrary.simpleMessage(
+      "Connection or routing changed. Run the check again.",
+    ),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
       "Helper service unavailable; TUN mode cannot be enabled. Reinstall FlClash to restore it.",
     ),
@@ -1419,6 +1450,36 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mixedPort": MessageLookupByLibrary.simpleMessage("Mixed port"),
     "mode": MessageLookupByLibrary.simpleMessage("Mode"),
+    "moduleAudit": MessageLookupByLibrary.simpleMessage(
+      "Module compatibility check",
+    ),
+    "moduleAuditDesc": MessageLookupByLibrary.simpleMessage(
+      "Inspect local rules, skipped entries and missing script resources.",
+    ),
+    "moduleAuditLimits": MessageLookupByLibrary.simpleMessage(
+      "This is an offline parser check, not proof of script execution or rule matches. Open details for Core validation. HTTPS rewrites require a trusted certificate and matching hostnames; certificate-pinned apps may reject interception.",
+    ),
+    "moduleHostCount": MessageLookupByLibrary.simpleMessage(
+      "MITM host patterns",
+    ),
+    "moduleInspectDetails": MessageLookupByLibrary.simpleMessage(
+      "Inspect details and unsupported entries",
+    ),
+    "moduleMissingCount": MessageLookupByLibrary.simpleMessage(
+      "Missing resources",
+    ),
+    "moduleNeedsAttention": MessageLookupByLibrary.simpleMessage(
+      "Some entries need attention. Open details.",
+    ),
+    "moduleParsePassed": MessageLookupByLibrary.simpleMessage(
+      "Parsed; runtime behavior still needs verification.",
+    ),
+    "moduleParseResult": MessageLookupByLibrary.simpleMessage("Parser result"),
+    "moduleRuleCount": MessageLookupByLibrary.simpleMessage("Parsed rules"),
+    "moduleScriptCount": MessageLookupByLibrary.simpleMessage("Parsed scripts"),
+    "moduleSkippedCount": MessageLookupByLibrary.simpleMessage(
+      "Skipped entries",
+    ),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage("Monochrome icon"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("Monochrome"),
     "monthsAgo": m65,
@@ -1440,6 +1501,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkConnectionError": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t connect to the server. Check your network connection or proxy settings",
+    ),
+    "networkHealth": MessageLookupByLibrary.simpleMessage("Network health"),
+    "networkHealthDesc": MessageLookupByLibrary.simpleMessage(
+      "Check direct access, routed access, Google and YouTube in order.",
+    ),
+    "networkHealthLimits": MessageLookupByLibrary.simpleMessage(
+      "Tests use the Core and current routing rules. They do not change your configuration or prove that every app works.",
     ),
     "networkHostLookupError": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t resolve the server address. Check that the URL is correct and DNS is working",
@@ -1464,6 +1532,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "nextMatch": MessageLookupByLibrary.simpleMessage("Next match"),
     "no": MessageLookupByLibrary.simpleMessage("No"),
     "noData": MessageLookupByLibrary.simpleMessage("No data"),
+    "noDiagnosticRecord": MessageLookupByLibrary.simpleMessage(
+      "No record available",
+    ),
     "noInfo": MessageLookupByLibrary.simpleMessage("No info"),
     "noLongerRemind": MessageLookupByLibrary.simpleMessage(
       "Don\'t remind me again",
@@ -1641,6 +1712,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "quickActions": MessageLookupByLibrary.simpleMessage("Quick actions"),
     "quickEdit": MessageLookupByLibrary.simpleMessage("Quick edit"),
+    "recentIssues": MessageLookupByLibrary.simpleMessage(
+      "Recent warnings and errors",
+    ),
     "recentRequests": MessageLookupByLibrary.simpleMessage("Recent requests"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("Suggested"),
     "recordType": MessageLookupByLibrary.simpleMessage("Record type"),
@@ -1657,6 +1731,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "Failed to release memory",
     ),
+    "reliabilityCenter": MessageLookupByLibrary.simpleMessage(
+      "Diagnostics center",
+    ),
     "remote": MessageLookupByLibrary.simpleMessage("Remote"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage(
       "Remote destination",
@@ -1666,6 +1743,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "remove": MessageLookupByLibrary.simpleMessage("Remove"),
     "rename": MessageLookupByLibrary.simpleMessage("Rename"),
+    "repairGeoResources": MessageLookupByLibrary.simpleMessage(
+      "Restore missing data files",
+    ),
+    "repairGeoResourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "Restore missing or empty bundled data without replacing nonempty files. Retry starting the VPN afterwards.",
+    ),
     "replace": MessageLookupByLibrary.simpleMessage("Replace"),
     "replaceAll": MessageLookupByLibrary.simpleMessage("Replace all"),
     "request": MessageLookupByLibrary.simpleMessage("Request"),
@@ -1683,6 +1766,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "resetTip": MessageLookupByLibrary.simpleMessage(
       "Are you sure you want to reset?",
     ),
+    "resourceMissing": MessageLookupByLibrary.simpleMessage("Missing or empty"),
     "resourceUpdateInterval": MessageLookupByLibrary.simpleMessage(
       "Auto-update interval",
     ),
@@ -1721,6 +1805,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "routeAddress": MessageLookupByLibrary.simpleMessage("Route addresses"),
     "routeExcludeAddress": MessageLookupByLibrary.simpleMessage(
       "Route exclude addresses",
+    ),
+    "routedExitCheck": MessageLookupByLibrary.simpleMessage(
+      "Exit through current rules",
     ),
     "routingMark": MessageLookupByLibrary.simpleMessage("Routing mark"),
     "ru": MessageLookupByLibrary.simpleMessage("Russian"),
@@ -1870,6 +1957,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "rules": MessageLookupByLibrary.simpleMessage("Rules"),
     "rulesCount": m87,
+    "runHealthCheck": MessageLookupByLibrary.simpleMessage("Run check"),
     "runTime": MessageLookupByLibrary.simpleMessage("Run time"),
     "running": MessageLookupByLibrary.simpleMessage("Running"),
     "runtimeConfig": MessageLookupByLibrary.simpleMessage("Runtime config"),
@@ -2159,10 +2247,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "view": MessageLookupByLibrary.simpleMessage("View"),
     "viewAll": MessageLookupByLibrary.simpleMessage("View all"),
     "virtualIpv4": MessageLookupByLibrary.simpleMessage("Virtual IPv4"),
+    "visualConfig": MessageLookupByLibrary.simpleMessage(
+      "Visual configuration",
+    ),
+    "visualConfigDesc": MessageLookupByLibrary.simpleMessage(
+      "Create a configuration, or import YAML from a file or URL, then edit groups, routing rules and DNS.",
+    ),
+    "visualNodeMembershipTip": MessageLookupByLibrary.simpleMessage(
+      "Add nodes manually or import links, then add them to a configuration’s policy group.",
+    ),
     "vividStyle": MessageLookupByLibrary.simpleMessage("Vivid"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "VPN settings changed. Tap to restart",
     ),
+    "vpnEvidence": MessageLookupByLibrary.simpleMessage(
+      "VPN extension evidence",
+    ),
+    "vpnEvidenceDesc": MessageLookupByLibrary.simpleMessage(
+      "These records may belong to an earlier run. A memory peak is not proof of a system kill; the matching iOS analysis report is needed to confirm the cause.",
+    ),
+    "vpnLastSample": MessageLookupByLibrary.simpleMessage("Recorded at"),
+    "vpnLastStage": MessageLookupByLibrary.simpleMessage("Last sampled stage"),
+    "vpnPeakMemory": MessageLookupByLibrary.simpleMessage(
+      "Recorded peak memory",
+    ),
+    "vpnStartupRecord": MessageLookupByLibrary.simpleMessage("Startup record"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage(
       "WebDAV configuration",
     ),

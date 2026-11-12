@@ -1,6 +1,9 @@
 import 'dart:io';
 
-Future<void> ensureGeoAsset(File target, Future<void> Function(File) extract) async {
+Future<void> ensureGeoAsset(
+  File target,
+  Future<void> Function(File) extract,
+) async {
   if (await target.exists() && await target.length() > 0) return;
   await target.parent.create(recursive: true);
   final temporary = await target.parent.createTemp('.geo-');

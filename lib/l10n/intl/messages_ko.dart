@@ -424,6 +424,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "columns": MessageLookupByLibrary.simpleMessage("열"),
     "compact": MessageLookupByLibrary.simpleMessage("간결하게"),
     "compatible": MessageLookupByLibrary.simpleMessage("호환 모드"),
+    "configPreflight": MessageLookupByLibrary.simpleMessage("설정 사전 검사"),
+    "configPreflightDesc": MessageLookupByLibrary.simpleMessage(
+      "선택한 설정을 생성하고 분석하며 실행 중 연결에는 적용하지 않습니다.",
+    ),
+    "configPreflightLimits": MessageLookupByLibrary.simpleMessage(
+      "구문을 검사하며 노드 접속 여부는 확인하지 않습니다. 리소스는 별도 검사하고 적용 시 코어가 라우팅을 검증합니다.",
+    ),
+    "configPreflightPassed": MessageLookupByLibrary.simpleMessage(
+      "설정 분석에 성공했습니다.",
+    ),
+    "configProtection": MessageLookupByLibrary.simpleMessage("거부된 설정 보호"),
+    "configProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "코어가 적용 전에 새 설정을 거부하면 기존 설정을 유지하고 가능하면 이전 프로필을 복원합니다. 시스템 종료 복구나 백업을 대신하지 않습니다.",
+    ),
     "confirm": MessageLookupByLibrary.simpleMessage("확인"),
     "confirmClearAllData": MessageLookupByLibrary.simpleMessage(
       "모든 데이터를 지우시겠습니까?",
@@ -544,6 +558,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialerProxyLoopStopped": m25,
     "dialog": MessageLookupByLibrary.simpleMessage("대화상자"),
     "direct": MessageLookupByLibrary.simpleMessage("직접"),
+    "directExitCheck": MessageLookupByLibrary.simpleMessage("직접 연결 출구"),
     "directNameserverDesc": MessageLookupByLibrary.simpleMessage(
       "직접 연결의 도메인을 확인합니다.",
     ),
@@ -758,6 +773,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "generateCertificate": MessageLookupByLibrary.simpleMessage("인증서 생성"),
     "geoResources": MessageLookupByLibrary.simpleMessage("Geo"),
+    "geoResourcesCheck": MessageLookupByLibrary.simpleMessage("지리 데이터 파일"),
+    "geoResourcesCheckDesc": MessageLookupByLibrary.simpleMessage(
+      "파일 존재 여부와 크기를 검사합니다. 존재해도 손상됐을 수 있으니 로드 실패 시 리소스에서 업데이트하세요.",
+    ),
     "geoSkipped": m30,
     "geoUpdated": m31,
     "geodataLoader": MessageLookupByLibrary.simpleMessage("Geo 저메모리 모드"),
@@ -777,6 +796,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "hashByInUser": MessageLookupByLibrary.simpleMessage("인바운드 사용자별 해시"),
     "headerRewrite": MessageLookupByLibrary.simpleMessage("헤더 재작성"),
     "healthCheck": MessageLookupByLibrary.simpleMessage("상태 확인"),
+    "healthRequiresVpn": MessageLookupByLibrary.simpleMessage("먼저 VPN을 시작하세요."),
+    "healthRouteChanged": MessageLookupByLibrary.simpleMessage(
+      "연결이나 경로가 변경되었습니다. 다시 검사하세요.",
+    ),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
       "헬퍼 서비스를 사용할 수 없어 TUN 모드를 켤 수 없습니다. FlClash를 다시 설치하여 복구하세요.",
     ),
@@ -1194,6 +1217,28 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmTrustUntrusted": MessageLookupByLibrary.simpleMessage("완전히 신뢰되지 않음"),
     "mixedPort": MessageLookupByLibrary.simpleMessage("혼합 포트"),
     "mode": MessageLookupByLibrary.simpleMessage("모드"),
+    "moduleAudit": MessageLookupByLibrary.simpleMessage("모듈 호환성 검사"),
+    "moduleAuditDesc": MessageLookupByLibrary.simpleMessage(
+      "로컬 규칙, 건너뛴 항목, 누락된 스크립트 리소스를 검사합니다.",
+    ),
+    "moduleAuditLimits": MessageLookupByLibrary.simpleMessage(
+      "오프라인 구문 검사이며 실행이나 규칙 일치를 뜻하지 않습니다. 세부 정보에서 코어 검증을 확인하세요. HTTPS에는 신뢰한 인증서와 일치하는 호스트가 필요합니다.",
+    ),
+    "moduleHostCount": MessageLookupByLibrary.simpleMessage("MITM 호스트 항목"),
+    "moduleInspectDetails": MessageLookupByLibrary.simpleMessage(
+      "세부 정보와 미지원 항목 확인",
+    ),
+    "moduleMissingCount": MessageLookupByLibrary.simpleMessage("누락된 리소스"),
+    "moduleNeedsAttention": MessageLookupByLibrary.simpleMessage(
+      "확인이 필요한 항목이 있습니다.",
+    ),
+    "moduleParsePassed": MessageLookupByLibrary.simpleMessage(
+      "분석 완료. 실제 작동은 확인이 필요합니다.",
+    ),
+    "moduleParseResult": MessageLookupByLibrary.simpleMessage("구문 분석 결과"),
+    "moduleRuleCount": MessageLookupByLibrary.simpleMessage("분석된 규칙"),
+    "moduleScriptCount": MessageLookupByLibrary.simpleMessage("분석된 스크립트"),
+    "moduleSkippedCount": MessageLookupByLibrary.simpleMessage("건너뛴 항목"),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage("모노크롬 아이콘"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("모노크롬"),
     "monthsAgo": m65,
@@ -1215,6 +1260,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkConnectionError": MessageLookupByLibrary.simpleMessage(
       "서버에 연결할 수 없습니다. 네트워크 연결이나 프록시 설정을 확인하세요",
+    ),
+    "networkHealth": MessageLookupByLibrary.simpleMessage("네트워크 진단"),
+    "networkHealthDesc": MessageLookupByLibrary.simpleMessage(
+      "직접 연결, 라우팅, Google, YouTube를 순서대로 확인합니다.",
+    ),
+    "networkHealthLimits": MessageLookupByLibrary.simpleMessage(
+      "현재 코어와 규칙으로 검사하며 설정은 변경하지 않습니다. 모든 앱의 작동을 보장하지는 않습니다.",
     ),
     "networkHostLookupError": MessageLookupByLibrary.simpleMessage(
       "서버 주소를 확인할 수 없습니다. URL이 올바른지, DNS가 정상인지 확인하세요",
@@ -1239,6 +1291,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nextMatch": MessageLookupByLibrary.simpleMessage("다음 결과"),
     "no": MessageLookupByLibrary.simpleMessage("아니요"),
     "noData": MessageLookupByLibrary.simpleMessage("데이터 없음"),
+    "noDiagnosticRecord": MessageLookupByLibrary.simpleMessage("기록 없음"),
     "noInfo": MessageLookupByLibrary.simpleMessage("정보 없음"),
     "noLongerRemind": MessageLookupByLibrary.simpleMessage("다시 알리지 않음"),
     "noNetwork": MessageLookupByLibrary.simpleMessage("네트워크 없음"),
@@ -1382,6 +1435,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "quickActions": MessageLookupByLibrary.simpleMessage("빠른 작업"),
     "quickEdit": MessageLookupByLibrary.simpleMessage("빠른 편집"),
+    "recentIssues": MessageLookupByLibrary.simpleMessage("최근 경고 및 오류"),
     "recentRequests": MessageLookupByLibrary.simpleMessage("최근 요청"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("추천"),
     "recordType": MessageLookupByLibrary.simpleMessage("레코드 유형"),
@@ -1396,11 +1450,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "메모리를 해제하지 못했습니다",
     ),
+    "reliabilityCenter": MessageLookupByLibrary.simpleMessage("진단 센터"),
     "remote": MessageLookupByLibrary.simpleMessage("원격"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage("원격 목적지"),
     "remoteDnsResolve": MessageLookupByLibrary.simpleMessage("원격 DNS 확인"),
     "remove": MessageLookupByLibrary.simpleMessage("제거"),
     "rename": MessageLookupByLibrary.simpleMessage("이름 변경"),
+    "repairGeoResources": MessageLookupByLibrary.simpleMessage("누락 데이터 복원"),
+    "repairGeoResourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "기존의 비어 있지 않은 파일을 보존하고 누락 또는 빈 파일을 복원합니다. 이후 VPN을 다시 시작하세요.",
+    ),
     "replace": MessageLookupByLibrary.simpleMessage("바꾸기"),
     "replaceAll": MessageLookupByLibrary.simpleMessage("모두 바꾸기"),
     "request": MessageLookupByLibrary.simpleMessage("요청"),
@@ -1414,6 +1473,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "이 페이지에 변경 사항이 있습니다. 초기화하시겠습니까?",
     ),
     "resetTip": MessageLookupByLibrary.simpleMessage("초기화하시겠습니까?"),
+    "resourceMissing": MessageLookupByLibrary.simpleMessage("없거나 비어 있음"),
     "resourceUpdateInterval": MessageLookupByLibrary.simpleMessage(
       "자동 업데이트 간격",
     ),
@@ -1443,6 +1503,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "root": MessageLookupByLibrary.simpleMessage("Root"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("라우팅 주소"),
     "routeExcludeAddress": MessageLookupByLibrary.simpleMessage("라우팅 제외 주소"),
+    "routedExitCheck": MessageLookupByLibrary.simpleMessage("현재 규칙 출구"),
     "routingMark": MessageLookupByLibrary.simpleMessage("라우팅 마크"),
     "ru": MessageLookupByLibrary.simpleMessage("러시아어"),
     "rule": MessageLookupByLibrary.simpleMessage("규칙"),
@@ -1573,6 +1634,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "rules": MessageLookupByLibrary.simpleMessage("규칙"),
     "rulesCount": m87,
+    "runHealthCheck": MessageLookupByLibrary.simpleMessage("검사 시작"),
     "runTime": MessageLookupByLibrary.simpleMessage("실행 시간"),
     "running": MessageLookupByLibrary.simpleMessage("실행 중"),
     "runtimeConfig": MessageLookupByLibrary.simpleMessage("런타임 구성"),
@@ -1826,10 +1888,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "view": MessageLookupByLibrary.simpleMessage("보기"),
     "viewAll": MessageLookupByLibrary.simpleMessage("모두 보기"),
     "virtualIpv4": MessageLookupByLibrary.simpleMessage("가상 IPv4"),
+    "visualConfig": MessageLookupByLibrary.simpleMessage("시각적 구성"),
+    "visualConfigDesc": MessageLookupByLibrary.simpleMessage(
+      "구성을 만들거나 파일 또는 URL에서 YAML을 가져온 후 그룹, 규칙 및 DNS를 편집하세요.",
+    ),
+    "visualNodeMembershipTip": MessageLookupByLibrary.simpleMessage(
+      "노드를 직접 추가하거나 링크로 가져온 후 구성의 정책 그룹에 추가하세요.",
+    ),
     "vividStyle": MessageLookupByLibrary.simpleMessage("선명"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "VPN 관련 구성이 변경되었습니다. 눌러서 재시작",
     ),
+    "vpnEvidence": MessageLookupByLibrary.simpleMessage("VPN 확장 기록"),
+    "vpnEvidenceDesc": MessageLookupByLibrary.simpleMessage(
+      "이전 실행 기록일 수 있습니다. 메모리 최고치만으로 시스템 종료를 확정할 수 없으며 해당 시각의 iOS 분석 기록이 필요합니다.",
+    ),
+    "vpnLastSample": MessageLookupByLibrary.simpleMessage("기록 시각"),
+    "vpnLastStage": MessageLookupByLibrary.simpleMessage("마지막 측정 단계"),
+    "vpnPeakMemory": MessageLookupByLibrary.simpleMessage("기록된 메모리 최고치"),
+    "vpnStartupRecord": MessageLookupByLibrary.simpleMessage("시작 기록"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV 구성"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("화이트리스트 모드"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("시스템에 기록"),

@@ -408,6 +408,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "columns": MessageLookupByLibrary.simpleMessage("列数"),
     "compact": MessageLookupByLibrary.simpleMessage("紧凑"),
     "compatible": MessageLookupByLibrary.simpleMessage("兼容模式"),
+    "configPreflight": MessageLookupByLibrary.simpleMessage("配置预检"),
+    "configPreflightDesc": MessageLookupByLibrary.simpleMessage(
+      "生成并解析当前选中的配置，不应用到正在运行的连接。",
+    ),
+    "configPreflightLimits": MessageLookupByLibrary.simpleMessage(
+      "预检检查配置解析，不验证节点是否可达；资源文件单独检查。实际应用时，内核仍会校验完整路由配置。",
+    ),
+    "configPreflightPassed": MessageLookupByLibrary.simpleMessage("配置解析通过。"),
+    "configProtection": MessageLookupByLibrary.simpleMessage("配置拒绝保护"),
+    "configProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "内核在应用前拒绝新配置时，会保留现有运行配置，并在可用时恢复之前选中的配置。这不能恢复被系统终止的 VPN，也不能代替备份。",
+    ),
     "confirm": MessageLookupByLibrary.simpleMessage("确定"),
     "confirmClearAllData": MessageLookupByLibrary.simpleMessage("确定要清除所有数据？"),
     "confirmDeleteProxyGroup": MessageLookupByLibrary.simpleMessage(
@@ -516,6 +528,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialerProxyLoopStopped": m25,
     "dialog": MessageLookupByLibrary.simpleMessage("对话框"),
     "direct": MessageLookupByLibrary.simpleMessage("直连"),
+    "directExitCheck": MessageLookupByLibrary.simpleMessage("直连出口"),
     "directNameserverDesc": MessageLookupByLibrary.simpleMessage(
       "用于解析直连连接的域名。",
     ),
@@ -708,6 +721,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "generateCertificate": MessageLookupByLibrary.simpleMessage("生成证书"),
     "geoResources": MessageLookupByLibrary.simpleMessage("Geo"),
+    "geoResourcesCheck": MessageLookupByLibrary.simpleMessage("地理资源文件检查"),
+    "geoResourcesCheckDesc": MessageLookupByLibrary.simpleMessage(
+      "检查文件是否存在且非空。文件存在也可能损坏；加载失败时可到资源页更新。",
+    ),
     "geoSkipped": m30,
     "geoUpdated": m31,
     "geodataLoader": MessageLookupByLibrary.simpleMessage("Geo低内存模式"),
@@ -725,6 +742,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "hashByInUser": MessageLookupByLibrary.simpleMessage("按入站用户哈希"),
     "headerRewrite": MessageLookupByLibrary.simpleMessage("Header 重写"),
     "healthCheck": MessageLookupByLibrary.simpleMessage("健康检查"),
+    "healthRequiresVpn": MessageLookupByLibrary.simpleMessage(
+      "请先启动 VPN，再运行检查。",
+    ),
+    "healthRouteChanged": MessageLookupByLibrary.simpleMessage(
+      "连接或策略已变化，请重新检查。",
+    ),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
       "Helper 服务不可用，无法启用 TUN 模式，请重新安装 FlClash。",
     ),
@@ -1096,6 +1119,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmTrustUntrusted": MessageLookupByLibrary.simpleMessage("未完全信任"),
     "mixedPort": MessageLookupByLibrary.simpleMessage("混合端口"),
     "mode": MessageLookupByLibrary.simpleMessage("模式"),
+    "moduleAudit": MessageLookupByLibrary.simpleMessage("模块兼容检查"),
+    "moduleAuditDesc": MessageLookupByLibrary.simpleMessage(
+      "检查本地规则、跳过的条目和缺失的脚本资源。",
+    ),
+    "moduleAuditLimits": MessageLookupByLibrary.simpleMessage(
+      "这是离线解析检查，不代表脚本已执行或规则已命中。点详情可查看内核校验。HTTPS 重写还需要信任证书和匹配的域名；使用证书固定的 App 可能拒绝解密。",
+    ),
+    "moduleHostCount": MessageLookupByLibrary.simpleMessage("MITM 域名条目数"),
+    "moduleInspectDetails": MessageLookupByLibrary.simpleMessage("查看详情和不支持的条目"),
+    "moduleMissingCount": MessageLookupByLibrary.simpleMessage("缺失资源数"),
+    "moduleNeedsAttention": MessageLookupByLibrary.simpleMessage(
+      "存在需要处理的条目，请查看详情。",
+    ),
+    "moduleParsePassed": MessageLookupByLibrary.simpleMessage("已解析，运行效果仍需验证。"),
+    "moduleParseResult": MessageLookupByLibrary.simpleMessage("解析结果"),
+    "moduleRuleCount": MessageLookupByLibrary.simpleMessage("已解析规则数"),
+    "moduleScriptCount": MessageLookupByLibrary.simpleMessage("已解析脚本数"),
+    "moduleSkippedCount": MessageLookupByLibrary.simpleMessage("跳过的条目数"),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage("单色图标"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("单色"),
     "monthsAgo": m65,
@@ -1115,6 +1156,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkCancelledError": MessageLookupByLibrary.simpleMessage("请求已取消"),
     "networkConnectionError": MessageLookupByLibrary.simpleMessage(
       "无法连接到服务器，请检查网络连接或代理设置",
+    ),
+    "networkHealth": MessageLookupByLibrary.simpleMessage("网络体检"),
+    "networkHealthDesc": MessageLookupByLibrary.simpleMessage(
+      "依次检查直连出口、代理出口、Google 和 YouTube。",
+    ),
+    "networkHealthLimits": MessageLookupByLibrary.simpleMessage(
+      "检测通过内核和当前分流规则发起，不修改配置；检测成功不代表所有 App 都可用。",
     ),
     "networkHostLookupError": MessageLookupByLibrary.simpleMessage(
       "无法解析服务器地址，请确认链接正确且 DNS 可用",
@@ -1139,6 +1187,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nextMatch": MessageLookupByLibrary.simpleMessage("下一个匹配"),
     "no": MessageLookupByLibrary.simpleMessage("否"),
     "noData": MessageLookupByLibrary.simpleMessage("暂无数据"),
+    "noDiagnosticRecord": MessageLookupByLibrary.simpleMessage("暂无记录"),
     "noInfo": MessageLookupByLibrary.simpleMessage("暂无信息"),
     "noLongerRemind": MessageLookupByLibrary.simpleMessage("不再提示"),
     "noNetwork": MessageLookupByLibrary.simpleMessage("无网络"),
@@ -1276,6 +1325,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "quickActions": MessageLookupByLibrary.simpleMessage("快捷操作"),
     "quickEdit": MessageLookupByLibrary.simpleMessage("快速编辑"),
+    "recentIssues": MessageLookupByLibrary.simpleMessage("最近警告与错误"),
     "recentRequests": MessageLookupByLibrary.simpleMessage("最近请求"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("推荐"),
     "recordType": MessageLookupByLibrary.simpleMessage("记录类型"),
@@ -1288,11 +1338,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "regex": MessageLookupByLibrary.simpleMessage("正则"),
     "releaseMemory": MessageLookupByLibrary.simpleMessage("释放内存"),
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage("释放内存失败"),
+    "reliabilityCenter": MessageLookupByLibrary.simpleMessage("诊断中心"),
     "remote": MessageLookupByLibrary.simpleMessage("远程"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage("远程目标"),
     "remoteDnsResolve": MessageLookupByLibrary.simpleMessage("远程 DNS 解析"),
     "remove": MessageLookupByLibrary.simpleMessage("移除"),
     "rename": MessageLookupByLibrary.simpleMessage("重命名"),
+    "repairGeoResources": MessageLookupByLibrary.simpleMessage("修复缺失资源"),
+    "repairGeoResourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "从安装包恢复缺失或为空的文件，不覆盖非空文件。修复后请重试启动 VPN。",
+    ),
     "replace": MessageLookupByLibrary.simpleMessage("替换"),
     "replaceAll": MessageLookupByLibrary.simpleMessage("全部替换"),
     "request": MessageLookupByLibrary.simpleMessage("请求"),
@@ -1306,6 +1361,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "当前页面存在更改，确定重置吗？",
     ),
     "resetTip": MessageLookupByLibrary.simpleMessage("确定要重置吗？"),
+    "resourceMissing": MessageLookupByLibrary.simpleMessage("文件缺失或为空"),
     "resourceUpdateInterval": MessageLookupByLibrary.simpleMessage("自动更新间隔"),
     "resourceUpdateIntervalTip": MessageLookupByLibrary.simpleMessage(
       "自动更新间隔必须大于0",
@@ -1333,6 +1389,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "root": MessageLookupByLibrary.simpleMessage("Root"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("路由地址"),
     "routeExcludeAddress": MessageLookupByLibrary.simpleMessage("排除路由地址"),
+    "routedExitCheck": MessageLookupByLibrary.simpleMessage("当前规则出口"),
     "routingMark": MessageLookupByLibrary.simpleMessage("路由标记"),
     "ru": MessageLookupByLibrary.simpleMessage("俄语"),
     "rule": MessageLookupByLibrary.simpleMessage("规则"),
@@ -1449,6 +1506,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "rules": MessageLookupByLibrary.simpleMessage("规则"),
     "rulesCount": m87,
+    "runHealthCheck": MessageLookupByLibrary.simpleMessage("开始检查"),
     "runTime": MessageLookupByLibrary.simpleMessage("运行时长"),
     "running": MessageLookupByLibrary.simpleMessage("运行中"),
     "runtimeConfig": MessageLookupByLibrary.simpleMessage("运行时配置"),
@@ -1674,10 +1732,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "view": MessageLookupByLibrary.simpleMessage("查看"),
     "viewAll": MessageLookupByLibrary.simpleMessage("查看全部"),
     "virtualIpv4": MessageLookupByLibrary.simpleMessage("虚拟 IPv4"),
+    "visualConfig": MessageLookupByLibrary.simpleMessage("可视化配置"),
+    "visualConfigDesc": MessageLookupByLibrary.simpleMessage(
+      "新建配置，或从文件、URL 导入 YAML，再编辑策略组、分流规则和 DNS。",
+    ),
+    "visualNodeMembershipTip": MessageLookupByLibrary.simpleMessage(
+      "手动添加节点或导入节点链接后，请将节点加入配置的策略组。",
+    ),
     "vividStyle": MessageLookupByLibrary.simpleMessage("鲜明"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "VPN 相关配置已改动，点击重启",
     ),
+    "vpnEvidence": MessageLookupByLibrary.simpleMessage("VPN 扩展记录"),
+    "vpnEvidenceDesc": MessageLookupByLibrary.simpleMessage(
+      "记录可能来自上一次运行。内存峰值不能单独证明系统杀进程；确认原因仍需要对应时间的 iOS 分析记录。",
+    ),
+    "vpnLastSample": MessageLookupByLibrary.simpleMessage("记录时间"),
+    "vpnLastStage": MessageLookupByLibrary.simpleMessage("最后采样阶段"),
+    "vpnPeakMemory": MessageLookupByLibrary.simpleMessage("记录的内存峰值"),
+    "vpnStartupRecord": MessageLookupByLibrary.simpleMessage("启动记录"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV配置"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("白名单模式"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("写入系统"),

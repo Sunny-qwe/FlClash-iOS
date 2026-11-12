@@ -548,6 +548,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "compatible": MessageLookupByLibrary.simpleMessage(
       "Modo de compatibilidad",
     ),
+    "configPreflight": MessageLookupByLibrary.simpleMessage(
+      "Comprobación de configuración",
+    ),
+    "configPreflightDesc": MessageLookupByLibrary.simpleMessage(
+      "Genera y analiza la configuración sin aplicarla.",
+    ),
+    "configPreflightLimits": MessageLookupByLibrary.simpleMessage(
+      "Comprueba el análisis, no el acceso a nodos. Los recursos se revisan aparte. El núcleo valida las rutas al aplicar.",
+    ),
+    "configPreflightPassed": MessageLookupByLibrary.simpleMessage(
+      "Configuración analizada correctamente.",
+    ),
+    "configProtection": MessageLookupByLibrary.simpleMessage(
+      "Protección ante configuración rechazada",
+    ),
+    "configProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "Si el núcleo rechaza el cambio antes de aplicarlo, conserva la configuración activa y restaura el perfil anterior cuando es posible. No recupera cierres del sistema ni sustituye una copia de seguridad.",
+    ),
     "confirm": MessageLookupByLibrary.simpleMessage("Confirmar"),
     "confirmClearAllData": MessageLookupByLibrary.simpleMessage(
       "¿Seguro que quieres borrar todos los datos?",
@@ -698,6 +716,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialerProxyLoopStopped": m25,
     "dialog": MessageLookupByLibrary.simpleMessage("Diálogo"),
     "direct": MessageLookupByLibrary.simpleMessage("Directo"),
+    "directExitCheck": MessageLookupByLibrary.simpleMessage("Salida directa"),
     "directNameserverDesc": MessageLookupByLibrary.simpleMessage(
       "Resuelve los dominios de las conexiones directas.",
     ),
@@ -970,6 +989,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Generar certificado",
     ),
     "geoResources": MessageLookupByLibrary.simpleMessage("Geo"),
+    "geoResourcesCheck": MessageLookupByLibrary.simpleMessage(
+      "Archivos geográficos",
+    ),
+    "geoResourcesCheckDesc": MessageLookupByLibrary.simpleMessage(
+      "Revisa existencia y tamaño. Un archivo presente puede estar dañado; actualízalo en Recursos si falla la carga.",
+    ),
     "geoSkipped": m30,
     "geoUpdated": m31,
     "geodataLoader": MessageLookupByLibrary.simpleMessage(
@@ -1000,6 +1025,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "healthCheck": MessageLookupByLibrary.simpleMessage(
       "Comprobación de estado",
+    ),
+    "healthRequiresVpn": MessageLookupByLibrary.simpleMessage(
+      "Inicia la VPN antes de comprobar.",
+    ),
+    "healthRouteChanged": MessageLookupByLibrary.simpleMessage(
+      "La conexión o la ruta cambió. Repite la prueba.",
     ),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
       "El servicio auxiliar (Helper) no está disponible; no se puede activar el modo TUN. Reinstala FlClash para restaurarlo.",
@@ -1524,6 +1555,40 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mixedPort": MessageLookupByLibrary.simpleMessage("Puerto mixto"),
     "mode": MessageLookupByLibrary.simpleMessage("Modo"),
+    "moduleAudit": MessageLookupByLibrary.simpleMessage(
+      "Compatibilidad de módulos",
+    ),
+    "moduleAuditDesc": MessageLookupByLibrary.simpleMessage(
+      "Revisa reglas locales, entradas omitidas y recursos que faltan.",
+    ),
+    "moduleAuditLimits": MessageLookupByLibrary.simpleMessage(
+      "Es un análisis local, no una prueba de ejecución. Abre los detalles para validar con el núcleo. HTTPS requiere certificado de confianza y dominios coincidentes.",
+    ),
+    "moduleHostCount": MessageLookupByLibrary.simpleMessage("Dominios MITM"),
+    "moduleInspectDetails": MessageLookupByLibrary.simpleMessage(
+      "Detalles y entradas no admitidas",
+    ),
+    "moduleMissingCount": MessageLookupByLibrary.simpleMessage(
+      "Recursos que faltan",
+    ),
+    "moduleNeedsAttention": MessageLookupByLibrary.simpleMessage(
+      "Algunas entradas requieren revisión.",
+    ),
+    "moduleParsePassed": MessageLookupByLibrary.simpleMessage(
+      "Analizado; falta verificar el funcionamiento.",
+    ),
+    "moduleParseResult": MessageLookupByLibrary.simpleMessage(
+      "Resultado del análisis",
+    ),
+    "moduleRuleCount": MessageLookupByLibrary.simpleMessage(
+      "Reglas analizadas",
+    ),
+    "moduleScriptCount": MessageLookupByLibrary.simpleMessage(
+      "Scripts analizados",
+    ),
+    "moduleSkippedCount": MessageLookupByLibrary.simpleMessage(
+      "Entradas omitidas",
+    ),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage("Icono monocromo"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("Monocromo"),
     "monthsAgo": m65,
@@ -1547,6 +1612,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkConnectionError": MessageLookupByLibrary.simpleMessage(
       "No se pudo conectar con el servidor. Comprueba tu conexión de red o los ajustes del proxy",
+    ),
+    "networkHealth": MessageLookupByLibrary.simpleMessage("Estado de la red"),
+    "networkHealthDesc": MessageLookupByLibrary.simpleMessage(
+      "Comprueba la salida directa, las rutas, Google y YouTube en orden.",
+    ),
+    "networkHealthLimits": MessageLookupByLibrary.simpleMessage(
+      "Las pruebas usan el núcleo y las reglas actuales sin modificar la configuración. No garantizan que todas las apps funcionen.",
     ),
     "networkHostLookupError": MessageLookupByLibrary.simpleMessage(
       "No se pudo resolver la dirección del servidor. Comprueba que la URL sea correcta y que el DNS funcione",
@@ -1573,6 +1645,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nextMatch": MessageLookupByLibrary.simpleMessage("Coincidencia siguiente"),
     "no": MessageLookupByLibrary.simpleMessage("No"),
     "noData": MessageLookupByLibrary.simpleMessage("Sin datos"),
+    "noDiagnosticRecord": MessageLookupByLibrary.simpleMessage("Sin registros"),
     "noInfo": MessageLookupByLibrary.simpleMessage("Sin información"),
     "noLongerRemind": MessageLookupByLibrary.simpleMessage(
       "No volver a recordármelo",
@@ -1766,6 +1839,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "quickActions": MessageLookupByLibrary.simpleMessage("Acciones rápidas"),
     "quickEdit": MessageLookupByLibrary.simpleMessage("Edición rápida"),
+    "recentIssues": MessageLookupByLibrary.simpleMessage(
+      "Avisos y errores recientes",
+    ),
     "recentRequests": MessageLookupByLibrary.simpleMessage(
       "Solicitudes recientes",
     ),
@@ -1784,6 +1860,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "No se pudo liberar la memoria",
     ),
+    "reliabilityCenter": MessageLookupByLibrary.simpleMessage(
+      "Centro de diagnóstico",
+    ),
     "remote": MessageLookupByLibrary.simpleMessage("Remoto"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage("Destino remoto"),
     "remoteDnsResolve": MessageLookupByLibrary.simpleMessage(
@@ -1791,6 +1870,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "remove": MessageLookupByLibrary.simpleMessage("Quitar"),
     "rename": MessageLookupByLibrary.simpleMessage("Renombrar"),
+    "repairGeoResources": MessageLookupByLibrary.simpleMessage(
+      "Restaurar datos que faltan",
+    ),
+    "repairGeoResourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "Restaura archivos ausentes o vacíos sin reemplazar los demás. Después vuelve a iniciar la VPN.",
+    ),
     "replace": MessageLookupByLibrary.simpleMessage("Reemplazar"),
     "replaceAll": MessageLookupByLibrary.simpleMessage("Reemplazar todo"),
     "request": MessageLookupByLibrary.simpleMessage("Solicitud"),
@@ -1812,6 +1897,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "resetTip": MessageLookupByLibrary.simpleMessage(
       "¿Seguro que quieres restablecer?",
     ),
+    "resourceMissing": MessageLookupByLibrary.simpleMessage("Ausente o vacío"),
     "resourceUpdateInterval": MessageLookupByLibrary.simpleMessage(
       "Intervalo de actualización automática",
     ),
@@ -1860,6 +1946,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "routeAddress": MessageLookupByLibrary.simpleMessage("Direcciones de ruta"),
     "routeExcludeAddress": MessageLookupByLibrary.simpleMessage(
       "Direcciones excluidas de la ruta",
+    ),
+    "routedExitCheck": MessageLookupByLibrary.simpleMessage(
+      "Salida según las reglas",
     ),
     "routingMark": MessageLookupByLibrary.simpleMessage(
       "Marca de enrutamiento",
@@ -2017,6 +2106,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "rules": MessageLookupByLibrary.simpleMessage("Reglas"),
     "rulesCount": m87,
+    "runHealthCheck": MessageLookupByLibrary.simpleMessage(
+      "Iniciar comprobación",
+    ),
     "runTime": MessageLookupByLibrary.simpleMessage("Tiempo de ejecución"),
     "running": MessageLookupByLibrary.simpleMessage("En ejecución"),
     "runtimeConfig": MessageLookupByLibrary.simpleMessage(
@@ -2332,9 +2424,34 @@ class MessageLookup extends MessageLookupByLibrary {
     "view": MessageLookupByLibrary.simpleMessage("Ver"),
     "viewAll": MessageLookupByLibrary.simpleMessage("Ver todo"),
     "virtualIpv4": MessageLookupByLibrary.simpleMessage("IPv4 virtual"),
+    "visualConfig": MessageLookupByLibrary.simpleMessage(
+      "Configuración visual",
+    ),
+    "visualConfigDesc": MessageLookupByLibrary.simpleMessage(
+      "Cree una configuración o importe YAML desde un archivo o URL y edite grupos, reglas y DNS.",
+    ),
+    "visualNodeMembershipTip": MessageLookupByLibrary.simpleMessage(
+      "Añada nodos manualmente o importe enlaces y después inclúyalos en un grupo de la configuración.",
+    ),
     "vividStyle": MessageLookupByLibrary.simpleMessage("Vivo"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "La configuración de la VPN cambió. Toca para reiniciar",
+    ),
+    "vpnEvidence": MessageLookupByLibrary.simpleMessage(
+      "Datos de la extensión VPN",
+    ),
+    "vpnEvidenceDesc": MessageLookupByLibrary.simpleMessage(
+      "Los datos pueden ser de una sesión anterior. Un pico de memoria no demuestra un cierre del sistema; hace falta el informe iOS correspondiente.",
+    ),
+    "vpnLastSample": MessageLookupByLibrary.simpleMessage("Fecha del registro"),
+    "vpnLastStage": MessageLookupByLibrary.simpleMessage(
+      "Última etapa registrada",
+    ),
+    "vpnPeakMemory": MessageLookupByLibrary.simpleMessage(
+      "Pico de memoria registrado",
+    ),
+    "vpnStartupRecord": MessageLookupByLibrary.simpleMessage(
+      "Registro de inicio",
     ),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage(
       "Configuración de WebDAV",

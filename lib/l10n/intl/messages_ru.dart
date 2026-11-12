@@ -527,6 +527,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "columns": MessageLookupByLibrary.simpleMessage("Столбцы"),
     "compact": MessageLookupByLibrary.simpleMessage("Компактный"),
     "compatible": MessageLookupByLibrary.simpleMessage("Режим совместимости"),
+    "configPreflight": MessageLookupByLibrary.simpleMessage(
+      "Проверка конфигурации",
+    ),
+    "configPreflightDesc": MessageLookupByLibrary.simpleMessage(
+      "Создать и разобрать выбранную конфигурацию без применения.",
+    ),
+    "configPreflightLimits": MessageLookupByLibrary.simpleMessage(
+      "Проверяется разбор, а не доступность узлов. Ресурсы проверяются отдельно. При применении ядро проверяет маршрутизацию.",
+    ),
+    "configPreflightPassed": MessageLookupByLibrary.simpleMessage(
+      "Конфигурация разобрана.",
+    ),
+    "configProtection": MessageLookupByLibrary.simpleMessage(
+      "Защита при отклонении",
+    ),
+    "configProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "Если ядро отклонит замену до применения, рабочая конфигурация сохраняется, а выбор профиля по возможности восстанавливается. Это не отменяет завершение системой и не заменяет резервную копию.",
+    ),
     "confirm": MessageLookupByLibrary.simpleMessage("Подтвердить"),
     "confirmClearAllData": MessageLookupByLibrary.simpleMessage(
       "Вы уверены, что хотите удалить все данные?",
@@ -681,6 +699,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialerProxyLoopStopped": m25,
     "dialog": MessageLookupByLibrary.simpleMessage("Диалог"),
     "direct": MessageLookupByLibrary.simpleMessage("Прямой"),
+    "directExitCheck": MessageLookupByLibrary.simpleMessage("Прямой выход"),
     "directNameserverDesc": MessageLookupByLibrary.simpleMessage(
       "Разрешает домены прямых соединений.",
     ),
@@ -949,6 +968,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Создать сертификат",
     ),
     "geoResources": MessageLookupByLibrary.simpleMessage("Geo"),
+    "geoResourcesCheck": MessageLookupByLibrary.simpleMessage(
+      "Файлы геоданных",
+    ),
+    "geoResourcesCheckDesc": MessageLookupByLibrary.simpleMessage(
+      "Проверяется наличие и ненулевой размер. Файл может быть повреждён; при ошибке загрузки обновите его в ресурсах.",
+    ),
     "geoSkipped": m30,
     "geoUpdated": m31,
     "geodataLoader": MessageLookupByLibrary.simpleMessage(
@@ -978,6 +1003,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Перезапись заголовков",
     ),
     "healthCheck": MessageLookupByLibrary.simpleMessage("Проверка состояния"),
+    "healthRequiresVpn": MessageLookupByLibrary.simpleMessage(
+      "Перед проверкой включите VPN.",
+    ),
+    "healthRouteChanged": MessageLookupByLibrary.simpleMessage(
+      "Подключение или маршрут изменились. Повторите проверку.",
+    ),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
       "Служба Helper недоступна, поэтому TUN-режим включить нельзя. Переустановите FlClash.",
     ),
@@ -1489,6 +1520,40 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mixedPort": MessageLookupByLibrary.simpleMessage("Смешанный порт"),
     "mode": MessageLookupByLibrary.simpleMessage("Режим"),
+    "moduleAudit": MessageLookupByLibrary.simpleMessage(
+      "Совместимость модулей",
+    ),
+    "moduleAuditDesc": MessageLookupByLibrary.simpleMessage(
+      "Проверка локальных правил, пропущенных строк и отсутствующих ресурсов.",
+    ),
+    "moduleAuditLimits": MessageLookupByLibrary.simpleMessage(
+      "Это автономная проверка разбора, а не подтверждение выполнения или совпадения. Проверка ядром доступна в подробностях. HTTPS требует доверенного сертификата и подходящих доменов.",
+    ),
+    "moduleHostCount": MessageLookupByLibrary.simpleMessage("Домены MITM"),
+    "moduleInspectDetails": MessageLookupByLibrary.simpleMessage(
+      "Подробности и неподдерживаемые строки",
+    ),
+    "moduleMissingCount": MessageLookupByLibrary.simpleMessage(
+      "Отсутствующие ресурсы",
+    ),
+    "moduleNeedsAttention": MessageLookupByLibrary.simpleMessage(
+      "Некоторые строки требуют проверки. Откройте подробности.",
+    ),
+    "moduleParsePassed": MessageLookupByLibrary.simpleMessage(
+      "Разобрано; работу ещё нужно проверить.",
+    ),
+    "moduleParseResult": MessageLookupByLibrary.simpleMessage(
+      "Результат разбора",
+    ),
+    "moduleRuleCount": MessageLookupByLibrary.simpleMessage(
+      "Разобранные правила",
+    ),
+    "moduleScriptCount": MessageLookupByLibrary.simpleMessage(
+      "Разобранные скрипты",
+    ),
+    "moduleSkippedCount": MessageLookupByLibrary.simpleMessage(
+      "Пропущенные строки",
+    ),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage(
       "Монохромный значок",
     ),
@@ -1513,6 +1578,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "networkConnectionError": MessageLookupByLibrary.simpleMessage(
       "Не удалось подключиться к серверу. Проверьте подключение к сети или настройки прокси",
     ),
+    "networkHealth": MessageLookupByLibrary.simpleMessage("Проверка сети"),
+    "networkHealthDesc": MessageLookupByLibrary.simpleMessage(
+      "Последовательная проверка прямого выхода, маршрутизации, Google и YouTube.",
+    ),
+    "networkHealthLimits": MessageLookupByLibrary.simpleMessage(
+      "Проверка использует ядро и текущие правила, не меняя настройки. Успех не гарантирует работу всех приложений.",
+    ),
     "networkHostLookupError": MessageLookupByLibrary.simpleMessage(
       "Не удалось определить адрес сервера. Проверьте правильность URL и работу DNS",
     ),
@@ -1536,6 +1608,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nextMatch": MessageLookupByLibrary.simpleMessage("Следующее совпадение"),
     "no": MessageLookupByLibrary.simpleMessage("Нет"),
     "noData": MessageLookupByLibrary.simpleMessage("Нет данных"),
+    "noDiagnosticRecord": MessageLookupByLibrary.simpleMessage("Нет записей"),
     "noInfo": MessageLookupByLibrary.simpleMessage("Нет информации"),
     "noLongerRemind": MessageLookupByLibrary.simpleMessage(
       "Больше не напоминать",
@@ -1721,6 +1794,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "quickActions": MessageLookupByLibrary.simpleMessage("Быстрые действия"),
     "quickEdit": MessageLookupByLibrary.simpleMessage("Быстрое редактирование"),
+    "recentIssues": MessageLookupByLibrary.simpleMessage(
+      "Последние предупреждения и ошибки",
+    ),
     "recentRequests": MessageLookupByLibrary.simpleMessage("Последние запросы"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("Рекомендуемые"),
     "recordType": MessageLookupByLibrary.simpleMessage("Тип записи"),
@@ -1737,6 +1813,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "Не удалось освободить память",
     ),
+    "reliabilityCenter": MessageLookupByLibrary.simpleMessage(
+      "Центр диагностики",
+    ),
     "remote": MessageLookupByLibrary.simpleMessage("Удалённо"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage(
       "Удалённое назначение",
@@ -1746,6 +1825,12 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "remove": MessageLookupByLibrary.simpleMessage("Убрать"),
     "rename": MessageLookupByLibrary.simpleMessage("Переименовать"),
+    "repairGeoResources": MessageLookupByLibrary.simpleMessage(
+      "Восстановить отсутствующие данные",
+    ),
+    "repairGeoResourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "Восстановить отсутствующие или пустые файлы из приложения, сохранив непустые. Затем повторите запуск VPN.",
+    ),
     "replace": MessageLookupByLibrary.simpleMessage("Заменить"),
     "replaceAll": MessageLookupByLibrary.simpleMessage("Заменить все"),
     "request": MessageLookupByLibrary.simpleMessage("Запрос"),
@@ -1762,6 +1847,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "resetTip": MessageLookupByLibrary.simpleMessage(
       "Вы уверены, что хотите выполнить сброс?",
+    ),
+    "resourceMissing": MessageLookupByLibrary.simpleMessage(
+      "Отсутствует или пуст",
     ),
     "resourceUpdateInterval": MessageLookupByLibrary.simpleMessage(
       "Интервал автообновления",
@@ -1807,6 +1895,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "routeAddress": MessageLookupByLibrary.simpleMessage("Адреса маршрутов"),
     "routeExcludeAddress": MessageLookupByLibrary.simpleMessage(
       "Исключённые адреса маршрутов",
+    ),
+    "routedExitCheck": MessageLookupByLibrary.simpleMessage(
+      "Выход по текущим правилам",
     ),
     "routingMark": MessageLookupByLibrary.simpleMessage("Метка маршрутизации"),
     "ru": MessageLookupByLibrary.simpleMessage("Русский"),
@@ -1964,6 +2055,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "rules": MessageLookupByLibrary.simpleMessage("Правила"),
     "rulesCount": m87,
+    "runHealthCheck": MessageLookupByLibrary.simpleMessage("Начать проверку"),
     "runTime": MessageLookupByLibrary.simpleMessage("Время работы"),
     "running": MessageLookupByLibrary.simpleMessage("Работает"),
     "runtimeConfig": MessageLookupByLibrary.simpleMessage(
@@ -2273,10 +2365,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "view": MessageLookupByLibrary.simpleMessage("Просмотр"),
     "viewAll": MessageLookupByLibrary.simpleMessage("Показать всё"),
     "virtualIpv4": MessageLookupByLibrary.simpleMessage("Виртуальный IPv4"),
+    "visualConfig": MessageLookupByLibrary.simpleMessage(
+      "Визуальная настройка",
+    ),
+    "visualConfigDesc": MessageLookupByLibrary.simpleMessage(
+      "Создайте конфигурацию или импортируйте YAML из файла или URL, затем настройте группы, правила и DNS.",
+    ),
+    "visualNodeMembershipTip": MessageLookupByLibrary.simpleMessage(
+      "Добавьте узлы вручную или импортируйте ссылки, затем включите узлы в группу конфигурации.",
+    ),
     "vividStyle": MessageLookupByLibrary.simpleMessage("Яркий"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "Настройки VPN изменены. Нажмите, чтобы перезапустить",
     ),
+    "vpnEvidence": MessageLookupByLibrary.simpleMessage(
+      "Данные расширения VPN",
+    ),
+    "vpnEvidenceDesc": MessageLookupByLibrary.simpleMessage(
+      "Записи могут относиться к прошлому запуску. Пик памяти не доказывает завершение системой; нужен отчёт iOS за то же время.",
+    ),
+    "vpnLastSample": MessageLookupByLibrary.simpleMessage("Время записи"),
+    "vpnLastStage": MessageLookupByLibrary.simpleMessage("Последний этап"),
+    "vpnPeakMemory": MessageLookupByLibrary.simpleMessage(
+      "Записанный пик памяти",
+    ),
+    "vpnStartupRecord": MessageLookupByLibrary.simpleMessage("Запись запуска"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage(
       "Настройка WebDAV",
     ),

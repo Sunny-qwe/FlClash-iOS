@@ -432,6 +432,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "columns": MessageLookupByLibrary.simpleMessage("列数"),
     "compact": MessageLookupByLibrary.simpleMessage("コンパクト"),
     "compatible": MessageLookupByLibrary.simpleMessage("互換モード"),
+    "configPreflight": MessageLookupByLibrary.simpleMessage("設定の事前検査"),
+    "configPreflightDesc": MessageLookupByLibrary.simpleMessage(
+      "選択設定を生成・解析し、実行中の接続には適用しません。",
+    ),
+    "configPreflightLimits": MessageLookupByLibrary.simpleMessage(
+      "事前検査は解析のみで、ノード疎通は確認しません。資源は別途確認し、適用時にはコアがルーティングを検証します。",
+    ),
+    "configPreflightPassed": MessageLookupByLibrary.simpleMessage(
+      "設定の解析に成功しました。",
+    ),
+    "configProtection": MessageLookupByLibrary.simpleMessage("不正設定からの保護"),
+    "configProtectionDesc": MessageLookupByLibrary.simpleMessage(
+      "適用前にコアが設定を拒否した場合、既存設定を保持し、可能なら以前の選択に戻します。OS による終了からの復旧やバックアップの代わりにはなりません。",
+    ),
     "confirm": MessageLookupByLibrary.simpleMessage("OK"),
     "confirmClearAllData": MessageLookupByLibrary.simpleMessage(
       "すべてのデータを消去してもよろしいですか？",
@@ -556,6 +570,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dialerProxyLoopStopped": m25,
     "dialog": MessageLookupByLibrary.simpleMessage("ダイアログ"),
     "direct": MessageLookupByLibrary.simpleMessage("ダイレクト"),
+    "directExitCheck": MessageLookupByLibrary.simpleMessage("直接接続の出口"),
     "directNameserverDesc": MessageLookupByLibrary.simpleMessage(
       "直接接続する通信のドメイン名を解決します。",
     ),
@@ -768,6 +783,10 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "generateCertificate": MessageLookupByLibrary.simpleMessage("証明書を生成"),
     "geoResources": MessageLookupByLibrary.simpleMessage("Geo"),
+    "geoResourcesCheck": MessageLookupByLibrary.simpleMessage("地理データファイル"),
+    "geoResourcesCheckDesc": MessageLookupByLibrary.simpleMessage(
+      "存在とサイズを確認します。存在しても破損の場合があるため、読込失敗時は資源を更新してください。",
+    ),
     "geoSkipped": m30,
     "geoUpdated": m31,
     "geodataLoader": MessageLookupByLibrary.simpleMessage("Geo低メモリモード"),
@@ -787,6 +806,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "hashByInUser": MessageLookupByLibrary.simpleMessage("インバウンドユーザーでハッシュ"),
     "headerRewrite": MessageLookupByLibrary.simpleMessage("ヘッダー書き換え"),
     "healthCheck": MessageLookupByLibrary.simpleMessage("ヘルスチェック"),
+    "healthRequiresVpn": MessageLookupByLibrary.simpleMessage(
+      "VPN を開始してから確認してください。",
+    ),
+    "healthRouteChanged": MessageLookupByLibrary.simpleMessage(
+      "接続またはルールが変わりました。再検査してください。",
+    ),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
       "Helper サービスが利用できないため、TUN モードを有効にできません。FlClash を再インストールしてください。",
     ),
@@ -1212,6 +1237,26 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmTrustUntrusted": MessageLookupByLibrary.simpleMessage("完全には信頼されていません"),
     "mixedPort": MessageLookupByLibrary.simpleMessage("Mixedポート"),
     "mode": MessageLookupByLibrary.simpleMessage("モード"),
+    "moduleAudit": MessageLookupByLibrary.simpleMessage("モジュール互換性検査"),
+    "moduleAuditDesc": MessageLookupByLibrary.simpleMessage(
+      "ローカルルール、スキップ項目、スクリプト資源を確認します。",
+    ),
+    "moduleAuditLimits": MessageLookupByLibrary.simpleMessage(
+      "これはオフライン解析です。実行や一致を示すものではありません。詳細でコア検証を確認できます。HTTPS 書き換えには信頼済み証明書と対象ホストが必要です。",
+    ),
+    "moduleHostCount": MessageLookupByLibrary.simpleMessage("MITM ホスト項目"),
+    "moduleInspectDetails": MessageLookupByLibrary.simpleMessage("詳細と未対応項目を表示"),
+    "moduleMissingCount": MessageLookupByLibrary.simpleMessage("不足リソース"),
+    "moduleNeedsAttention": MessageLookupByLibrary.simpleMessage(
+      "確認が必要な項目があります。",
+    ),
+    "moduleParsePassed": MessageLookupByLibrary.simpleMessage(
+      "解析済み。動作確認が必要です。",
+    ),
+    "moduleParseResult": MessageLookupByLibrary.simpleMessage("解析結果"),
+    "moduleRuleCount": MessageLookupByLibrary.simpleMessage("解析済みルール"),
+    "moduleScriptCount": MessageLookupByLibrary.simpleMessage("解析済みスクリプト"),
+    "moduleSkippedCount": MessageLookupByLibrary.simpleMessage("スキップ項目"),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage("モノクロームアイコン"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("モノクローム"),
     "monthsAgo": m65,
@@ -1233,6 +1278,13 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "networkConnectionError": MessageLookupByLibrary.simpleMessage(
       "サーバーに接続できませんでした。ネットワーク接続またはプロキシ設定を確認してください",
+    ),
+    "networkHealth": MessageLookupByLibrary.simpleMessage("ネットワーク診断"),
+    "networkHealthDesc": MessageLookupByLibrary.simpleMessage(
+      "直接接続、ルーティング、Google、YouTube を順に確認します。",
+    ),
+    "networkHealthLimits": MessageLookupByLibrary.simpleMessage(
+      "検査は現在のコアとルールを使用し、設定を変更しません。すべてのアプリの動作を保証するものではありません。",
     ),
     "networkHostLookupError": MessageLookupByLibrary.simpleMessage(
       "サーバーのアドレスを解決できませんでした。URL が正しいこと、DNS が使えることを確認してください",
@@ -1257,6 +1309,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nextMatch": MessageLookupByLibrary.simpleMessage("次の一致"),
     "no": MessageLookupByLibrary.simpleMessage("いいえ"),
     "noData": MessageLookupByLibrary.simpleMessage("データがありません"),
+    "noDiagnosticRecord": MessageLookupByLibrary.simpleMessage("記録なし"),
     "noInfo": MessageLookupByLibrary.simpleMessage("情報がありません"),
     "noLongerRemind": MessageLookupByLibrary.simpleMessage("今後表示しない"),
     "noNetwork": MessageLookupByLibrary.simpleMessage("ネットワークがありません"),
@@ -1406,6 +1459,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "quickActions": MessageLookupByLibrary.simpleMessage("クイック操作"),
     "quickEdit": MessageLookupByLibrary.simpleMessage("クイック編集"),
+    "recentIssues": MessageLookupByLibrary.simpleMessage("最近の警告とエラー"),
     "recentRequests": MessageLookupByLibrary.simpleMessage("最近のリクエスト"),
     "recommendedIcons": MessageLookupByLibrary.simpleMessage("おすすめ"),
     "recordType": MessageLookupByLibrary.simpleMessage("レコードタイプ"),
@@ -1420,11 +1474,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "releaseMemoryFailed": MessageLookupByLibrary.simpleMessage(
       "メモリの解放に失敗しました",
     ),
+    "reliabilityCenter": MessageLookupByLibrary.simpleMessage("診断センター"),
     "remote": MessageLookupByLibrary.simpleMessage("リモート"),
     "remoteDestination": MessageLookupByLibrary.simpleMessage("リモート宛先"),
     "remoteDnsResolve": MessageLookupByLibrary.simpleMessage("リモート DNS 解決"),
     "remove": MessageLookupByLibrary.simpleMessage("削除"),
     "rename": MessageLookupByLibrary.simpleMessage("名前を変更"),
+    "repairGeoResources": MessageLookupByLibrary.simpleMessage("不足データを復元"),
+    "repairGeoResourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "同梱データから不足または空のファイルを復元します。既存データは上書きしません。その後 VPN を再試行してください。",
+    ),
     "replace": MessageLookupByLibrary.simpleMessage("置換"),
     "replaceAll": MessageLookupByLibrary.simpleMessage("すべて置換"),
     "request": MessageLookupByLibrary.simpleMessage("リクエスト"),
@@ -1438,6 +1497,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "このページには変更があります。リセットしてもよろしいですか？",
     ),
     "resetTip": MessageLookupByLibrary.simpleMessage("リセットしてもよろしいですか？"),
+    "resourceMissing": MessageLookupByLibrary.simpleMessage("未存在または空"),
     "resourceUpdateInterval": MessageLookupByLibrary.simpleMessage("自動更新間隔"),
     "resourceUpdateIntervalTip": MessageLookupByLibrary.simpleMessage(
       "自動更新間隔は0より大きくしてください",
@@ -1465,6 +1525,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "root": MessageLookupByLibrary.simpleMessage("Root"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("ルートアドレス"),
     "routeExcludeAddress": MessageLookupByLibrary.simpleMessage("ルート除外アドレス"),
+    "routedExitCheck": MessageLookupByLibrary.simpleMessage("現在のルールの出口"),
     "routingMark": MessageLookupByLibrary.simpleMessage("ルーティングマーク"),
     "ru": MessageLookupByLibrary.simpleMessage("ロシア語"),
     "rule": MessageLookupByLibrary.simpleMessage("ルール"),
@@ -1603,6 +1664,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "rules": MessageLookupByLibrary.simpleMessage("ルール"),
     "rulesCount": m87,
+    "runHealthCheck": MessageLookupByLibrary.simpleMessage("検査を開始"),
     "runTime": MessageLookupByLibrary.simpleMessage("稼働時間"),
     "running": MessageLookupByLibrary.simpleMessage("実行中"),
     "runtimeConfig": MessageLookupByLibrary.simpleMessage("ランタイム設定"),
@@ -1856,10 +1918,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "view": MessageLookupByLibrary.simpleMessage("表示"),
     "viewAll": MessageLookupByLibrary.simpleMessage("すべて表示"),
     "virtualIpv4": MessageLookupByLibrary.simpleMessage("仮想 IPv4"),
+    "visualConfig": MessageLookupByLibrary.simpleMessage("ビジュアル設定"),
+    "visualConfigDesc": MessageLookupByLibrary.simpleMessage(
+      "設定を作成するか、ファイルや URL から YAML を読み込み、グループ・ルール・DNS を編集します。",
+    ),
+    "visualNodeMembershipTip": MessageLookupByLibrary.simpleMessage(
+      "ノードを手動追加またはリンクから読み込み、設定のポリシーグループに追加してください。",
+    ),
     "vividStyle": MessageLookupByLibrary.simpleMessage("ビビッド"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "VPN関連の設定が変更されました。タップして再起動",
     ),
+    "vpnEvidence": MessageLookupByLibrary.simpleMessage("VPN 拡張の記録"),
+    "vpnEvidenceDesc": MessageLookupByLibrary.simpleMessage(
+      "過去の実行記録の場合があります。メモリのピークだけでは OS 終了を証明できず、同時刻の iOS 解析記録が必要です。",
+    ),
+    "vpnLastSample": MessageLookupByLibrary.simpleMessage("記録時刻"),
+    "vpnLastStage": MessageLookupByLibrary.simpleMessage("最後の計測段階"),
+    "vpnPeakMemory": MessageLookupByLibrary.simpleMessage("記録された最大メモリ"),
+    "vpnStartupRecord": MessageLookupByLibrary.simpleMessage("起動記録"),
     "webDAVConfiguration": MessageLookupByLibrary.simpleMessage("WebDAV設定"),
     "whitelistMode": MessageLookupByLibrary.simpleMessage("ホワイトリストモード"),
     "writeToSystem": MessageLookupByLibrary.simpleMessage("システムに書き込む"),

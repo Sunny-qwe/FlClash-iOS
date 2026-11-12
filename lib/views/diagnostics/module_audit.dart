@@ -34,7 +34,12 @@ class _ModuleAuditViewState extends ConsumerState<ModuleAuditView> {
 
   Future<void> _refresh() async {
     final revision = ++_revision;
-    setState(() { _busy = true; _loadError = null; _reports.clear(); _errors.clear(); });
+    setState(() {
+      _busy = true;
+      _loadError = null;
+      _reports.clear();
+      _errors.clear();
+    });
     try {
       final modules = await ref.read(mitmModulesProvider.future);
       final directory = await appPath.mitmModulesDirPath;
@@ -47,11 +52,14 @@ class _ModuleAuditViewState extends ConsumerState<ModuleAuditView> {
           setState(() => _reports[module.id] = report);
         } catch (error) {
           if (!mounted || revision != _revision) return;
-          setState(() => _errors[module.id] = redactDiagnostic(compactError(error)));
+          setState(
+            () => _errors[module.id] = redactDiagnostic(compactError(error)),
+          );
         }
       }
     } catch (error) {
-      if (mounted && revision == _revision) setState(() => _loadError = redactDiagnostic(compactError(error)));
+      if (mounted && revision == _revision)
+        setState(() => _loadError = redactDiagnostic(compactError(error)));
     } finally {
       if (mounted && revision == _revision) setState(() => _busy = false);
     }
@@ -65,29 +73,86 @@ class _ModuleAuditViewState extends ConsumerState<ModuleAuditView> {
     return Scaffold(
       title: l.moduleAudit,
       isLoading: _busy,
-      iconActions: [IconButtonData(glyph: AppGlyphs.sync, tooltip: l.sync, onPressed: _busy ? null : _refresh)],
+      iconActions: [
+        IconButtonData(
+          glyph: AppGlyphs.sync,
+          tooltip: l.sync,
+          onPressed: _busy ? null : _refresh,
+        ),
+      ],
       body: ListView(
-        padding: EdgeInsets.fromLTRB(16, context.sectionsTopPadding, 16, 24 + context.bottomInset),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          context.sectionsTopPadding,
+          16,
+          24 + context.bottomInset,
+        ),
         children: [
-          generateSection(footer: l.moduleAuditLimits, items: [
-            ListItem.open(title: Text(l.mitmModules), subtitle: Text(l.moduleAuditDesc), widget: const MitmModulesView()),
-          ]),
-          if (state.hasError) ListItem(title: Text(l.error), subtitle: Text(redactDiagnostic(compactError(state.error!)))),
-          if (_loadError != null) ListItem(title: Text(l.error), subtitle: Text(_loadError!)),
-          if (modules.isEmpty && !state.isLoading) ListItem(title: Text(l.noDiagnosticRecord)),
-          for (final module in modules) generateSection(title: module.name, items: [
-            ListItem(title: Text(l.status), subtitle: Text(module.enabled ? l.enabled : l.disabled)),
-            if (_errors[module.id] case final error?) ListItem(title: Text(l.error), subtitle: Text(error)),
-            if (_reports[module.id] case final report?) ...[
-              ListItem(title: Text(l.moduleParseResult), subtitle: Text(report.needsAttention ? l.moduleNeedsAttention : l.moduleParsePassed)),
-              ListItem(title: Text(l.moduleRuleCount), trailing: Text('${report.rules}')),
-              ListItem(title: Text(l.moduleScriptCount), trailing: Text('${report.scripts}')),
-              ListItem(title: Text(l.moduleSkippedCount), trailing: Text('${report.skipped}')),
-              ListItem(title: Text(l.moduleMissingCount), trailing: Text('${report.missingResources}')),
-              ListItem(title: Text(l.moduleHostCount), trailing: Text('${report.hostnames}')),
+          generateSection(
+            footer: l.moduleAuditLimits,
+            items: [
+              ListItem.open(
+                title: Text(l.mitmModules),
+                subtitle: Text(l.moduleAuditDesc),
+                widget: const MitmModulesView(),
+              ),
             ],
-            ListItem.open(title: Text(l.moduleInspectDetails), widget: MitmModuleView(id: module.id)),
-          ]),
+          ),
+          if (state.hasError)
+            ListItem(
+              title: Text(l.error),
+              subtitle: Text(redactDiagnostic(compactError(state.error!))),
+            ),
+          if (_loadError != null)
+            ListItem(title: Text(l.error), subtitle: Text(_loadError!)),
+          if (modules.isEmpty && !state.isLoading)
+            ListItem(title: Text(l.noDiagnosticRecord)),
+          for (final module in modules)
+            generateSection(
+              title: module.name,
+              items: [
+                ListItem(
+                  title: Text(l.status),
+                  subtitle: Text(module.enabled ? l.enabled : l.disabled),
+                ),
+                if (_errors[module.id] case final error?)
+                  ListItem(title: Text(l.error), subtitle: Text(error)),
+                if (_reports[module.id] case final report?) ...[
+                  ListItem(
+                    title: Text(l.moduleParseResult),
+                    subtitle: Text(
+                      report.needsAttention
+                          ? l.moduleNeedsAttention
+                          : l.moduleParsePassed,
+                    ),
+                  ),
+                  ListItem(
+                    title: Text(l.moduleRuleCount),
+                    trailing: Text('${report.rules}'),
+                  ),
+                  ListItem(
+                    title: Text(l.moduleScriptCount),
+                    trailing: Text('${report.scripts}'),
+                  ),
+                  ListItem(
+                    title: Text(l.moduleSkippedCount),
+                    trailing: Text('${report.skipped}'),
+                  ),
+                  ListItem(
+                    title: Text(l.moduleMissingCount),
+                    trailing: Text('${report.missingResources}'),
+                  ),
+                  ListItem(
+                    title: Text(l.moduleHostCount),
+                    trailing: Text('${report.hostnames}'),
+                  ),
+                ],
+                ListItem.open(
+                  title: Text(l.moduleInspectDetails),
+                  widget: MitmModuleView(id: module.id),
+                ),
+              ],
+            ),
         ],
       ),
     );

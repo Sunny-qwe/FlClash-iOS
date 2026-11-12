@@ -2,15 +2,31 @@ import 'dart:convert';
 import 'dart:io';
 
 String redactDiagnostic(String text) => text
-    .replaceAll(RegExp(r'https?://[^\s<>"\x27]+', caseSensitive: false), '[URL]')
-    .replaceAll(RegExp(r'/private/var/[^\s"\x27]+|[A-Za-z]:\\[^\r\n]+'), '[PATH]')
+    .replaceAll(
+      RegExp(r'https?://[^\s<>"\x27]+', caseSensitive: false),
+      '[URL]',
+    )
+    .replaceAll(
+      RegExp(r'/private/var/[^\s"\x27]+|[A-Za-z]:\\[^\r\n]+'),
+      '[PATH]',
+    )
     .replaceAllMapped(
-      RegExp(r'(token|password|passwd|secret|authorization|cookie|uuid|OwO)\s*[:=]\s*[^\s,;]+', caseSensitive: false),
+      RegExp(
+        r'(token|password|passwd|secret|authorization|cookie|uuid|OwO)\s*[:=]\s*[^\s,;]+',
+        caseSensitive: false,
+      ),
       (match) => '${match[1]}=[REDACTED]',
     );
 
 class VpnDiagnosticSnapshot {
-  const VpnDiagnosticSnapshot({this.peakBytes, this.sampledAt, this.stage, this.startupStage, this.startupDetail, this.startupAt});
+  const VpnDiagnosticSnapshot({
+    this.peakBytes,
+    this.sampledAt,
+    this.stage,
+    this.startupStage,
+    this.startupDetail,
+    this.startupAt,
+  });
 
   final int? peakBytes;
   final DateTime? sampledAt;
@@ -19,18 +35,36 @@ class VpnDiagnosticSnapshot {
   final String? startupDetail;
   final DateTime? startupAt;
 
-  factory VpnDiagnosticSnapshot.parse(Map<String, dynamic> memory, Map<String, dynamic> startup) {
+  factory VpnDiagnosticSnapshot.parse(
+    Map<String, dynamic> memory,
+    Map<String, dynamic> startup,
+  ) {
     final samples = memory['samples'];
     final sample = samples is List && samples.isNotEmpty && samples.last is Map
-        ? samples.last as Map : const {};
-    DateTime? date(Object? value, {int epoch = 0}) => value is num && value.isFinite && value.abs() < 8640000000000
-        ? DateTime.fromMillisecondsSinceEpoch(((value + epoch) * 1000).round(), isUtc: true).toLocal() : null;
+        ? samples.last as Map
+        : const {};
+    DateTime? date(Object? value, {int epoch = 0}) =>
+        value is num && value.isFinite && value.abs() < 8640000000000
+        ? DateTime.fromMillisecondsSinceEpoch(
+            ((value + epoch) * 1000).round(),
+            isUtc: true,
+          ).toLocal()
+        : null;
     return VpnDiagnosticSnapshot(
-      peakBytes: switch (memory['peak-footprint-bytes']) { final num bytes when bytes.isFinite && bytes >= 0 => bytes.toInt(), _ => null },
+      peakBytes: switch (memory['peak-footprint-bytes']) {
+        final num bytes when bytes.isFinite && bytes >= 0 => bytes.toInt(),
+        _ => null,
+      },
       sampledAt: date(sample['timestamp']),
-      stage: sample['stage'] is String ? redactDiagnostic(sample['stage'] as String) : null,
-      startupStage: startup['stage'] is String ? redactDiagnostic(startup['stage'] as String) : null,
-      startupDetail: startup['detail'] is String ? redactDiagnostic(startup['detail'] as String) : null,
+      stage: sample['stage'] is String
+          ? redactDiagnostic(sample['stage'] as String)
+          : null,
+      startupStage: startup['stage'] is String
+          ? redactDiagnostic(startup['stage'] as String)
+          : null,
+      startupDetail: startup['detail'] is String
+          ? redactDiagnostic(startup['detail'] as String)
+          : null,
       startupAt: date(startup['date'], epoch: 978307200),
     );
   }
@@ -38,7 +72,8 @@ class VpnDiagnosticSnapshot {
 
 Future<Map<String, dynamic>> _readDiagnosticJson(File file) async {
   try {
-    if (!await file.exists() || await file.length() > 256 * 1024) return const {};
+    if (!await file.exists() || await file.length() > 256 * 1024)
+      return const {};
     final decoded = jsonDecode(await file.readAsString());
     return decoded is Map<String, dynamic> ? decoded : const {};
   } on FileSystemException {
@@ -63,7 +98,8 @@ Future<Map<String, int>> inspectGeoResources(String home) async {
     if (entry is! File) continue;
     final name = entry.uri.pathSegments.last;
     for (final wanted in names) {
-      if (name.toLowerCase() == wanted.toLowerCase()) files[wanted] = await entry.length();
+      if (name.toLowerCase() == wanted.toLowerCase())
+        files[wanted] = await entry.length();
     }
   }
   return {for (final name in names) name: files[name] ?? 0};

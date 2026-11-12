@@ -55,6 +55,436 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `Restore missing data files`
+  String get repairGeoResources {
+    return Intl.message(
+      'Restore missing data files',
+      name: 'repairGeoResources',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore missing or empty bundled data without replacing nonempty files. Retry starting the VPN afterwards.`
+  String get repairGeoResourcesDesc {
+    return Intl.message(
+      'Restore missing or empty bundled data without replacing nonempty files. Retry starting the VPN afterwards.',
+      name: 'repairGeoResourcesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Diagnostics center`
+  String get reliabilityCenter {
+    return Intl.message(
+      'Diagnostics center',
+      name: 'reliabilityCenter',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Network health`
+  String get networkHealth {
+    return Intl.message(
+      'Network health',
+      name: 'networkHealth',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Check direct access, routed access, Google and YouTube in order.`
+  String get networkHealthDesc {
+    return Intl.message(
+      'Check direct access, routed access, Google and YouTube in order.',
+      name: 'networkHealthDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Run check`
+  String get runHealthCheck {
+    return Intl.message(
+      'Run check',
+      name: 'runHealthCheck',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start the VPN before testing.`
+  String get healthRequiresVpn {
+    return Intl.message(
+      'Start the VPN before testing.',
+      name: 'healthRequiresVpn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tests use the Core and current routing rules. They do not change your configuration or prove that every app works.`
+  String get networkHealthLimits {
+    return Intl.message(
+      'Tests use the Core and current routing rules. They do not change your configuration or prove that every app works.',
+      name: 'networkHealthLimits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Direct exit`
+  String get directExitCheck {
+    return Intl.message(
+      'Direct exit',
+      name: 'directExitCheck',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exit through current rules`
+  String get routedExitCheck {
+    return Intl.message(
+      'Exit through current rules',
+      name: 'routedExitCheck',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Connection or routing changed. Run the check again.`
+  String get healthRouteChanged {
+    return Intl.message(
+      'Connection or routing changed. Run the check again.',
+      name: 'healthRouteChanged',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Module compatibility check`
+  String get moduleAudit {
+    return Intl.message(
+      'Module compatibility check',
+      name: 'moduleAudit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Inspect local rules, skipped entries and missing script resources.`
+  String get moduleAuditDesc {
+    return Intl.message(
+      'Inspect local rules, skipped entries and missing script resources.',
+      name: 'moduleAuditDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This is an offline parser check, not proof of script execution or rule matches. Open details for Core validation. HTTPS rewrites require a trusted certificate and matching hostnames; certificate-pinned apps may reject interception.`
+  String get moduleAuditLimits {
+    return Intl.message(
+      'This is an offline parser check, not proof of script execution or rule matches. Open details for Core validation. HTTPS rewrites require a trusted certificate and matching hostnames; certificate-pinned apps may reject interception.',
+      name: 'moduleAuditLimits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Parser result`
+  String get moduleParseResult {
+    return Intl.message(
+      'Parser result',
+      name: 'moduleParseResult',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Some entries need attention. Open details.`
+  String get moduleNeedsAttention {
+    return Intl.message(
+      'Some entries need attention. Open details.',
+      name: 'moduleNeedsAttention',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Parsed; runtime behavior still needs verification.`
+  String get moduleParsePassed {
+    return Intl.message(
+      'Parsed; runtime behavior still needs verification.',
+      name: 'moduleParsePassed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Parsed rules`
+  String get moduleRuleCount {
+    return Intl.message(
+      'Parsed rules',
+      name: 'moduleRuleCount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Parsed scripts`
+  String get moduleScriptCount {
+    return Intl.message(
+      'Parsed scripts',
+      name: 'moduleScriptCount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Skipped entries`
+  String get moduleSkippedCount {
+    return Intl.message(
+      'Skipped entries',
+      name: 'moduleSkippedCount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Missing resources`
+  String get moduleMissingCount {
+    return Intl.message(
+      'Missing resources',
+      name: 'moduleMissingCount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `MITM host patterns`
+  String get moduleHostCount {
+    return Intl.message(
+      'MITM host patterns',
+      name: 'moduleHostCount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Inspect details and unsupported entries`
+  String get moduleInspectDetails {
+    return Intl.message(
+      'Inspect details and unsupported entries',
+      name: 'moduleInspectDetails',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Configuration preflight`
+  String get configPreflight {
+    return Intl.message(
+      'Configuration preflight',
+      name: 'configPreflight',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Build and parse the selected configuration without applying it.`
+  String get configPreflightDesc {
+    return Intl.message(
+      'Build and parse the selected configuration without applying it.',
+      name: 'configPreflightDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Preflight checks parsing, not node reachability. Resource files are checked separately. The Core still validates full routing when applying the configuration.`
+  String get configPreflightLimits {
+    return Intl.message(
+      'Preflight checks parsing, not node reachability. Resource files are checked separately. The Core still validates full routing when applying the configuration.',
+      name: 'configPreflightLimits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Configuration parsed successfully.`
+  String get configPreflightPassed {
+    return Intl.message(
+      'Configuration parsed successfully.',
+      name: 'configPreflightPassed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rejected configuration protection`
+  String get configProtection {
+    return Intl.message(
+      'Rejected configuration protection',
+      name: 'configProtection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `If the Core rejects a replacement before applying it, the existing running configuration is preserved and the previous profile selection is restored when available. This does not recover from system termination or replace a backup.`
+  String get configProtectionDesc {
+    return Intl.message(
+      'If the Core rejects a replacement before applying it, the existing running configuration is preserved and the previous profile selection is restored when available. This does not recover from system termination or replace a backup.',
+      name: 'configProtectionDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `VPN extension evidence`
+  String get vpnEvidence {
+    return Intl.message(
+      'VPN extension evidence',
+      name: 'vpnEvidence',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `These records may belong to an earlier run. A memory peak is not proof of a system kill; the matching iOS analysis report is needed to confirm the cause.`
+  String get vpnEvidenceDesc {
+    return Intl.message(
+      'These records may belong to an earlier run. A memory peak is not proof of a system kill; the matching iOS analysis report is needed to confirm the cause.',
+      name: 'vpnEvidenceDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recorded peak memory`
+  String get vpnPeakMemory {
+    return Intl.message(
+      'Recorded peak memory',
+      name: 'vpnPeakMemory',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recorded at`
+  String get vpnLastSample {
+    return Intl.message(
+      'Recorded at',
+      name: 'vpnLastSample',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Last sampled stage`
+  String get vpnLastStage {
+    return Intl.message(
+      'Last sampled stage',
+      name: 'vpnLastStage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Startup record`
+  String get vpnStartupRecord {
+    return Intl.message(
+      'Startup record',
+      name: 'vpnStartupRecord',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No record available`
+  String get noDiagnosticRecord {
+    return Intl.message(
+      'No record available',
+      name: 'noDiagnosticRecord',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Geographic data files`
+  String get geoResourcesCheck {
+    return Intl.message(
+      'Geographic data files',
+      name: 'geoResourcesCheck',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Check that data files exist and are nonempty. A present file can still be corrupt; open Resources to update it if loading fails.`
+  String get geoResourcesCheckDesc {
+    return Intl.message(
+      'Check that data files exist and are nonempty. A present file can still be corrupt; open Resources to update it if loading fails.',
+      name: 'geoResourcesCheckDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Missing or empty`
+  String get resourceMissing {
+    return Intl.message(
+      'Missing or empty',
+      name: 'resourceMissing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Recent warnings and errors`
+  String get recentIssues {
+    return Intl.message(
+      'Recent warnings and errors',
+      name: 'recentIssues',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Visual configuration`
+  String get visualConfig {
+    return Intl.message(
+      'Visual configuration',
+      name: 'visualConfig',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create a configuration, or import YAML from a file or URL, then edit groups, routing rules and DNS.`
+  String get visualConfigDesc {
+    return Intl.message(
+      'Create a configuration, or import YAML from a file or URL, then edit groups, routing rules and DNS.',
+      name: 'visualConfigDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add nodes manually or import links, then add them to a configuration’s policy group.`
+  String get visualNodeMembershipTip {
+    return Intl.message(
+      'Add nodes manually or import links, then add them to a configuration’s policy group.',
+      name: 'visualNodeMembershipTip',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `MITM certificates`
   String get mitmCertificateSettings {
     return Intl.message(

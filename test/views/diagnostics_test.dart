@@ -6,6 +6,7 @@ import 'package:fl_clash/core/interface.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/ui/scaffold/scaffold.dart';
 import 'package:fl_clash/views/diagnostics/diagnostics.dart';
 import 'package:fl_clash/views/diagnostics/health_check.dart';
 import 'package:fl_clash/views/diagnostics/module_audit.dart';
@@ -89,6 +90,16 @@ void main() {
     return container;
   }
 
+  Future<void> finishLoading(WidgetTester tester) async {
+    await tester.pump();
+    for (var attempt = 0; attempt < 100 && tester.widget<Scaffold>(find.byType(Scaffold)).isLoading; attempt++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.pump();
+    }
+    expect(tester.widget<Scaffold>(find.byType(Scaffold)).isLoading, isFalse);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('network check does not probe a stopped VPN', (tester) async {
     await mount(tester, const NetworkHealthView(), running: false);
     await tester.tap(find.text('Run check').first);
@@ -129,8 +140,7 @@ void main() {
     when(() => core.validateConfig(any())).thenAnswer((_) async => null);
     final container = await mount(tester, const ConfigPreflightView());
     await tester.tap(find.text('Run check').first);
-    await tester.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 100)); });
-    await tester.pumpAndSettle();
+    await finishLoading(tester);
     expect(find.text('Configuration parsed successfully.'), findsOneWidget);
     verify(() => core.validateConfig(any())).called(1);
     expect(container.read(currentProfileIdProvider), 1);
@@ -142,8 +152,7 @@ void main() {
       testWidgets('${page.runtimeType} fits enlarged text in ${dark ? 'dark' : 'light'} mode', (tester) async {
         final capture = GlobalKey();
         await mount(tester, page, dark: dark, capture: capture);
-        await tester.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 50)); });
-        await tester.pumpAndSettle();
+        await finishLoading(tester);
         await tester.runAsync(() async {
           final boundary = capture.currentContext!.findRenderObject()! as RenderRepaintBoundary;
           final image = await boundary.toImage();
