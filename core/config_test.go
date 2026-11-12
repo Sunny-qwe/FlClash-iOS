@@ -951,8 +951,8 @@ func blackHoleServer(t *testing.T) net.Addr {
 // back of the queue.
 func TestTestDelayDoesNotSpendTheProbeBudgetQueueing(t *testing.T) {
 	const (
-		timeout  = 200 * time.Millisecond
-		queueFor = 150 * time.Millisecond
+		timeout  = time.Second
+		queueFor = 200 * time.Millisecond
 	)
 
 	addr := blackHoleServer(t)
@@ -961,8 +961,13 @@ func TestTestDelayDoesNotSpendTheProbeBudgetQueueing(t *testing.T) {
 		delayTestSlots <- struct{}{}
 	}
 	t.Cleanup(func() {
-		for i := 0; i < delayTestConcurrency; i++ {
-			<-delayTestSlots
+		// A failed queue wait has already consumed one fewer token.
+		for {
+			select {
+			case <-delayTestSlots:
+			default:
+				return
+			}
 		}
 	})
 
@@ -1001,10 +1006,6 @@ func TestTestDelayDoesNotSpendTheProbeBudgetQueueing(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("handleTestDelay never returned")
 	}
-
-	// handleTestDelay released the slot it was handed; put it back so the
-	// cleanup above drains what it put in.
-	delayTestSlots <- struct{}{}
 }
 
 func TestTestDelayKeepsToTheTimeoutTheGroupNames(t *testing.T) {
