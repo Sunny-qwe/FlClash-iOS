@@ -215,7 +215,20 @@ func (p *Proxy) URLTest(ctx context.Context, url string, expectedStatus utils.In
 	if err != nil {
 		return
 	}
+	// Some adapters return an already-established connection from DialContext.
+	// In that case http.Transport cannot reliably interrupt a read when the
+	// caller's context expires. Close the connection explicitly on cancellation
+	// so URL tests cannot keep a delay-test slot (or a VPN reload) stuck.
+	stopClose := make(chan struct{})
+	go func() {
+		select {
+		case <-ctx.Done():
+			_ = instance.Close()
+		case <-stopClose:
+		}
+	}()
 	defer func() {
+		close(stopClose)
 		_ = instance.Close()
 	}()
 
