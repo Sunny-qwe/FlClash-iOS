@@ -349,7 +349,7 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 	if err == nil && response == nil {
 		e.rewriteHeaders("http-request", original, r.Header, &actions)
 		requestNeedsBody := e.needsBody("http-request", original) || e.capture.Load()
-		if requestNeedsBody && r.Header.Get("Content-Encoding") == "" {
+		if requestNeedsBody && (r.Header.Get("Content-Encoding") == "" || e.binaryBodyScript("http-request", original)) {
 			reqBody, _ = readBoundedBody(&r.Body, e.maxBody)
 		}
 		if reqBody != nil {
@@ -537,6 +537,18 @@ func (e *Engine) needsBody(phase, rawURL string) bool {
 	}
 	for _, r := range e.rules["script"] {
 		if r.params["type"] == phase && r.params["requires-body"] == "true" && r.match.matches(rawURL) {
+			return true
+		}
+	}
+	return false
+}
+
+func (e *Engine) binaryBodyScript(phase, rawURL string) bool {
+	for _, r := range e.rules["script"] {
+		if r.params["type"] == phase &&
+			r.params["requires-body"] == "true" &&
+			scriptBinaryBody(r.params) &&
+			r.match.matches(rawURL) {
 			return true
 		}
 	}

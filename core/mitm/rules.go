@@ -178,11 +178,6 @@ func parseRule(kind, line string) (rule, error) {
 		default:
 			return r, errors.New("supported script types: http-request, http-response, generic; scheduled/event scripts are not supported")
 		}
-		for _, key := range []string{"binary-body-mode", "full-header-mode"} {
-			if params[key] == "true" {
-				return r, fmt.Errorf("%s is not supported", key)
-			}
-		}
 		if params["script-path"] == "" {
 			return r, errors.New("missing downloaded script-path")
 		}
@@ -199,7 +194,22 @@ func parseRule(kind, line string) (rule, error) {
 	patternIndex := 0
 	if kind == "header-rewrite" || kind == "body-rewrite" {
 		if parts[0] != "http-request" && parts[0] != "http-response" {
-			return r, errors.New("expected http-request or http-response")
+			if kind != "body-rewrite" || len(parts) < 4 {
+				return r, errors.New("expected http-request or http-response")
+			}
+			// Surge/Loon modules commonly use the legacy form:
+			//   pattern response-body-replace-regex match replacement
+			// Normalize it to the core representation used by rewriteBody.
+			phase := ""
+			switch parts[1] {
+			case "request-body-replace-regex":
+				phase = "http-request"
+			case "response-body-replace-regex":
+				phase = "http-response"
+			default:
+				return r, errors.New("expected http-request or http-response")
+			}
+			parts = []string{phase, parts[0], parts[2], strings.Join(parts[3:], " ")}
 		}
 		patternIndex = 1
 	}

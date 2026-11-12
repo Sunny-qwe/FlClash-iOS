@@ -28,6 +28,24 @@ func scriptHeaders(header http.Header) map[string]string {
 	return out
 }
 
+func scriptBinaryBody(params map[string]string) bool {
+	return strings.EqualFold(strings.TrimSpace(params["binary-body-mode"]), "true")
+}
+
+func scriptBodyValue(body []byte, binary bool) string {
+	if binary {
+		return base64.StdEncoding.EncodeToString(body)
+	}
+	return string(body)
+}
+
+func scriptBodyBytes(value string, binary bool) ([]byte, error) {
+	if !binary {
+		return []byte(value), nil
+	}
+	return base64.StdEncoding.DecodeString(value)
+}
+
 func (e *Engine) runScript(r rule, request *http.Request, response *http.Response, body []byte) (result map[string]any, output ScriptOutput) {
 	output.Logs = []string{}
 	select {
@@ -114,14 +132,14 @@ func (e *Engine) runScript(r rule, request *http.Request, response *http.Respons
 	if request != nil {
 		object := map[string]any{"url": request.URL.String(), "method": request.Method, "headers": scriptHeaders(request.Header)}
 		if r.params["requires-body"] == "true" && response == nil && body != nil {
-			object["body"] = string(body)
+			object["body"] = scriptBodyValue(body, scriptBinaryBody(r.params))
 		}
 		_ = vm.Set("$request", object)
 	}
 	if response != nil {
 		object := map[string]any{"status": response.StatusCode, "statusCode": response.StatusCode, "headers": scriptHeaders(response.Header)}
 		if body != nil {
-			object["body"] = string(body)
+			object["body"] = scriptBodyValue(body, scriptBinaryBody(r.params))
 		}
 		_ = vm.Set("$response", object)
 	}
@@ -191,7 +209,12 @@ func (e *Engine) applyScripts(phase string, request *http.Request, response *htt
 				request.Header = exportHeaders(headers)
 			}
 			if text, ok := result["body"].(string); ok {
-				body = []byte(text)
+				decoded, decodeErr := scriptBodyBytes(text, scriptBinaryBody(r.params))
+				if decodeErr != nil {
+					e.warn("MITM script " + r.name + " returned invalid binary body")
+					continue
+				}
+				body = decoded
 				setRequestBody(request, body)
 			}
 		} else {
@@ -199,7 +222,12 @@ func (e *Engine) applyScripts(phase string, request *http.Request, response *htt
 				response.Header = exportHeaders(headers)
 			}
 			if text, ok := result["body"].(string); ok {
-				body = []byte(text)
+				decoded, decodeErr := scriptBodyBytes(text, scriptBinaryBody(r.params))
+				if decodeErr != nil {
+					e.warn("MITM script " + r.name + " returned invalid binary body")
+					continue
+				}
+				body = decoded
 				setResponseBody(response, body)
 			}
 			if code := scriptStatus(result); code != 0 {

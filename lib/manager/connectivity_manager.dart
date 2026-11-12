@@ -76,7 +76,11 @@ class _ConnectivityManagerState extends ConsumerState<ConnectivityManager> {
     // The SSID costs a blocking platform call and a location permission on
     // Android, macOS and Windows, and nothing reads it until a network is
     // excluded.
-    if (!_onWifi ||
+    // The bundled wifi_ssid plugin has no iOS implementation. iOS does not
+    // expose the SSID through this channel, so treat it as unavailable rather
+    // than invoking a missing method on every connectivity update.
+    if (system.isIOS ||
+        !_onWifi ||
         ref.read(safeModeProvider) ||
         ref.read(excludeSSIDsProvider).isEmpty) {
       _publishSsid(requestId, null);
