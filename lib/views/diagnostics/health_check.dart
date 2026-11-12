@@ -69,9 +69,7 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
           setState(
             () => _results.add((
               title: title,
-              detail: ip == null
-                  ? l.serviceFailed
-                  : result.chains.join(' → '),
+              detail: ip == null ? l.serviceFailed : result.chains.join(' → '),
               passed: ip != null,
               ip: ip?.ip,
             )),
@@ -138,7 +136,9 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
   Widget build(BuildContext context) {
     final l = context.appLocalizations;
     final running = ref.watch(isStartProvider);
-    final hideIp = ref.watch(appSettingProvider.select((settings) => settings.hideIp));
+    final hideIp = ref.watch(
+      appSettingProvider.select((settings) => settings.hideIp),
+    );
     final stale =
         _stale ||
         _checkedRoute != null &&
@@ -188,7 +188,13 @@ class _NetworkHealthViewState extends ConsumerState<NetworkHealthView> {
               for (final result in _results)
                 ListItem(
                   title: Text(result.title),
-                  subtitle: Text(stale ? l.healthRouteChanged : result.ip == null ? result.detail : '${hideIp ? '••••••••' : result.ip}${result.detail.isEmpty ? '' : '\n${result.detail}'}'),
+                  subtitle: Text(
+                    stale
+                        ? l.healthRouteChanged
+                        : result.ip == null
+                        ? result.detail
+                        : '${hideIp ? '••••••••' : result.ip}${result.detail.isEmpty ? '' : '\n${result.detail}'}',
+                  ),
                   trailing: Text(
                     stale
                         ? '—'
@@ -228,7 +234,11 @@ class _ConfigPreflightViewState extends ConsumerState<ConfigPreflightView> {
     setState(() {
       _busy = true;
       _result = null;
-      _checkedInputs = (profile, ref.read(patchClashConfigProvider), ref.read(mitmModulesProvider).value);
+      _checkedInputs = (
+        profile,
+        ref.read(patchClashConfigProvider),
+        ref.read(mitmModulesProvider).value,
+      );
     });
     try {
       final yaml = await ref
@@ -257,7 +267,11 @@ class _ConfigPreflightViewState extends ConsumerState<ConfigPreflightView> {
   Widget build(BuildContext context) {
     final l = context.appLocalizations;
     final profile = ref.watch(currentProfileProvider);
-    final inputs = (profile, ref.watch(patchClashConfigProvider), ref.watch(mitmModulesProvider).value);
+    final inputs = (
+      profile,
+      ref.watch(patchClashConfigProvider),
+      ref.watch(mitmModulesProvider).value,
+    );
     return Scaffold(
       title: l.configPreflight,
       isLoading: _busy,
