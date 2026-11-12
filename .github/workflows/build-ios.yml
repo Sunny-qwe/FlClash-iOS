@@ -166,6 +166,7 @@ jobs:
           name: dashboard-reference-render
           path: |
             build/verification/status-card.png
+            build/verification/diagnostics/
             build/verification/ios-bundle.json
           if-no-files-found: warn
 
