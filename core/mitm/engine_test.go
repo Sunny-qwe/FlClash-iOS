@@ -59,6 +59,33 @@ func TestCertificateRegenerationSignsRealLeaf(t *testing.T) {
 	}
 }
 
+func TestModuleEditReusesCompiledRulesAndDropsRemovedRules(t *testing.T) {
+	home := t.TempDir()
+	const kept = `^https://api\.example/keep reject-dict`
+	const removed = `^https://api\.example/remove reject`
+	first, err := New(home, Config{Enable: true, Rules: Rules{URLRewrite: []string{kept, removed}}}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer first.Close()
+	next, err := Reconfigure(first, home, Config{Enable: true, Rules: Rules{URLRewrite: []string{kept, `^https://api\.example/new reject`}}}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer next.Close()
+	if next == first || len(next.rules["url-rewrite"]) != 2 {
+		t.Fatal("module edit did not create the expected rules")
+	}
+	if next.rules["url-rewrite"][0].match.plain != first.rules["url-rewrite"][0].match.plain {
+		t.Fatal("unchanged rule was compiled twice during replacement")
+	}
+	first.Close()
+	if !next.rules["url-rewrite"][0].match.matches("https://api.example/keep") ||
+		next.rules["url-rewrite"][1].match.matches("https://api.example/remove") {
+		t.Fatal("new engine lost a kept rule or retained a removed rule")
+	}
+}
+
 func TestHTTPSRewriteScriptAndCapture(t *testing.T) {
 	for _, h2 := range []bool{false, true} {
 		t.Run(fmt.Sprintf("http2=%t", h2), func(t *testing.T) { exerciseHTTPSRewrite(t, h2) })

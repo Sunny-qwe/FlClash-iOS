@@ -17,6 +17,7 @@ import (
 	"github.com/metacubex/mihomo/component/resolver"
 	"github.com/metacubex/mihomo/config"
 	"github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/constant/features"
 	"github.com/metacubex/mihomo/hub"
 	"github.com/metacubex/mihomo/hub/route"
 	authStore "github.com/metacubex/mihomo/listener/auth"
@@ -120,11 +121,21 @@ func loadConfig(path string) (*config.Config, error) {
 }
 
 func withPlatformLimits(cfg *config.Config) *config.Config {
+	if features.IOS {
+		applyIOSConfigLimits(cfg)
+	}
 	if cfg.NTP.WriteToSystem && !systemTimeWritable {
 		log.Warnln("ntp write-to-system ignored: Android does not let apps set the system time")
 		cfg.NTP.WriteToSystem = false
 	}
 	return cfg
+}
+
+func applyIOSConfigLimits(cfg *config.Config) {
+	// The TUN resolves DNS in-process. Both iOS cores must not bind the profile's DNS port.
+	if cfg.DNS != nil {
+		cfg.DNS.Listen = ""
+	}
 }
 
 func runningConfigPath() string {
@@ -143,6 +154,14 @@ func applyConfig(params *SetupParams) error {
 	runtime.GC()
 	configMu.Lock()
 	defer configMu.Unlock()
+	var digest [32]byte
+	var digestValid bool
+	if reuseModuleConfiguration {
+		digest, digestValid = routingDigest(params.Base)
+		if currentConfig != nil && digestValid && appliedRoutingDigestValid && digest == appliedRoutingDigest {
+			return applyModuleConfiguration(params)
+		}
+	}
 
 	cfg, err := loadSetupConfig(params)
 	if err != nil {
@@ -165,6 +184,7 @@ func applyConfig(params *SetupParams) error {
 	currentConfig = cfg
 	hub.ApplyConfig(cfg)
 	activateMitm(engine)
+	appliedRoutingDigest, appliedRoutingDigestValid = digest, digestValid
 	patchSelectGroup(params.SelectedMap)
 	bumpRouteEpoch()
 	updateListeners(cfg)
@@ -179,6 +199,7 @@ func updateConfig(params *UpdateParams) error {
 	if currentConfig == nil {
 		return errConfigNotApplied
 	}
+	appliedRoutingDigestValid = false
 
 	general := currentConfig.General
 	if params.MixedPort != nil {

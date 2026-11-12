@@ -104,6 +104,7 @@ func handleShutdown() {
 	updater.StopGeoUpdater()
 	executor.Shutdown()
 	currentConfig = nil
+	appliedRoutingDigestValid = false
 	if engine := mitmEngine.Swap(nil); engine != nil {
 		engine.CloseIdle()
 	}

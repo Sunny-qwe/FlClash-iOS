@@ -73,6 +73,7 @@ func (p pattern) replace(text, replacement string) (string, error) {
 }
 
 type rule struct {
+	source string
 	match  pattern
 	fields []string
 	name   string

@@ -45,7 +45,7 @@ type Engine struct {
 
 func Reconfigure(current *Engine, home string, cfg Config, dial DialFunc, logger func(string)) (*Engine, error) {
 	if current == nil || current.home != home || !reflect.DeepEqual(current.config, cfg) {
-		return New(home, cfg, dial, logger)
+		return newEngine(home, cfg, dial, logger, current)
 	}
 	if cfg.Enable && cfg.DecryptTLS {
 		certificateMu.Lock()
@@ -62,6 +62,10 @@ func Reconfigure(current *Engine, home string, cfg Config, dial DialFunc, logger
 }
 
 func New(home string, cfg Config, dial DialFunc, logger func(string)) (*Engine, error) {
+	return newEngine(home, cfg, dial, logger, nil)
+}
+
+func newEngine(home string, cfg Config, dial DialFunc, logger func(string), previous *Engine) (*Engine, error) {
 	e := &Engine{home: home, config: cfg, rules: map[string][]rule{}, maxBody: 256 << 10, certs: map[string]*tls.Certificate{}, log: logger}
 	e.store.init()
 	if limit := cfg.Limits["capture-entries"]; limit > 0 && limit < e.store.limit {
@@ -86,12 +90,24 @@ func New(home string, cfg Config, dial DialFunc, logger func(string)) (*Engine, 
 		if kind == "hostname" {
 			continue
 		}
+		// Module edits keep most rules; compiling both generations can exceed an iOS extension's budget.
+		reusable := map[string]rule{}
+		if previous != nil {
+			for _, r := range previous.rules[kind] {
+				reusable[r.source] = r
+			}
+		}
 		for index, line := range lines {
+			if r, ok := reusable[line]; ok {
+				e.rules[kind] = append(e.rules[kind], r)
+				continue
+			}
 			r, err := parseRule(kind, line)
 			if err != nil {
 				e.warn(fmt.Sprintf("MITM %s line %d skipped: %v", kind, index+1, err))
 				continue
 			}
+			r.source = line
 			e.rules[kind] = append(e.rules[kind], r)
 		}
 	}

@@ -676,6 +676,8 @@ Future<int> packageIOSNoSign({
     final packageResult = await Process.run('ditto', [
       '-c',
       '-k',
+      '--zlibCompressionLevel',
+      '9',
       '--sequesterRsrc',
       '--keepParent',
       payloadDir.path,
