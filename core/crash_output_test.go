@@ -30,9 +30,13 @@ func TestCrashOutputPreservesFatalStack(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, text := range []string{"prior-report", "flclash-crash-output-fixture", "crash_output_test.go"} {
+	for _, text := range []string{"flclash-crash-output-fixture", "crash_output_test.go"} {
 		if !bytes.Contains(data, []byte(text)) {
 			t.Fatalf("crash report missing %q", text)
 		}
+	}
+	previous, err := os.ReadFile(path + ".previous")
+	if err != nil || string(previous) != "prior-report\n" {
+		t.Fatal("previous crash report was not retained")
 	}
 }

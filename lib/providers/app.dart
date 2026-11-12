@@ -71,11 +71,17 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
           try {
             final length = await handle.length();
             const limit = 256 << 10;
-            await handle.setPosition(length > limit ? length - limit : 0);
-            final data = await handle.read(limit);
+            final data = await handle.read(length > limit ? limit ~/ 2 : limit);
             if (data.isNotEmpty) {
-              output.write('\n--- $name ---\n');
+              output.write('\n--- $name (${await crash.lastModified()}) ---\n');
               output.write(utf8.decode(data, allowMalformed: true));
+              if (length > limit) {
+                await handle.setPosition(length - limit ~/ 2);
+                output.write('\n--- middle omitted ---\n');
+                output.write(
+                  utf8.decode(await handle.read(limit ~/ 2), allowMalformed: true),
+                );
+              }
             }
           } finally {
             await handle.close();
