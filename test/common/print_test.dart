@@ -1,8 +1,17 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:fl_clash/common/print.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('network diagnostics include errno without leaking the URL or credentials', () {
+    final error = DioException(
+      requestOptions: RequestOptions(path: 'https://private.example/?token=secret'),
+      error: const SocketException('private host', osError: OSError('refused', 61)),
+    );
+    expect(compactError(error), 'DioException(unknown, SocketException, errno 61)');
+  });
   test('compactError compacts DioException to type and status code', () {
     final error = DioException(
       requestOptions: RequestOptions(path: '/'),

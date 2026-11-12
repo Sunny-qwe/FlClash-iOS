@@ -64,7 +64,12 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
     );
     if (system.isIOS) {
       final home = await appPath.homeDirPath;
-      for (final name in ['core-crash.log.previous', 'core-crash.log']) {
+      for (final name in [
+        'vpn-memory.json',
+        'vpn-startup.json',
+        'core-crash.log.previous',
+        'core-crash.log',
+      ]) {
         try {
           final crash = File('$home/$name');
           if (!await crash.exists()) continue;

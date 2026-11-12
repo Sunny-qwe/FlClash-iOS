@@ -54,7 +54,7 @@ jobs:
         env:
           CGO_ENABLED: '0'
         run: |
-          test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go)"
+          test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go mitm/engine.go mitm/body_budget_test.go)"
           go test . ./mitm
           go test -tags=with_low_memory . ./mitm
           go vet . ./mitm
@@ -82,9 +82,18 @@ jobs:
           swiftc -emit-library -emit-module -module-name Shared tool/tests/fixtures/vpn_shared.swift ios/Shared/TunnelStartupDiagnostic.swift -o "$vpn_tests/libShared.dylib" -emit-module-path "$vpn_tests/Shared.swiftmodule"
           swiftc -I "$vpn_tests" -L "$vpn_tests" -lNetworkExtension -lShared -Xlinker -rpath -Xlinker "$vpn_tests" ios/Runner/Tunnel/TunnelTypes.swift ios/Runner/Tunnel/TunnelCoordinator.swift tool/tests/ios_tunnel_lifecycle_test.swift -o "$vpn_tests/lifecycle-tests"
           "$vpn_tests/lifecycle-tests"
+          swiftc -emit-library -emit-module -module-name ClashCore tool/tests/fixtures/memory_clash_core.swift -o "$vpn_tests/libClashCore.dylib" -emit-module-path "$vpn_tests/ClashCore.swiftmodule"
+          swiftc -I "$vpn_tests" -L "$vpn_tests" -lClashCore -Xlinker -rpath -Xlinker "$vpn_tests" ios/NECore/TunnelMemoryMonitor.swift tool/tests/ios_tunnel_memory_test.swift -o "$vpn_tests/memory-tests"
+          "$vpn_tests/memory-tests"
 
       - name: Verify Dart changes and startup ordering
         run: |
+          dart format lib/common/geo_asset.dart lib/common/vpn_diagnostics.dart lib/common/mitm_module_audit.dart lib/views/diagnostics test/common/vpn_diagnostics_test.dart test/common/mitm_module_audit_test.dart test/views/diagnostics_test.dart
+          flutter analyze --no-fatal-infos lib/common/geo_asset.dart lib/common/vpn_diagnostics.dart lib/common/mitm_module_audit.dart lib/views/diagnostics test/common/vpn_diagnostics_test.dart test/common/mitm_module_audit_test.dart test/views/diagnostics_test.dart
+          flutter test test/common/vpn_diagnostics_test.dart test/common/mitm_module_audit_test.dart test/views/diagnostics_test.dart
+          dart format lib/common/request.dart lib/common/print.dart lib/views/profiles/visual.dart lib/views/profiles/profiles.dart lib/views/profiles/custom/custom.dart test/common/request_test.dart test/common/print_test.dart test/features/profile_views_test.dart
+          flutter analyze --no-fatal-infos lib/common/request.dart lib/common/print.dart lib/views/profiles/visual.dart lib/views/profiles/profiles.dart lib/views/profiles/custom/custom.dart
+          flutter test test/common/request_test.dart test/common/print_test.dart test/features/profile_views_test.dart
           dart format lib/common/path.dart lib/core/controller.dart lib/providers/actions/setup.dart lib/manager/core_manager.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart test/common/path_test.dart test/core/controller_test.dart test/views/dashboard/status_reference_test.dart test/providers/setup_action_test.dart test/manager/core_manager_test.dart setup.dart
           flutter analyze --no-fatal-infos --no-fatal-warnings lib/common/path.dart lib/core/controller.dart lib/providers/actions/setup.dart lib/manager/core_manager.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart
           flutter test test/common/path_test.dart test/core/controller_test.dart test/views/dashboard/current_outbound_test.dart test/views/dashboard/status_reference_test.dart
@@ -100,6 +109,10 @@ jobs:
           name: verified-generated-sources
           path: |
             lib/l10n/
+            lib/common/geo_asset.dart
+            lib/common/vpn_diagnostics.dart
+            lib/common/mitm_module_audit.dart
+            lib/views/diagnostics/
             lib/providers/generated/
             lib/models/generated/
             lib/common/mitm_module.dart

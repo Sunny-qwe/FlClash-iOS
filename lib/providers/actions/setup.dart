@@ -626,20 +626,23 @@ class SetupAction extends _$SetupAction {
 
   Future<String> getProfileWithId(int profileId) async {
     try {
-      final setupState = await ref.read(setupStateProvider(profileId).future);
-      final patchClashConfig = ref.read(patchClashConfigProvider);
-      final res = await getProfile(
-        setupState: setupState,
-        patchConfig: patchClashConfig,
-      );
-      return switch (res.base) {
-        final base? => await _core.buildProfile(base),
-        null => res.yaml,
-      };
+      return await buildProfileWithId(profileId);
     } catch (e) {
       dialogs.showBanner(e.toString(), level: BannerLevel.error);
     }
     return '';
+  }
+
+  Future<String> buildProfileWithId(int profileId) async {
+    final setupState = await ref.read(setupStateProvider(profileId).future);
+    final res = await getProfile(
+      setupState: setupState,
+      patchConfig: ref.read(patchClashConfigProvider),
+    );
+    return switch (res.base) {
+      final base? => await _core.buildProfile(base),
+      null => res.yaml,
+    };
   }
 
   PatchClashConfig _effectivePatchConfig(PatchClashConfig patchConfig) {

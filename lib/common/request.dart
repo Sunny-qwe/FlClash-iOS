@@ -29,6 +29,7 @@ class Request {
         final client = HttpClient();
         client.badCertificateCallback = (cert, host, port) => true;
         client.connectionTimeout = const Duration(seconds: 15);
+        client.findProxy = (_) => 'DIRECT';
         return client;
       },
     );
@@ -62,6 +63,21 @@ class Request {
     return FlClashHttpOverrides.findProxyForReader(read, uri);
   }
   Future<Response<T>> _download<T>(String url, ResponseType responseType) async {
+    final token = CancelToken();
+    try {
+      return await _downloadAttempts<T>(url, responseType, token).timeout(
+        downloadTimeoutDuration,
+        onTimeout: () => throw DioException.receiveTimeout(
+          timeout: downloadTimeoutDuration,
+          requestOptions: RequestOptions(path: url),
+        ),
+      );
+    } finally {
+      token.cancel();
+    }
+  }
+
+  Future<Response<T>> _downloadAttempts<T>(String url, ResponseType responseType, CancelToken cancelToken) async {
     final target = downloadTarget(url);
     final candidateUserAgents = [
       if (globalState.ua.isNotEmpty) globalState.ua,
@@ -74,7 +90,6 @@ class Request {
     DioException? lastException;
     for (var i = 0; i < candidateUserAgents.length; i++) {
       final ua = candidateUserAgents[i];
-      final cancelToken = CancelToken();
       final headers = <String, Object>{
         'User-Agent': ua,
         'Accept': '*/*',
@@ -93,16 +108,6 @@ class Request {
                 validateStatus: (status) => status != null && status < 500,
               ),
               cancelToken: cancelToken,
-            )
-            .timeout(
-              downloadTimeoutDuration,
-              onTimeout: () {
-                cancelToken.cancel();
-                throw DioException.receiveTimeout(
-                  timeout: downloadTimeoutDuration,
-                  requestOptions: RequestOptions(path: url),
-                );
-              },
             );
         if (res.statusCode == 403 || res.statusCode == 401 || res.statusCode == 406) {
           lastException = DioException.badResponse(
@@ -124,6 +129,7 @@ class Request {
         }
         return res;
       } on DioException catch (e) {
+        if (CancelToken.isCancel(e)) rethrow;
         lastException = e;
         final status = e.response?.statusCode;
         if (status == 403 || status == 401 || status == 406) {
@@ -133,6 +139,7 @@ class Request {
           continue;
         }
         commonPrint.log('Download $url with UA "$ua" failed: ${compactError(e)}');
+        if (e.response == null) break;
         if (i < candidateUserAgents.length - 1) {
           continue;
         }
@@ -141,7 +148,6 @@ class Request {
 
     try {
       commonPrint.log('Trying direct fallback download for $url...');
-      final directCancel = CancelToken();
       final directRes = await dio
           .getUri<T>(
             target.uri,
@@ -156,17 +162,7 @@ class Request {
               maxRedirects: 10,
               validateStatus: (status) => status != null && status < 400,
             ),
-            cancelToken: directCancel,
-          )
-          .timeout(
-            downloadTimeoutDuration,
-            onTimeout: () {
-              directCancel.cancel();
-              throw DioException.receiveTimeout(
-                timeout: downloadTimeoutDuration,
-                requestOptions: RequestOptions(path: url),
-              );
-            },
+            cancelToken: cancelToken,
           );
       return directRes;
     } catch (e) {

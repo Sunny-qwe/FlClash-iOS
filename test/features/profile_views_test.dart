@@ -9,6 +9,8 @@ import 'package:fl_clash/views/config/tun.dart';
 import 'package:fl_clash/views/profiles/add.dart';
 import 'package:fl_clash/views/profiles/custom/custom.dart';
 import 'package:fl_clash/views/profiles/custom/providers.dart';
+import 'package:fl_clash/views/profiles/custom/custom_proxies.dart';
+import 'package:fl_clash/views/profiles/visual.dart';
 import 'package:fl_clash/views/profiles/extend/extend.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
@@ -406,6 +408,7 @@ void main() {
       final l = currentAppLocalizations;
       expect(find.text('mine'), findsOneWidget);
       expect(find.text(l.preview), findsNothing);
+      expect(tile(l.proxies), findsOneWidget);
       expect(tile(l.rule), findsOneWidget);
       expect(statusOf(tester, 'DNS'), l.disabled);
       expect(
@@ -609,6 +612,40 @@ void main() {
       builder: (open) =>
           FilledButton(onPressed: open, child: const Text('home')),
     );
+
+    testWidgets('visual configuration creates an editable profile and discards an untouched draft', (tester) async {
+      final container = buildContainer(const []);
+      await pumpOver(tester, container, const VisualConfigView());
+      final l = currentAppLocalizations;
+      expect(find.text(l.visualConfigDesc), findsOneWidget);
+      await tester.tap(find.text(l.addProfile));
+      await tester.pumpAndSettle();
+      expect(editor, findsOneWidget);
+      expect(container.read(profilesProvider).single.type, ProfileType.custom);
+      await leave(tester);
+      expect(container.read(profilesProvider), isEmpty);
+      expect(find.byType(VisualConfigView), findsOneWidget);
+    });
+
+    testWidgets('visual configuration opens the real node library in its own navigator', (tester) async {
+      setViewport(tester);
+      final container = buildContainer(const []);
+      final tabNavigator = GlobalKey<NavigatorState>();
+      await tester.pumpWidget(UncontrolledProviderScope(
+        container: container,
+        child: TestApp(child: Navigator(
+          key: tabNavigator,
+          pages: const [RootPage(child: VisualConfigView())],
+          onDidRemovePage: (_) {},
+        )),
+      ));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(currentAppLocalizations.proxies));
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: find.byKey(tabNavigator), matching: find.byType(CustomProxiesView)), findsOneWidget);
+      expect(container.read(profilesProvider), isEmpty);
+      expect(tester.takeException(), isNull);
+    });
 
     testWidgets('opens from the add menu under a default name', (tester) async {
       setViewport(tester);

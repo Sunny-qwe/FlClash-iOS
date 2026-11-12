@@ -16,6 +16,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'add.dart';
 import 'edit.dart';
 import 'preview.dart';
+import 'visual.dart';
 
 const _infoGap = 4.0;
 
@@ -67,8 +68,13 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
   }
 
   List<IconButtonData> _buildActions(List<Profile> profiles) {
-    return profiles.isNotEmpty
-        ? [
+    return [
+      IconButtonData(
+        glyph: AppGlyphs.sliders,
+        tooltip: context.appLocalizations.visualConfig,
+        onPressed: () => BaseNavigator.push(context, const VisualConfigView()),
+      ),
+      if (profiles.isNotEmpty) ...[
             IconButtonData(
               glyph: AppGlyphs.sync,
               onPressed: () {
@@ -88,8 +94,8 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
               },
               tooltip: context.appLocalizations.profilesSort,
             ),
-          ]
-        : [];
+      ],
+    ];
   }
 
   @override

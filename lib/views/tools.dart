@@ -10,6 +10,7 @@ import 'package:fl_clash/views/backup_and_restore.dart';
 import 'package:fl_clash/views/config/general.dart';
 import 'package:fl_clash/views/config/local_network.dart';
 import 'package:fl_clash/views/hotkey.dart';
+import 'package:fl_clash/views/diagnostics/diagnostics.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,6 +84,11 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         if (system.isDesktop) const _HotkeyItem(),
         if (system.isAndroid) const _AccessItem(),
         const _BackupItem(),
+        ListItem.open(
+          title: Text(context.appLocalizations.reliabilityCenter),
+          leading: const GlyphIcon(AppGlyphs.logs),
+          widget: const DiagnosticsView(),
+        ),
         const _AdvancedConfigItem(),
         if (mitmFeature)
           ListItem.open(

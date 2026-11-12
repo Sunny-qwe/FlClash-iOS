@@ -20,6 +20,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dialers.dart';
+import 'custom_proxies.dart';
 import 'groups.dart';
 import 'providers.dart';
 import 'rules.dart';
@@ -475,6 +476,13 @@ class _Overview extends ConsumerWidget {
         ),
         generateSection(
           items: [
+            _sectionRow(
+              context,
+              AppGlyphs.proxies,
+              appLocalizations.proxies,
+              const SizedBox.shrink(),
+              const CustomProxiesView(),
+            ),
             row(0, _CountText(count: ruleNum, issueCount: issueCounts.rules)),
             row(
               1,

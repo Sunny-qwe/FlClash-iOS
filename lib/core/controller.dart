@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/geo_asset.dart';
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/core/interface.dart';
 import 'package:fl_clash/core/spill.dart';
@@ -52,20 +53,17 @@ extension type CoreController._(CoreHandlerInterface _interface)
     try {
       for (final geoFileName in geoFileNameList) {
         final geoFile = File(join(homePath, geoFileName));
-        final isExists = await geoFile.exists();
-        if (isExists) {
-          continue;
-        }
         final asset = 'assets/data/$geoFileName';
         // rootBundle inflates the asset on the platform thread, which Android
         // shares with the UI: the four files stall frames for over 100 ms.
-        if (app case final app?) {
-          await app.extractAsset(asset, geoFile.path);
-          continue;
-        }
-        final data = await rootBundle.load(asset);
-        final List<int> bytes = data.buffer.asUint8List();
-        await geoFile.writeAsBytes(bytes, flush: true);
+        await ensureGeoAsset(geoFile, (staged) async {
+          if (app case final app?) {
+            await app.extractAsset(asset, staged.path);
+            return;
+          }
+          final data = await rootBundle.load(asset);
+          await staged.writeAsBytes(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes), flush: true);
+        });
       }
     } catch (e) {
       commonPrint.log(

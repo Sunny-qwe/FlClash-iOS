@@ -140,6 +140,19 @@ Future<void> _waitForSetupToSettle(
 }
 
 void main() {
+  testWidgets('provider refresh tolerates a core disconnected during the request', (tester) async {
+    final coreInterface = _coreInterface();
+    when(() => coreInterface.getExternalProvider(any())).thenThrow(
+      const CoreMethodException(code: 'transport_disconnected', message: 'stopped'),
+    );
+    await _pumpCoreManager(tester, coreInterface);
+    final dynamic listener = tester.state(find.byType(CoreManager));
+    await listener.onLoaded('subscription');
+    verify(() => coreInterface.getExternalProvider('subscription')).called(1);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   late Directory profileSwitchTempDir;
 
   setUpAll(() async {

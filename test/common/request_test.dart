@@ -5,12 +5,21 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:fl_clash/common/constant.dart';
 import 'package:fl_clash/common/exception.dart';
 import 'package:fl_clash/common/request.dart';
+import 'package:fl_clash/state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class _StalledHttpClient extends Fake implements HttpClient {
+  @override
+  void close({bool force = false}) {}
+  @override
+  bool Function(X509Certificate, String, int)? badCertificateCallback;
+
   @override
   Duration? connectionTimeout;
 
@@ -60,6 +69,26 @@ class _PathAdapter implements HttpClientAdapter {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    final container = ProviderContainer();
+    globalState.container = container;
+    globalState.packageInfo = PackageInfo(appName: 'FlClash', packageName: 'com.follow.clash', version: '0.9.3', buildNumber: '2026111207');
+    addTearDown(container.dispose);
+  });
+
+  test('fallback client overrides inherited proxy routing', () {
+    final inherited = _StalledHttpClient()
+      ..findProxy = (_) => 'PROXY unreachable.invalid:7890';
+    HttpOverrides.runZoned(() {
+      final instance = Request();
+      final adapter = instance.dio.httpClientAdapter as IOHttpClientAdapter;
+      adapter.createHttpClient!();
+      expect(inherited.findProxy!(Uri.parse('https://example.com/module')), 'DIRECT');
+      instance.dio.close();
+      instance.releaseDio.close();
+    }, createHttpClient: (_) => inherited);
+  });
 
   test('getTextResponseForUrl propagates the typed DioException', () async {
     // flutter_test's mocked HttpClient answers every request with HTTP 400,

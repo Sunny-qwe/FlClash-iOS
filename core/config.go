@@ -172,6 +172,9 @@ func applyConfig(params *SetupParams) error {
 		return &MethodError{Code: code, Message: err.Error()}
 	}
 
+	if features.WithLowMemory {
+		releaseLoadMemory()
+	}
 	engine, err := prepareMitm(params.Base)
 	if err != nil {
 		code := "config_rejected"

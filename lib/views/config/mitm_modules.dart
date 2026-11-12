@@ -399,6 +399,7 @@ class MitmModuleView extends ConsumerWidget {
   /// A module written for Apple systems still applies, so this only warns.
   String? _systemTip(AppLocalizations appLocalizations, String? target) {
     final current = switch (true) {
+      _ when system.isIOS => 'ios',
       _ when system.isMacOS => 'mac',
       _ when system.isAndroid => 'android',
       _ when system.isWindows => 'windows',

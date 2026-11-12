@@ -18,6 +18,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/metacubex/mihomo/constant/features"
 	"golang.org/x/net/http2"
 )
 
@@ -25,6 +26,14 @@ type DialFunc func(context.Context, string, string) (net.Conn, error)
 
 var sessionBudget = make(chan struct{}, 16)
 var scriptBudget = make(chan struct{}, 1)
+var bodyBudget = make(chan struct{}, bodyConcurrency())
+
+func bodyConcurrency() int {
+	if features.WithLowMemory {
+		return 1
+	}
+	return 4
+}
 
 type Engine struct {
 	config    Config
@@ -306,6 +315,16 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 		return
 	}
 	original := r.URL.String()
+	capture := e.capture.Load()
+	// Acquire before buffering: queued scripts otherwise retain one decoded body per HTTP/2 stream.
+	if capture || e.needsBody("http-request", original) || e.needsBody("http-response", original) {
+		select {
+		case bodyBudget <- struct{}{}:
+			defer func() { <-bodyBudget }()
+		case <-r.Context().Done():
+			return
+		}
+	}
 	started := time.Now().UTC()
 	stripHopHeaders(r.Header)
 	var actions []action
@@ -374,7 +393,7 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 	}
 	if err == nil && response == nil {
 		e.rewriteHeaders("http-request", original, r.Header, &actions)
-		requestNeedsBody := e.needsBody("http-request", original) || e.capture.Load()
+		requestNeedsBody := e.needsBody("http-request", original) || capture
 		if requestNeedsBody {
 			encoded := r.Header.Get("Content-Encoding") != ""
 			wrapper := &http.Response{Header: r.Header, Body: r.Body}
@@ -392,7 +411,7 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 			}
 		}
 		response = e.applyScripts("http-request", r, nil, reqBody, &actions)
-		if e.capture.Load() && r.Header.Get("Content-Encoding") == "" {
+		if capture && r.Header.Get("Content-Encoding") == "" {
 			reqBody, _ = readBoundedBody(&r.Body, e.maxBody)
 		}
 		if response == nil {
@@ -406,7 +425,7 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 	}
 	defer response.Body.Close()
 	e.rewriteHeaders("http-response", original, response.Header, &actions)
-	needsBody := e.needsBody("http-response", original) || e.capture.Load()
+	needsBody := e.needsBody("http-response", original) || capture
 	if needsBody {
 		respBody, _ = e.responseBody(response)
 	}
@@ -422,7 +441,7 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 		response = replacement
 		defer response.Body.Close()
 	}
-	if e.capture.Load() {
+	if capture {
 		respBody, _ = e.responseBody(response)
 	}
 	stripHopHeaders(response.Header)
@@ -431,7 +450,7 @@ func (e *Engine) serveHTTP(w http.ResponseWriter, incoming *http.Request, host s
 	}
 	w.WriteHeader(response.StatusCode)
 	_, copyErr := io.Copy(w, response.Body)
-	if e.capture.Load() {
+	if capture {
 		e.store.add(id, started, r, response, original, reqBody, respBody, actions, copyErr)
 	}
 }

@@ -175,7 +175,17 @@ class _CoreContainerState extends ConsumerState<CoreManager>
 
   @override
   Future<void> onLoaded(String providerName) async {
-    final provider = await _core.getExternalProvider(providerName);
+    ExternalProvider? provider;
+    try {
+      provider = await _core.getExternalProvider(providerName);
+    } on CoreMethodException catch (error) {
+      if (!error.isCoreUnavailable) rethrow;
+      commonPrint.log(
+        'provider refresh cancelled: VPN core disconnected',
+        logLevel: LogLevel.debug,
+      );
+      return;
+    }
     if (!mounted) {
       return;
     }

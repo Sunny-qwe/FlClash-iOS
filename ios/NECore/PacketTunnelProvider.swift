@@ -12,10 +12,12 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     sharedStateStore: sharedStateStore
   )
   private var memoryPressureSource: DispatchSourceMemoryPressure?
+  private let memoryMonitor = TunnelMemoryMonitor()
   private var mailbox: CoreMailboxServer?
   private var startupID = ""
 
   private func recordStartup(_ stage: String, error: Error? = nil) {
+    memoryMonitor.setStage(stage)
     TunnelStartupDiagnostic.write(directory: sharedStateStore.appGroupDirectory(), id: startupID, stage: stage, error: error)
   }
   private let logger = Logger(
@@ -70,6 +72,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     )
 
     eventQueue.start()
+    memoryMonitor.start(directory: sharedStateStore.appGroupDirectory(), id: startupID)
     watchMemoryPressure()
     recordStartup("core-setup")
     MobileQuickSetup(
@@ -193,6 +196,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     sharedStateStore.clearRunTime()
     memoryPressureSource?.cancel()
     memoryPressureSource = nil
+    memoryMonitor.stop()
     eventQueue.stop()
     MobileStopTun()
     reloadControls()
@@ -226,6 +230,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
     )
     source.setEventHandler {
       self.recordStartup("memory-pressure")
+      MobileSetMitmPressure(1)
       MobileForceGC()
     }
     source.resume()
