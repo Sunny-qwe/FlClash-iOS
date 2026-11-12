@@ -61,6 +61,7 @@ jobs:
 
       - name: Verify modules and MITM execution
         run: |
+          dart format lib/providers/app.dart
           dart format lib/common/picker.dart lib/common/mitm_module.dart lib/common/mitm_trust.dart lib/common/constant.dart lib/common/common.dart lib/models/clash_config.dart lib/providers/mitm.dart lib/providers/state/profile.dart lib/providers/actions/core.dart lib/providers/actions/mitm_modules.dart lib/views/config/mitm.dart lib/views/config/advanced.dart lib/views/config/network.dart lib/features/connection/mitm_exchanges.dart test/common/mitm_module_test.dart test/common/mitm_trust_test.dart test/views/mitm_view_test.dart
           flutter analyze --no-fatal-infos --no-fatal-warnings lib/common/mitm_module.dart lib/common/mitm_trust.dart lib/providers/mitm.dart lib/providers/state/profile.dart lib/providers/actions/core.dart lib/providers/actions/mitm_modules.dart lib/views/config/mitm.dart lib/views/config/advanced.dart lib/views/config/network.dart lib/features/connection/mitm_exchanges.dart
           flutter test test/common/mitm_module_test.dart test/common/mitm_trust_test.dart test/providers/mitm_modules_action_test.dart test/providers/mitm_exchanges_test.dart test/views/mitm_view_test.dart test/views/mitm_modules_view_test.dart test/lint/design_package_test.dart

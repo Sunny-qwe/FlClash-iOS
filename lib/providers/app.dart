@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' show Locale;
 
@@ -57,9 +58,36 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
 
   Future<bool> exportLogs() async {
     final logString = await encodeLogsTask(value.list);
+    final output = StringBuffer(
+      'FlClash ${globalState.packageInfo.version}+${globalState.packageInfo.buildNumber}\n$logString',
+    );
+    if (system.isIOS) {
+      final home = await appPath.homeDirPath;
+      for (final name in ['core-crash.log.previous', 'core-crash.log']) {
+        try {
+          final crash = File('$home/$name');
+          if (!await crash.exists()) continue;
+          final handle = await crash.open();
+          try {
+            final length = await handle.length();
+            const limit = 256 << 10;
+            await handle.setPosition(length > limit ? length - limit : 0);
+            final data = await handle.read(limit);
+            if (data.isNotEmpty) {
+              output.write('\n--- $name ---\n');
+              output.write(utf8.decode(data, allowMalformed: true));
+            }
+          } finally {
+            await handle.close();
+          }
+        } on FileSystemException catch (e) {
+          output.write('\nNative crash log unavailable: ${compactError(e)}\n');
+        }
+      }
+    }
     final tempFilePath = await appPath.tempFilePath;
     final file = File(tempFilePath);
-    await file.safeWriteAsString(logString);
+    await file.safeWriteAsString(output.toString());
     bool res = false;
     res = await picker.saveFileWithPath(logFileName, tempFilePath) != null;
     return res;

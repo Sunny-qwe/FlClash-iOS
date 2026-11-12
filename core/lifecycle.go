@@ -30,6 +30,9 @@ func handleInit(params *InitParams) error {
 	defer configMu.Unlock()
 	sdkVersion.Store(int32(params.Version))
 	constant.SetHomeDir(params.HomeDir)
+	if runtime.GOOS == "ios" {
+		_ = configureCrashOutput(params.HomeDir)
+	}
 	constant.Path.GeoSite()
 	constant.Path.GeoIP()
 	initOwnership(params.HomeDir)
