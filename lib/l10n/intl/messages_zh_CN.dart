@@ -1278,6 +1278,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "privateKeyPassphrase": MessageLookupByLibrary.simpleMessage("私钥密码"),
     "process": MessageLookupByLibrary.simpleMessage("进程"),
     "profile": MessageLookupByLibrary.simpleMessage("配置"),
+    "profileApplyFailed": MessageLookupByLibrary.simpleMessage(
+      "配置未能生效，请打开日志查看原因；程序会尽可能保留原有连接。",
+    ),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("请输入有效间隔时间格式"),
     "profileAutoUpdateIntervalNullValidationDesc":
@@ -1653,6 +1656,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "style": MessageLookupByLibrary.simpleMessage("风格"),
     "submit": MessageLookupByLibrary.simpleMessage("提交"),
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage("订阅信息"),
+    "subscriptionNoNodes": MessageLookupByLibrary.simpleMessage(
+      "此订阅没有可直接加载的节点。请添加包含节点的订阅，或将它作为完整配置导入。",
+    ),
     "sudoPasswordTitle": MessageLookupByLibrary.simpleMessage("输入 sudo 密码"),
     "suspended": MessageLookupByLibrary.simpleMessage("挂起中…"),
     "switchProfile": MessageLookupByLibrary.simpleMessage("切换配置"),

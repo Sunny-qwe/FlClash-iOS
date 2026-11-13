@@ -92,7 +92,11 @@ class _LogsViewState extends ConsumerState<LogsView>
   List<IconButtonData> _buildActions() {
     return [
       if (system.isIOS)
-        IconButtonData(glyph: AppGlyphs.sync, tooltip: context.appLocalizations.sync, onPressed: _loadNative),
+        IconButtonData(
+          glyph: AppGlyphs.sync,
+          tooltip: context.appLocalizations.sync,
+          onPressed: _loadNative,
+        ),
       IconButtonData(
         glyph: AppGlyphs.export,
         tooltip: context.appLocalizations.exportLogs,
@@ -199,7 +203,10 @@ class _LogsViewState extends ConsumerState<LogsView>
             _listController.setAutoScrollToEnd(false);
           },
           onResumeToEnd: () {
-            _listController.resumeAutoScrollToEnd([..._nativeLogs, ...ref.read(logsProvider).list]);
+            _listController.resumeAutoScrollToEnd([
+              ..._nativeLogs,
+              ...ref.read(logsProvider).list,
+            ]);
             _filters.offer(_listController.value.logs);
           },
           controller: _scrollController,

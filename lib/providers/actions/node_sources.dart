@@ -35,8 +35,12 @@ class NodeSourcesAction extends _$NodeSourcesAction {
     await ref.read(profilesProvider.notifier).flushWrites();
     final groupsLease = ref.listen(proxyGroupsProvider(profile.id), (_, _) {});
     final rulesLease = ref.listen(profileRulesProvider(profile.id), (_, _) {});
-    final nodesLease = config == null ? null : ref.listen(customProxiesProvider, (_, _) {});
-    final dialersLease = config == null ? null : ref.listen(proxyDialersProvider(profile.id), (_, _) {});
+    final nodesLease = config == null
+        ? null
+        : ref.listen(customProxiesProvider, (_, _) {});
+    final dialersLease = config == null
+        ? null
+        : ref.listen(proxyDialersProvider(profile.id), (_, _) {});
     try {
       await ref.read(proxyGroupsProvider(profile.id).future);
       await ref.read(profileRulesProvider(profile.id).future);
@@ -196,9 +200,13 @@ class NodeSourcesAction extends _$NodeSourcesAction {
   }
 
   Future<Set<int>> importShareLinks(String content) async {
-    final links = content.split(RegExp(r'\s+')).where((line) => line.isShareLink).toList();
+    final links = content
+        .split(RegExp(r'\s+'))
+        .where((line) => line.isShareLink)
+        .toList();
     final core = ref.read(coreHandlerProvider);
-    if (links.isEmpty) throw MessageException(currentAppLocalizations.shareLinksInvalid);
+    if (links.isEmpty)
+      throw MessageException(currentAppLocalizations.shareLinksInvalid);
     final decoded = await core.decodeShareLinks(links);
     if (decoded.any((nodes) => nodes.isEmpty)) {
       throw MessageException(currentAppLocalizations.shareLinksInvalid);
@@ -206,16 +214,26 @@ class NodeSourcesAction extends _$NodeSourcesAction {
     final lease = ref.listen(customProxiesProvider, (_, _) {});
     try {
       final previous = await ref.read(customProxiesProvider.future);
-      final taken = {...reservedProxyNames, ...previous.map((node) => node.name), ...await ref.read(customGroupNamesProvider.future)};
+      final taken = {
+        ...reservedProxyNames,
+        ...previous.map((node) => node.name),
+        ...await ref.read(customGroupNamesProvider.future),
+      };
       final nodes = <CustomProxy>[];
       for (final definitions in decoded) {
         for (final definition in definitions) {
-          final name = uniqueLabelFor(definition['name']?.toString() ?? '', fallback: 'Proxy', taken: taken.contains);
+          final name = uniqueLabelFor(
+            definition['name']?.toString() ?? '',
+            fallback: 'Proxy',
+            taken: taken.contains,
+          );
           taken.add(name);
           nodes.add(CustomProxy.fromDefinition({...definition, 'name': name}));
         }
       }
-      final issues = await core.validateProxies(nodes.map((node) => node.definition).toList());
+      final issues = await core.validateProxies(
+        nodes.map((node) => node.definition).toList(),
+      );
       if (issues.isNotEmpty) throw MessageException(issues.values.first);
       final notifier = ref.read(customProxiesProvider.notifier);
       notifier.putAll(nodes);

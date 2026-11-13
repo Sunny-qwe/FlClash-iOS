@@ -30,6 +30,7 @@ class _RecordingSources extends NodeSourcesAction {
     pasted = content;
     return {42};
   }
+
   @override
   Future<void> attach(
     int profileId, {
@@ -188,18 +189,34 @@ void main() {
     expect(find.text(currentAppLocalizations.server), findsWidgets);
     expect(find.text(currentAppLocalizations.port), findsWidgets);
     expect(tester.takeException(), isNull);
-    Navigator.of(tester.element(find.byType(NestedFormSheet<CustomProxy>))).pop();
+    Navigator.of(
+      tester.element(find.byType(NestedFormSheet<CustomProxy>)),
+    ).pop();
     await tester.pumpAndSettle();
-    expect(tester.widget<Scaffold>(find.byType(Scaffold).first).isLoading, false);
+    expect(
+      tester.widget<Scaffold>(find.byType(Scaffold).first).isLoading,
+      false,
+    );
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('clipboard nodes are attached to the open configuration', (tester) async {
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
-      if (call.method == 'Clipboard.getData') return {'text': 'ss://first\nvless://second'};
-      return null;
-    });
-    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+  testWidgets('clipboard nodes are attached to the open configuration', (
+    tester,
+  ) async {
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.getData')
+          return {'text': 'ss://first\nvless://second'};
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
     final action = _RecordingSources();
     await pump(tester, id: profile.id, action: action);
     await tester.tap(find.text(currentAppLocalizations.clipboardImport));

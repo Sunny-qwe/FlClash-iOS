@@ -136,7 +136,8 @@ class AddProfileMenu extends ConsumerWidget {
           PopupMenuItem(
             glyph: AppGlyphs.proxies,
             label: appLocalizations.nodeSourcesTitle,
-            onPressed: () => BaseNavigator.push(context, const NodeSourcesView()),
+            onPressed: () =>
+                BaseNavigator.push(context, const NodeSourcesView()),
           ),
           PopupMenuItem(
             glyph: AppGlyphs.qrCode,

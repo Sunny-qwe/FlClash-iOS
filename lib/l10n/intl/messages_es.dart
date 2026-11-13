@@ -1792,6 +1792,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "process": MessageLookupByLibrary.simpleMessage("Proceso"),
     "profile": MessageLookupByLibrary.simpleMessage("Perfil"),
+    "profileApplyFailed": MessageLookupByLibrary.simpleMessage(
+      "No se pudo aplicar la configuración. Consulta los registros; se conserva la conexión existente siempre que es posible.",
+    ),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("Introduce un intervalo válido"),
     "profileAutoUpdateIntervalNullValidationDesc":
@@ -2326,6 +2329,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit": MessageLookupByLibrary.simpleMessage("Enviar"),
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage(
       "Información de la suscripción",
+    ),
+    "subscriptionNoNodes": MessageLookupByLibrary.simpleMessage(
+      "Esta suscripción no contiene nodos utilizables directamente. Añade una suscripción con nodos o importa su configuración completa.",
     ),
     "sudoPasswordTitle": MessageLookupByLibrary.simpleMessage(
       "Introduce tu contraseña para sudo",

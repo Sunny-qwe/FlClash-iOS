@@ -1796,6 +1796,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "process": MessageLookupByLibrary.simpleMessage("Processus"),
     "profile": MessageLookupByLibrary.simpleMessage("Profil"),
+    "profileApplyFailed": MessageLookupByLibrary.simpleMessage(
+      "La configuration n’a pas pu être appliquée. Consultez les journaux ; la connexion existante est conservée si possible.",
+    ),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage(
           "Veuillez saisir un intervalle valide",
@@ -2326,6 +2329,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit": MessageLookupByLibrary.simpleMessage("Valider"),
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage(
       "Infos d’abonnement",
+    ),
+    "subscriptionNoNodes": MessageLookupByLibrary.simpleMessage(
+      "Cet abonnement ne contient aucun nœud utilisable directement. Ajoutez un abonnement de nœuds ou importez sa configuration complète.",
     ),
     "sudoPasswordTitle": MessageLookupByLibrary.simpleMessage(
       "Saisissez votre mot de passe pour sudo",

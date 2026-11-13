@@ -224,7 +224,7 @@ final class LogsProvider extends $NotifierProvider<Logs, FixedList<Log>> {
   }
 }
 
-String _$logsHash() => r'aefb14ef2c0a3c7a4e27f2ac4188a5b2943e60b5';
+String _$logsHash() => r'16d58ef3718454f66c192106ccd160c889d9719e';
 
 abstract class _$Logs extends $Notifier<FixedList<Log>> {
   FixedList<Log> build();
@@ -1358,7 +1358,7 @@ final class CurrentPageLabelProvider
   }
 }
 
-String _$currentPageLabelHash() => r'ccdbe5d0e0d2c324f74b3e2086d3e581740dd9bf';
+String _$currentPageLabelHash() => r'87770bc46268facb54ae5388bc14236e89841f70';
 
 abstract class _$CurrentPageLabel extends $Notifier<PageLabel> {
   PageLabel build();

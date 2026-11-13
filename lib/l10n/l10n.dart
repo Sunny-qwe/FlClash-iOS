@@ -55,6 +55,26 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `This subscription contains no directly usable nodes. Add a node subscription, or import its full configuration instead.`
+  String get subscriptionNoNodes {
+    return Intl.message(
+      'This subscription contains no directly usable nodes. Add a node subscription, or import its full configuration instead.',
+      name: 'subscriptionNoNodes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `The configuration could not be applied. Open Logs to see the reason; the existing connection has been preserved when possible.`
+  String get profileApplyFailed {
+    return Intl.message(
+      'The configuration could not be applied. Open Logs to see the reason; the existing connection has been preserved when possible.',
+      name: 'profileApplyFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Manual selection`
   String get nodeSourcesManualGroup {
     return Intl.message(

@@ -1753,6 +1753,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "process": MessageLookupByLibrary.simpleMessage("Процесс"),
     "profile": MessageLookupByLibrary.simpleMessage("Профиль"),
+    "profileApplyFailed": MessageLookupByLibrary.simpleMessage(
+      "Не удалось применить конфигурацию. Причина указана в журнале. По возможности сохранено текущее подключение.",
+    ),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("Введите корректный интервал"),
     "profileAutoUpdateIntervalNullValidationDesc":
@@ -2263,6 +2266,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "submit": MessageLookupByLibrary.simpleMessage("Отправить"),
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage(
       "Информация о подписке",
+    ),
+    "subscriptionNoNodes": MessageLookupByLibrary.simpleMessage(
+      "Подписка не содержит доступных узлов. Добавьте подписку с узлами или импортируйте её как полную конфигурацию.",
     ),
     "sudoPasswordTitle": MessageLookupByLibrary.simpleMessage(
       "Введите пароль для sudo",

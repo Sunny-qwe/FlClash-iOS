@@ -65,12 +65,19 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
       for (final group in groups)
         if (group.includeAllProviders == true ||
             group.includeAllProxies == true ||
-            (group.use?.isNotEmpty ?? false)) group.id,
+            (group.use?.isNotEmpty ?? false))
+          group.id,
     };
-    return (_groupIds ?? (defaults.isNotEmpty ? defaults : {
-      for (final group in groups)
-        if (group.type == GroupType.Selector || group.type == GroupType.URLTest) group.id,
-    })).intersection(groups.map((group) => group.id).toSet());
+    return (_groupIds ??
+            (defaults.isNotEmpty
+                ? defaults
+                : {
+                    for (final group in groups)
+                      if (group.type == GroupType.Selector ||
+                          group.type == GroupType.URLTest)
+                        group.id,
+                  }))
+        .intersection(groups.map((group) => group.id).toSet());
   }
 
   Future<Set<int>?> _choose(
@@ -219,7 +226,9 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
           (p) => p.type != ProfileType.custom && uses.contains(p.realLabel),
         )
         .toList();
-    final manualNodes = nodes?.where((node) => named.contains(node.name)).toList() ?? <CustomProxy>[];
+    final manualNodes =
+        nodes?.where((node) => named.contains(node.name)).toList() ??
+        <CustomProxy>[];
     final manual = manualNodes.length;
     final canAdd = !_busy && selected.isNotEmpty;
     return Scaffold(
@@ -321,7 +330,10 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
                                   final applied = await ref
                                       .read(setupActionProvider.notifier)
                                       .applyProfile(force: true);
-                                  if (!applied) throw MessageException(l.profileApplyFailed);
+                                  if (!applied)
+                                    throw MessageException(
+                                      l.profileApplyFailed,
+                                    );
                                 }),
                         ),
                       ],
@@ -338,13 +350,20 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
                   title: Text(manualNodes[index].name),
                   subtitle: Text(manualNodes[index].type),
                   trailing: const GlyphIcon(AppGlyphs.chevronForward),
-                  onTap: _busy ? null : () => _run(() async {
-                    final node = manualNodes[index];
-                    final saved = await showCustomProxyEditor(context, proxy: node);
-                    if (saved != null) {
-                      await ref.read(clashProvidersActionProvider.notifier).applyIfProxiesNamed({node.name, saved.name});
-                    }
-                  }),
+                  onTap: _busy
+                      ? null
+                      : () => _run(() async {
+                          final node = manualNodes[index];
+                          final saved = await showCustomProxyEditor(
+                            context,
+                            proxy: node,
+                          );
+                          if (saved != null) {
+                            await ref
+                                .read(clashProvidersActionProvider.notifier)
+                                .applyIfProxiesNamed({node.name, saved.name});
+                          }
+                        }),
                 ),
               ),
             ),

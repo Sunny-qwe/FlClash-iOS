@@ -1390,6 +1390,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "privateKeyPassphrase": MessageLookupByLibrary.simpleMessage("개인 키 암호"),
     "process": MessageLookupByLibrary.simpleMessage("프로세스"),
     "profile": MessageLookupByLibrary.simpleMessage("프로필"),
+    "profileApplyFailed": MessageLookupByLibrary.simpleMessage(
+      "구성을 적용하지 못했습니다. 로그에서 원인을 확인하세요. 가능한 경우 기존 연결을 유지합니다.",
+    ),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("올바른 간격을 입력하세요"),
     "profileAutoUpdateIntervalNullValidationDesc":
@@ -1799,6 +1802,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "style": MessageLookupByLibrary.simpleMessage("스타일"),
     "submit": MessageLookupByLibrary.simpleMessage("제출"),
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage("구독 정보"),
+    "subscriptionNoNodes": MessageLookupByLibrary.simpleMessage(
+      "이 구독에는 직접 사용할 수 있는 노드가 없습니다. 노드 구독을 추가하거나 전체 구성으로 가져오세요.",
+    ),
     "sudoPasswordTitle": MessageLookupByLibrary.simpleMessage(
       "sudo 비밀번호를 입력하세요",
     ),

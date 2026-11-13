@@ -193,14 +193,19 @@ enum _OptionSection {
   };
 }
 
-Future<CustomProxy?> showCustomProxyEditor(BuildContext context, {CustomProxy? proxy}) async {
+Future<CustomProxy?> showCustomProxyEditor(
+  BuildContext context, {
+  CustomProxy? proxy,
+}) async {
   CustomProxy? saved;
   await showNestedFormSheet<CustomProxy>(
     context: context,
     profileId: null,
     overrides: [
       customProxyProvider.overrideWithBuild(
-        (_, _) => proxy ?? const CustomProxy(id: -1, definition: {'name': '', 'type': 'ss'}),
+        (_, _) =>
+            proxy ??
+            const CustomProxy(id: -1, definition: {'name': '', 'type': 'ss'}),
       ),
     ],
     currentOf: (ref) => ref.read(customProxyProvider),

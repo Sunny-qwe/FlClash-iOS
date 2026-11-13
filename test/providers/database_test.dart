@@ -467,7 +467,10 @@ void main() {
       await flush;
       expect(flushed, true);
       final error = StateError('disk full');
-      await expectLater(notifier.optimisticAsync(read(), () => throw error), throwsA(same(error)));
+      await expectLater(
+        notifier.optimisticAsync(read(), () => throw error),
+        throwsA(same(error)),
+      );
       await expectLater(notifier.flushWrites(), throwsA(same(error)));
     });
 
