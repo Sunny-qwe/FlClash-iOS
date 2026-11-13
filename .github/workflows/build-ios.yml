@@ -56,6 +56,8 @@ jobs:
         run: |
           test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go mitm/engine.go mitm/body_budget_test.go mitm/http2_memory_test.go)"
           test -z "$(gofmt -l memory_diagnostics.go memory_diagnostics_test.go mitm/diagnostics.go mitm/diagnostics_test.go mobile/mobile.go)"
+          test -z "$(gofmt -l diagnostics memory_profile.go memory_profile_test.go mitm.go mitm/script.go mitm/encoding.go)"
+          go test ./diagnostics
           go test . ./mitm
           go test -tags=with_low_memory . ./mitm
           go vet . ./mitm
@@ -89,6 +91,8 @@ jobs:
 
       - name: Verify Dart changes and startup ordering
         run: |
+          dart format lib/common/vpn_log_export.dart lib/providers/app.dart test/common/vpn_log_export_test.dart
+          flutter test test/common/vpn_log_export_test.dart
           dart format lib/core/interface.dart test/core/interface_result_test.dart
           flutter test test/core/interface_result_test.dart
           dart format lib/common/geo_asset.dart lib/common/vpn_diagnostics.dart lib/common/mitm_module_audit.dart lib/views/diagnostics test/common/vpn_diagnostics_test.dart test/common/mitm_module_audit_test.dart test/views/diagnostics_test.dart
@@ -116,6 +120,9 @@ jobs:
             test/core/interface_result_test.dart
             lib/common/geo_asset.dart
             lib/common/vpn_diagnostics.dart
+            lib/common/vpn_log_export.dart
+            lib/providers/app.dart
+            test/common/vpn_log_export_test.dart
             lib/common/mitm_module_audit.dart
             lib/views/diagnostics/
             test/views/diagnostics_test.dart

@@ -5,6 +5,7 @@ import (
 	"compress/flate"
 	"compress/gzip"
 	"compress/zlib"
+	"core/diagnostics"
 	"io"
 	"net/http"
 	"strings"
@@ -12,7 +13,7 @@ import (
 	"github.com/andybalholm/brotli"
 )
 
-func (e *Engine) responseBody(response *http.Response) ([]byte, error) {
+func (e *Engine) responseBody(response *http.Response) (body []byte, result error) {
 	raw, err := readBoundedBody(&response.Body, e.maxBody)
 	if err != nil || raw == nil {
 		return nil, err
@@ -21,6 +22,10 @@ func (e *Engine) responseBody(response *http.Response) ([]byte, error) {
 	if encoding == "" || encoding == "identity" {
 		return raw, nil
 	}
+	diagnostics.Record("body.decode.begin", map[string]any{"encoding": encoding, "compressed-bytes": len(raw)})
+	defer func() {
+		diagnostics.Record("body.decode.end", map[string]any{"encoding": encoding, "decoded-bytes": len(body), "failed": result != nil, "skipped": body == nil})
+	}()
 	var reader io.Reader
 	var closer io.Closer
 	switch encoding {

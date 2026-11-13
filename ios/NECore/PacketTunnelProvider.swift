@@ -17,7 +17,7 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
   private var startupID = ""
 
   private func recordStartup(_ stage: String, error: Error? = nil) {
-    memoryMonitor.setStage(stage)
+    memoryMonitor.setStage(stage, error: error)
     TunnelStartupDiagnostic.write(directory: sharedStateStore.appGroupDirectory(), id: startupID, stage: stage, error: error)
   }
   private let logger = Logger(

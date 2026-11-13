@@ -2,11 +2,13 @@ package mitm
 
 import (
 	"context"
+	"core/diagnostics"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -72,6 +74,12 @@ func scriptHeaderValue(vm *goja.Runtime, header http.Header, full bool) any {
 }
 
 func (e *Engine) runScript(r rule, request *http.Request, response *http.Response, body []byte) (result map[string]any, output ScriptOutput) {
+	started := time.Now()
+	script := filepath.Base(r.params["script-path"])
+	diagnostics.Record("script.queue", map[string]any{"name": r.name, "resource": script, "body-bytes": len(body)})
+	defer func() {
+		diagnostics.Record("script.complete", map[string]any{"name": r.name, "resource": script, "failed": output.Error != "", "elapsed-ms": time.Since(started).Milliseconds()})
+	}()
 	output.Logs = []string{}
 	timeout := 500 * time.Millisecond
 	if seconds, err := strconv.ParseFloat(r.params["timeout"], 64); err == nil && seconds > 0 {
@@ -89,6 +97,7 @@ func (e *Engine) runScript(r rule, request *http.Request, response *http.Respons
 	select {
 	case scriptBudget <- struct{}{}:
 		defer func() { <-scriptBudget }()
+		diagnostics.Record("script.start", map[string]any{"name": r.name, "resource": script})
 	case <-ctx.Done():
 		output.Error = "script wait time limit exceeded"
 		return

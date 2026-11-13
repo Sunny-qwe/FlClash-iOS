@@ -103,6 +103,10 @@ class MitmModulesAction extends _$MitmModulesAction {
   }
 
   void putModule(MitmModule module, {bool first = false}) {
+    commonPrint.log(
+      'MITM module change id=${module.id} name=${module.name} enabled=${module.enabled} scripts=${module.scripts} resources=${module.resources.length}',
+      logLevel: LogLevel.info,
+    );
     ref.read(mitmModulesProvider.notifier).put(module, first: first);
   }
 
@@ -196,6 +200,7 @@ class MitmModulesAction extends _$MitmModulesAction {
   }
 
   Future<void> deleteModule(MitmModule module) async {
+    commonPrint.log('MITM module delete id=${module.id} name=${module.name}', logLevel: LogLevel.info);
     ref.read(mitmModulesProvider.notifier).del(module.id);
     await File(await _pathOf(module)).safeDelete();
     await clean();

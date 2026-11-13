@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"core/diagnostics"
 	"core/mitm"
 	"encoding/binary"
 	"errors"
@@ -80,7 +81,12 @@ func dialMitm(ctx context.Context, network, address string) (net.Conn, error) {
 	return client, nil
 }
 
-func prepareMitm(base *SetupBase) (*mitm.Engine, error) {
+func prepareMitm(base *SetupBase) (engine *mitm.Engine, result error) {
+	started := time.Now()
+	diagnostics.Record("mitm.prepare.begin", nil)
+	defer func() {
+		diagnostics.Record("mitm.prepare.end", map[string]any{"failed": result != nil, "elapsed-ms": time.Since(started).Milliseconds()})
+	}()
 	var data []byte
 	if base != nil {
 		data = []byte(base.Overlay)
@@ -97,6 +103,12 @@ func prepareMitm(base *SetupBase) (*mitm.Engine, error) {
 	if err := yaml.Unmarshal(data, &document); err != nil {
 		return nil, err
 	}
+	cfg := document.MITM
+	diagnostics.Record("mitm.rules", map[string]any{
+		"enabled": cfg.Enable, "decrypt-tls": cfg.DecryptTLS, "hostnames": len(cfg.Hostname),
+		"scripts": len(cfg.Script), "body-rewrites": len(cfg.BodyRewrite),
+		"url-rewrites": len(cfg.URLRewrite), "header-rewrites": len(cfg.HeaderRewrite), "map-local": len(cfg.MapLocal),
+	})
 	return mitm.Reconfigure(mitmEngine.Load(), C.Path.HomeDir(), document.MITM, dialMitm, func(message string) { log.Warnln("%s", message) })
 }
 

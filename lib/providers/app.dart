@@ -5,12 +5,15 @@ import 'dart:io';
 import 'dart:ui' show Locale;
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/vpn_log_export.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/core.dart';
+import 'package:fl_clash/providers/database.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show compute;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'generated/app.g.dart';
@@ -66,6 +69,7 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
       final home = await appPath.homeDirPath;
       for (final name in [
         'vpn-memory.json',
+        'vpn-memory.json.previous',
         'vpn-startup.json',
         'core-crash.log.previous',
         'core-crash.log',
@@ -96,15 +100,36 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
           output.write('\nNative crash log unavailable: ${compactError(e)}\n');
         }
       }
+      try {
+        final modules = await ref.read(mitmModulesProvider.future).timeout(const Duration(seconds: 2));
+        output.write('\n--- module-manifest ---\n');
+        output.write(jsonEncode([
+          for (final module in modules) {
+            'id': module.id, 'name': module.name, 'enabled': module.enabled,
+            'scripts': module.scripts, 'resources': module.resources.values.toSet().toList(),
+          },
+        ]));
+      } catch (e) {
+        output.write('\nModule manifest unavailable: ${compactError(e)}\n');
+      }
     }
     final tempFilePath = await appPath.tempFilePath;
     final file = File(tempFilePath);
     await file.safeWriteAsString(output.toString());
+    if (system.isIOS) {
+      final home = await appPath.homeDirPath;
+      final archivePath = '$tempFilePath.zip';
+      await compute(_writeVpnDiagnosticArchive, (home: home, logPath: tempFilePath, archivePath: archivePath));
+      return await picker.saveFileWithPath(logFileName.replaceFirst('.log', '-diagnostics.zip'), archivePath) != null;
+    }
     bool res = false;
     res = await picker.saveFileWithPath(logFileName, tempFilePath) != null;
     return res;
   }
 }
+
+Future<void> _writeVpnDiagnosticArchive(({String home, String logPath, String archivePath}) paths) =>
+    writeVpnDiagnosticArchive(home: paths.home, logPath: paths.logPath, archivePath: paths.archivePath);
 
 @Riverpod(keepAlive: true)
 class Requests extends _$Requests with AutoDisposeNotifierMixin {

@@ -1,12 +1,14 @@
 package core
 
 import (
+	"core/diagnostics"
 	"errors"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/adapter/inbound"
@@ -150,7 +152,12 @@ func loadSetupConfig(params *SetupParams) (*config.Config, error) {
 	return loadConfig(path)
 }
 
-func applyConfig(params *SetupParams) error {
+func applyConfig(params *SetupParams) (result error) {
+	started := time.Now()
+	diagnostics.Record("config.apply.begin", nil)
+	defer func() {
+		diagnostics.Record("config.apply.end", map[string]any{"failed": result != nil, "elapsed-ms": time.Since(started).Milliseconds()})
+	}()
 	runtime.GC()
 	configMu.Lock()
 	defer configMu.Unlock()
@@ -159,11 +166,14 @@ func applyConfig(params *SetupParams) error {
 	if reuseModuleConfiguration {
 		digest, digestValid = routingDigest(params.Base)
 		if currentConfig != nil && digestValid && appliedRoutingDigestValid && digest == appliedRoutingDigest {
+			diagnostics.Record("config.apply.path", map[string]any{"mode": "module-only"})
 			return applyModuleConfiguration(params)
 		}
 	}
 
+	diagnostics.Record("config.load.begin", nil)
 	cfg, err := loadSetupConfig(params)
+	diagnostics.Record("config.load.end", map[string]any{"failed": err != nil})
 	if err != nil {
 		code := "config_rejected"
 		if currentConfig != nil {
@@ -185,6 +195,7 @@ func applyConfig(params *SetupParams) error {
 	}
 	applyOptions(params.Options)
 	currentConfig = cfg
+	diagnostics.Record("config.activate.begin", nil)
 	hub.ApplyConfig(cfg)
 	activateMitm(engine)
 	appliedRoutingDigest, appliedRoutingDigestValid = digest, digestValid
@@ -193,6 +204,7 @@ func applyConfig(params *SetupParams) error {
 	updateListeners(cfg)
 	reconcileGeoUpdater()
 	scheduleLoadMemoryRelease()
+	diagnostics.Record("config.activate.end", nil)
 	return nil
 }
 

@@ -91,6 +91,10 @@ func GetMemoryDiagnostics() string {
 	return core.GetMemoryDiagnostics()
 }
 
+func RequestMemoryProfile(directory, runID, kind string) bool {
+	return core.RequestMemoryProfile(directory, runID, kind)
+}
+
 func SetMitmPressure(level int32) {
 	core.SetMitmPressure(level)
 }

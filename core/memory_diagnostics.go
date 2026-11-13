@@ -1,6 +1,7 @@
 package core
 
 import (
+	"core/diagnostics"
 	"core/mitm"
 	"encoding/json"
 	"runtime"
@@ -19,6 +20,7 @@ func GetMemoryDiagnostics() string {
 		"gc-cycles":                stats.NumGC,
 		"goroutines":               runtime.NumGoroutine(),
 		"mitm":                     mitm.DiagnosticActivity(),
+		"events":                   diagnostics.Snapshot(),
 	})
 	return string(data)
 }
