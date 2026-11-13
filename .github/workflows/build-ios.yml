@@ -57,10 +57,17 @@ jobs:
           test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go mitm/engine.go mitm/body_budget_test.go mitm/http2_memory_test.go)"
           test -z "$(gofmt -l memory_diagnostics.go memory_diagnostics_test.go mitm/diagnostics.go mitm/diagnostics_test.go mobile/mobile.go)"
           test -z "$(gofmt -l diagnostics memory_profile.go memory_profile_test.go mitm.go mitm/script.go mitm/encoding.go)"
+          test -z "$(gofmt -l probe_budget.go probe_budget_test.go Clash.Meta/adapter/patch.go Clash.Meta/adapter/adapter.go)"
           go test ./diagnostics
           go test . ./mitm
           go test -tags=with_low_memory . ./mitm
           go vet . ./mitm
+
+      - name: Verify background editor and imported subscriptions
+        run: |
+          dart format lib/bootstrap.dart lib/common/constant.dart lib/common/preferences.dart lib/pages/editor.dart lib/providers/actions/setup.dart lib/providers/actions/theme.dart lib/providers/app.dart lib/providers/state/custom_import.dart lib/views/profiles/edit.dart test/common/preferences_test.dart test/manager/theme_manager_test.dart test/pages/editor_load_test.dart test/providers/custom_import_test.dart test/providers/setup_action_test.dart
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib/bootstrap.dart lib/common/preferences.dart lib/pages/editor.dart lib/providers/actions/theme.dart lib/providers/app.dart lib/providers/state/custom_import.dart lib/views/profiles/edit.dart
+          flutter test test/common/preferences_test.dart test/manager/theme_manager_test.dart test/pages/editor_load_test.dart test/providers/custom_import_test.dart test/providers/setup_action_test.dart
 
       - name: Verify modules and MITM execution
         run: |
@@ -122,6 +129,19 @@ jobs:
             lib/common/vpn_diagnostics.dart
             lib/common/vpn_log_export.dart
             lib/providers/app.dart
+            lib/bootstrap.dart
+            lib/common/constant.dart
+            lib/common/preferences.dart
+            lib/pages/editor.dart
+            lib/providers/actions/setup.dart
+            lib/providers/actions/theme.dart
+            lib/providers/state/custom_import.dart
+            lib/views/profiles/edit.dart
+            test/common/preferences_test.dart
+            test/manager/theme_manager_test.dart
+            test/pages/editor_load_test.dart
+            test/providers/custom_import_test.dart
+            test/providers/setup_action_test.dart
             test/common/vpn_log_export_test.dart
             lib/common/mitm_module_audit.dart
             lib/views/diagnostics/

@@ -584,6 +584,8 @@ class SetupAction extends _$SetupAction {
   }) async {
     final usedProxyProviders = <String>{
       for (final proxyGroup in proxyGroups) ...?proxyGroup.use,
+      if (proxyGroups.any((group) => group.includeAllProviders == true))
+        ...setupState.overrides.proxyProviders.keys,
     };
     final usedRuleProviders = <String>{
       for (final rule in rules) ...rule.ruleSets,

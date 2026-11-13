@@ -456,7 +456,16 @@ ProxyGroup _importGroup(
     'name': name,
     if (group.containsKey('proxies'))
       'proxies': _renamedList(group['proxies'], names),
-    if (group.containsKey('use')) 'use': _renamedList(group['use'], use),
+    if (group.containsKey('use') ||
+        (use.isNotEmpty &&
+            (group['include-all'] == true ||
+                group['include-all-providers'] == true)))
+      'use': {
+        ..._renamedList(group['use'], use),
+        if (group['include-all'] == true ||
+            group['include-all-providers'] == true)
+          ...use.values,
+      }.toList(),
     if (group.containsKey('use-position'))
       'use-position': usePositionOf(group['use-position'], use),
     if (group['default-selected'] case final Object selected)

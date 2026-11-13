@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
@@ -38,6 +39,31 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
   final _fileInfoNotifier = ValueNotifier<FileInfo?>(null);
   late SetupAction _setupAction;
   Uint8List? _fileData;
+  Future<void> _draftWrite = Future.value();
+  int _draftRevision = 0;
+
+  Future<File> get _draftFile async =>
+      File('${await appPath.getProfilePath(widget.profile.id.toString())}.draft');
+
+  Future<void> _writeDraft(EditorContent? content) async {
+    final revision = ++_draftRevision;
+    final data = await content?.readBytes();
+    if (revision != _draftRevision) return;
+    _draftWrite = _draftWrite.then((_) async {
+      final file = await _draftFile;
+      if (data == null) {
+        if (await file.exists()) await file.delete();
+      } else {
+        final temporary = File('${file.path}.tmp');
+        await temporary.parent.create(recursive: true);
+        await temporary.writeAsBytes(data, flush: true);
+        await temporary.rename(file.path);
+      }
+    }).catchError((Object error) {
+      commonPrint.log('profile draft write failed: ${compactError(error)}');
+    });
+    await _draftWrite;
+  }
 
   @override
   void initState() {
@@ -175,6 +201,8 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
       );
     }
     if (mounted) {
+      if (_fileData != null) await _writeDraft(null);
+      if (!mounted) return;
       Navigator.of(context).pop();
     }
   }
@@ -211,9 +239,20 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
     final title = widget.profile.label.takeFirstValid([
       widget.profile.id.toString(),
     ]);
-    final editedData = _editedData;
+    final draft = await _draftFile;
+    await _draftWrite;
+    final original = await widget.profile.file;
+    if (await draft.exists() && await original.exists() &&
+        (await original.lastModified()).isAfter(await draft.lastModified())) {
+      await _writeDraft(null);
+    }
+    final editedData = _editedData ??
+        (await draft.exists() ? await draft.readAsBytes() : null);
+    if (!mounted) return;
     final editorPage = EditorPage(
       title: title,
+      initiallyDirty: editedData != null,
+      onDraft: _writeDraft,
       load: () async => editedData != null
           ? CodeForgeDocument.fromUtf8(editedData)
           : openEditorFile(
@@ -221,6 +260,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
             ),
       onSave: (context, _, content) async {
         final data = await content.readBytes();
+        await _writeDraft(content);
         if (context.mounted) {
           await _handleSaveEdit(context, data);
         }
@@ -231,9 +271,11 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
           message: TextSpan(text: context.appLocalizations.hasCacheChange),
         );
         if (res != true || !context.mounted) {
+          if (context.mounted) await _writeDraft(null);
           return true;
         }
         final data = await content.readBytes();
+        await _writeDraft(content);
         if (context.mounted) {
           unawaited(_handleSaveEdit(context, data));
         }

@@ -118,6 +118,8 @@ class EditorPage extends ConsumerStatefulWidget {
   )?
   onPop;
   final bool? readOnly;
+  final bool initiallyDirty;
+  final Future<void> Function(EditorContent? content)? onDraft;
   final EditorSchema schema;
 
   const EditorPage({
@@ -130,6 +132,8 @@ class EditorPage extends ConsumerStatefulWidget {
     this.onSave,
     this.onPop,
     this.readOnly,
+    this.initiallyDirty = false,
+    this.onDraft,
     this.language = Language.yaml,
     this.schema = EditorSchema.config,
   }) : assert(content == null || load == null);
@@ -139,7 +143,8 @@ class EditorPage extends ConsumerStatefulWidget {
 }
 
 class _EditorPageState extends ConsumerState<EditorPage>
-    with RouteSettledMixin<EditorPage> {
+    with RouteSettledMixin<EditorPage>, WidgetsBindingObserver {
+  Timer? _draftTimer;
   final _editorKey = GlobalKey<EditorViewState>();
   late UndoRedoController _undoController;
   late TextEditingController _titleController;
@@ -175,12 +180,15 @@ class _EditorPageState extends ConsumerState<EditorPage>
   bool get _isDirty {
     final controller = _editor?.controller;
     return controller != null &&
-        (controller.isModified || _titleController.text != widget.title);
+        (widget.initiallyDirty ||
+            controller.isModified ||
+            _titleController.text != widget.title);
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     readOnly = widget.readOnly ?? widget.onSave == null;
     _undoController = UndoRedoController()..addListener(_syncBarState);
     _titleController = TextEditingController(text: widget.title)
@@ -221,6 +229,29 @@ class _EditorPageState extends ConsumerState<EditorPage>
     final next = _currentBarState;
     if (next != _barState) {
       setState(() => _barState = next);
+    }
+    if (widget.onDraft != null && !readOnly && _editor?.controller != null) {
+      _draftTimer?.cancel();
+      _draftTimer = Timer(const Duration(milliseconds: 600), _saveDraft);
+    }
+  }
+
+  Future<void> _saveDraft() async {
+    _draftTimer?.cancel();
+    final controller = _editor?.controller;
+    if (controller == null) return;
+    try {
+      await widget.onDraft?.call(_isDirty ? _EditedContent(controller) : null);
+    } catch (error) {
+      commonPrint.log('editor draft save failed: ${compactError(error)}');
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      unawaited(_saveDraft());
     }
   }
 
@@ -297,6 +328,8 @@ class _EditorPageState extends ConsumerState<EditorPage>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _draftTimer?.cancel();
     _undoController.dispose();
     _titleController.dispose();
     _document?.dispose();

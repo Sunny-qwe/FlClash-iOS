@@ -4,6 +4,7 @@ import 'package:fl_clash/common/boot_record.dart';
 import 'package:fl_clash/common/constant.dart';
 import 'package:fl_clash/common/preferences.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,6 +30,13 @@ void main() {
   });
 
   group('applied config md5', () {
+    test('last page survives reload and unknown labels fall back safely', () async {
+      await preferences.saveLastPage(PageLabel.profiles);
+      await preferences.rebind();
+      expect(await preferences.getLastPage(), PageLabel.profiles);
+      await store.setString('last-page', 'removed-page');
+      expect(await preferences.getLastPage(), PageLabel.dashboard);
+    });
     test('round-trips a written md5 and forgets a cleared one', () async {
       expect(await preferences.getAppliedConfigMd5(), isNull);
 

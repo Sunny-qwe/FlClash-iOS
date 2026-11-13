@@ -41,6 +41,18 @@ class Preferences {
     return preferences?.getInt('version') ?? 0;
   }
 
+  Future<PageLabel> getLastPage() async {
+    final store = await _store.value;
+    final name = store?.getString('last-page');
+    return PageLabel.values.where((page) => page.name == name).firstOrNull ??
+        PageLabel.dashboard;
+  }
+
+  Future<void> saveLastPage(PageLabel page) async {
+    final store = await _store.value;
+    await store?.setString('last-page', page.name);
+  }
+
   Future<void> setVersion(int version) async {
     final preferences = await _store.value;
     await preferences?.setInt('version', version);

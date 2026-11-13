@@ -63,6 +63,20 @@ Matcher _issue(CustomImportIssue issue, {String? item}) =>
 
 void main() {
   group('proxy providers', () {
+    test('include-all binds declared subscriptions after source renaming', () {
+      final config = _read('''
+proxy-providers:
+  sub: {type: http, url: https://example.com/sub}
+  extra: {type: http, url: https://example.com/extra}
+proxy-groups:
+  - {name: Auto, type: url-test, include-all: true}
+  - {name: HK, type: select, include-all-providers: true, filter: HK}
+''', _app(profiles: {'https://example.com/sub': 'Existing'}));
+      expect(config.proxyGroups[0].use, ['Existing', 'extra']);
+      expect(config.proxyGroups[1].use, ['Existing', 'extra']);
+      expect(config.proxyGroups[1].filter, 'HK');
+    });
+
     test('uses a provider the app already has under its label', () {
       final config = _read('''
 proxy-providers:

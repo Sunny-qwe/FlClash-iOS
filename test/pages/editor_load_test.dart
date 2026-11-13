@@ -19,6 +19,33 @@ import '../plugins/code_forge/support.dart';
 void main() {
   setUpAll(initEditorNative);
 
+  testWidgets('background keeps the editor open and writes the current draft', (
+    tester,
+  ) async {
+    final drafts = <String?>[];
+    await tester.pumpWidget(TestApp(
+      overrides: [
+        viewSizeProvider.overrideWithBuild((_, _) => const Size(1200, 1000)),
+      ],
+      child: EditorPage(
+        title: 'Draft',
+        content: 'mode: rule',
+        onSave: (_, _, _) {},
+        onDraft: (content) async => drafts.add(await content?.readText()),
+      ),
+    ));
+    await settle(tester);
+    final controller = tester.widget<CodeForge>(find.byType(CodeForge)).controller;
+    controller.replaceRange(6, 10, 'global');
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 40)); });
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    expect(drafts, contains('mode: global'));
+    expect(find.byType(EditorPage), findsOneWidget);
+    expect(controller.text, 'mode: global');
+  });
+
   testWidgets('mounts the editor only once loaded content arrives', (
     tester,
   ) async {

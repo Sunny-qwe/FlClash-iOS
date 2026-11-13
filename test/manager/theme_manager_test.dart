@@ -1,12 +1,23 @@
 import 'package:fl_clash/manager/theme_manager.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/config.dart';
+import 'package:fl_clash/providers/action.dart';
+import 'package:fl_clash/providers/app.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:prism_ui/prism_ui.dart';
 
 void main() {
+  testWidgets('a transient empty viewport preserves the last page size', (tester) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    container.listen(viewSizeProvider, (_, _) {});
+    container.read(viewSizeProvider.notifier).value = const Size(390, 844);
+    container.read(themeActionProvider.notifier).updateViewSize(Size.zero);
+    await tester.pump();
+    expect(container.read(viewSizeProvider), const Size(390, 844));
+  });
   testWidgets('a theme setting the theme does not read keeps the same theme', (
     tester,
   ) async {

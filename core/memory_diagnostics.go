@@ -19,6 +19,7 @@ func GetMemoryDiagnostics() string {
 		"runtime-other-bytes":      stats.MSpanInuse + stats.MCacheInuse + stats.BuckHashSys + stats.GCSys + stats.OtherSys,
 		"gc-cycles":                stats.NumGC,
 		"goroutines":               runtime.NumGoroutine(),
+		"active-node-probes":       len(backgroundProbeSlots),
 		"mitm":                     mitm.DiagnosticActivity(),
 		"events":                   diagnostics.Snapshot(),
 	})
