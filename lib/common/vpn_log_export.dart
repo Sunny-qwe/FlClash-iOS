@@ -10,7 +10,13 @@ Future<void> writeVpnDiagnosticArchive({
   final encoder = ZipFileEncoder()..create(archivePath);
   try {
     await encoder.addFile(File(logPath), 'FlClash.log');
-    for (final name in ['vpn-memory.json', 'vpn-memory.json.previous', 'vpn-startup.json', 'core-crash.log', 'core-crash.log.previous']) {
+    for (final name in [
+      'vpn-memory.json',
+      'vpn-memory.json.previous',
+      'vpn-startup.json',
+      'core-crash.log',
+      'core-crash.log.previous',
+    ]) {
       final file = File('$home/$name');
       try {
         if (await file.exists() && await file.length() <= (256 << 10)) {
