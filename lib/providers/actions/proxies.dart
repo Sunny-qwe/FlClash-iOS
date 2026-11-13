@@ -149,7 +149,8 @@ class ProxiesAction extends _$ProxiesAction {
             );
           } catch (e) {
             if (e is TimeoutException ||
-                e is CoreMethodException && e.isCoreUnavailable) rethrow;
+                e is CoreMethodException && e.isCoreUnavailable)
+              rethrow;
             commonPrint.log(
               'updateGroups error: $e',
               logLevel: coreFailureLogLevel(e),
