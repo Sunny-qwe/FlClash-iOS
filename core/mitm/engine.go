@@ -121,6 +121,13 @@ func newEngine(home string, cfg Config, dial DialFunc, logger func(string), prev
 		}
 	}
 	e.transport = &http.Transport{DialContext: dial, Proxy: nil, TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS12, InsecureSkipVerify: cfg.SkipVerify}, DisableCompression: false, MaxIdleConns: 8, MaxIdleConnsPerHost: 2, MaxConnsPerHost: 8, IdleConnTimeout: 30 * time.Second, TLSHandshakeTimeout: 10 * time.Second, ResponseHeaderTimeout: 20 * time.Second, MaxResponseHeaderBytes: 128 << 10, ForceAttemptHTTP2: cfg.H2}
+	if features.WithLowMemory {
+		e.transport.HTTP2 = &http.HTTP2Config{
+			MaxReceiveBufferPerConnection: 256 << 10,
+			MaxReceiveBufferPerStream:     64 << 10,
+			MaxReadFrameSize:              16 << 10,
+		}
+	}
 	if cfg.H2 {
 		if err := http2.ConfigureTransport(e.transport); err != nil {
 			return nil, err
@@ -240,8 +247,8 @@ func (e *Engine) Serve(conn net.Conn, host string, port uint16, id string) (hand
 		_ = tlsConn.SetDeadline(time.Time{})
 		conn = tlsConn
 		if tlsConn.ConnectionState().NegotiatedProtocol == "h2" {
-			server := &http2.Server{MaxConcurrentStreams: 4, IdleTimeout: 30 * time.Second, MaxReadFrameSize: 16 << 10}
-			server.ServeConn(conn, &http2.ServeConnOpts{Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { e.serveHTTP(w, r, host, port, id) })})
+			server := newHTTP2Server()
+			server.ServeConn(conn, &http2.ServeConnOpts{BaseConfig: &http.Server{MaxHeaderBytes: 128 << 10}, Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { e.serveHTTP(w, r, host, port, id) })})
 			return true
 		}
 	}
@@ -251,6 +258,15 @@ func (e *Engine) Serve(conn net.Conn, host string, port uint16, id string) (hand
 	_ = server.Serve(listener)
 	<-listener.done
 	return true
+}
+
+func newHTTP2Server() *http2.Server {
+	server := &http2.Server{MaxConcurrentStreams: 4, IdleTimeout: 30 * time.Second, MaxReadFrameSize: 16 << 10}
+	if features.WithLowMemory {
+		server.MaxUploadBufferPerConnection = 256 << 10
+		server.MaxUploadBufferPerStream = 64 << 10
+	}
+	return server
 }
 
 type singleListener struct {

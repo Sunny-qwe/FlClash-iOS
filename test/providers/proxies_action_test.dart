@@ -111,6 +111,36 @@ void main() {
   }
 
   group('updateGroups', () {
+    test('coalesces concurrent refreshes into one core request', () async {
+      final response = Completer<ProxiesData>();
+      when(core.getProxies).thenAnswer((_) => response.future);
+      final container = buildContainer();
+      final action = actionOf(container);
+      final first = action.updateGroups();
+      final second = action.updateGroups();
+      response.complete(ProxiesData(
+        all: const ['Proxy'],
+        proxies: {
+          'Proxy': {'name': 'Proxy', 'type': 'Selector', 'all': ['HK-01'], 'now': 'HK-01'},
+          'HK-01': {'name': 'HK-01', 'type': 'ss'},
+        },
+      ));
+      await Future.wait([first, second]);
+      verify(core.getProxies).called(1);
+      expect(container.read(groupsProvider).single.name, 'Proxy');
+    });
+
+    test('keeps cached nodes and stops retrying a disconnected core', () async {
+      when(core.getProxies).thenThrow(const CoreMethodException(
+        code: 'core_unavailable', message: 'VPN stopped',
+      ));
+      final container = buildContainer();
+      container.read(groupsProvider.notifier).value = [_group('Cached', const [])];
+      await actionOf(container).updateGroups();
+      verify(core.getProxies).called(1);
+      expect(container.read(groupsProvider).single.name, 'Cached');
+    });
+
     test('publishes the groups derived from core proxy data', () async {
       when(core.getProxies).thenAnswer(
         (_) async => ProxiesData(

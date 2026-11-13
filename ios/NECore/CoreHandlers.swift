@@ -9,7 +9,7 @@ final class CoreResultHandler: NSObject, MobileResultHandlerProtocol {
   }
 
   func onResult(_ data: Data?) throws {
-    handler(data ?? Data())
+    autoreleasepool { handler(data ?? Data()) }
   }
 }
 

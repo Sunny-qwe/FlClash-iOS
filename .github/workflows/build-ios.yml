@@ -54,7 +54,7 @@ jobs:
         env:
           CGO_ENABLED: '0'
         run: |
-          test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go mitm/engine.go mitm/body_budget_test.go)"
+          test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go mitm/engine.go mitm/body_budget_test.go mitm/http2_memory_test.go)"
           go test . ./mitm
           go test -tags=with_low_memory . ./mitm
           go vet . ./mitm
@@ -98,7 +98,7 @@ jobs:
           flutter analyze --no-fatal-infos --no-fatal-warnings lib/common/path.dart lib/core/controller.dart lib/providers/actions/setup.dart lib/manager/core_manager.dart lib/plugins/service.dart lib/views/config/app_icon.dart lib/views/dashboard/widgets/current_outbound.dart
           flutter test test/common/path_test.dart test/core/controller_test.dart test/views/dashboard/current_outbound_test.dart test/views/dashboard/status_reference_test.dart
           flutter test test/setup_test.dart --plain-name 'iOS'
-          dart format lib/providers/actions/proxies.dart lib/providers/outbound_ip.dart lib/providers/routed_probe.dart lib/views/config/local_network.dart lib/views/tools.dart lib/views/dashboard/widgets/network_takeover.dart test/providers/outbound_ip_test.dart test/views/local_network_test.dart
+          dart format lib/providers/actions/proxies.dart lib/providers/outbound_ip.dart lib/providers/routed_probe.dart lib/views/config/local_network.dart lib/views/tools.dart lib/views/dashboard/widgets/network_takeover.dart test/providers/outbound_ip_test.dart test/providers/proxies_action_test.dart test/views/local_network_test.dart
           flutter analyze --no-fatal-infos --no-fatal-warnings lib/providers/actions/proxies.dart lib/providers/outbound_ip.dart lib/providers/routed_probe.dart lib/views/config/local_network.dart lib/views/tools.dart lib/views/dashboard/widgets/network_takeover.dart
           flutter test test/providers/routed_probe_test.dart test/providers/outbound_ip_test.dart test/providers/proxies_action_test.dart test/providers/setup_action_test.dart test/manager/core_manager_test.dart test/views/local_network_test.dart test/l10n test/lint/dynamic_message_key_test.dart
 
@@ -146,6 +146,9 @@ jobs:
             lib/views/tools.dart
             lib/views/dashboard/widgets/network_takeover.dart
             test/providers/outbound_ip_test.dart
+            test/providers/proxies_action_test.dart
+            lib/views/dashboard/widgets/current_outbound.dart
+            test/views/dashboard/status_reference_test.dart
             test/views/local_network_test.dart
 
       - name: Analyze complete Flutter project
@@ -168,7 +171,7 @@ jobs:
         with:
           name: dashboard-reference-render
           path: |
-            build/verification/status-card.png
+            build/verification/status-card*.png
             build/verification/diagnostics/
             build/verification/ios-bundle.json
           if-no-files-found: warn

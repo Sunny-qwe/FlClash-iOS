@@ -46,16 +46,20 @@ void main() {
     }
   });
 
-  testWidgets('reference status card preserves the bottom wave cutouts', (tester) async {
+  for (final brightness in Brightness.values) {
+  for (final running in [false, true]) {
+  testWidgets('reference status card preserves the wave: $brightness running=$running', (tester) async {
     final capture = GlobalKey();
     await tester.pumpWidget(TestApp(
       locale: const Locale('zh', 'CN'),
-      theme: ThemeData(fontFamily: 'ReferenceFont'),
+      theme: ThemeData(fontFamily: 'ReferenceFont', brightness: brightness),
+      darkTheme: ThemeData(fontFamily: 'ReferenceFont', brightness: brightness),
+      themeMode: brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light,
       overrides: [
         profilesProvider.overrideWithValue(const [
           Profile(id: 1, autoUpdateDuration: Duration.zero),
         ]),
-        runTimeProvider.overrideWithBuild((_, _) => null),
+        runTimeProvider.overrideWithBuild((_, _) => running ? 1 : null),
         suspendProvider.overrideWithValue(false),
         rootAccessProvider.overrideWith((_) async => false),
         outboundIpProbeProvider.overrideWith(_StoppedIps.new),
@@ -94,17 +98,24 @@ void main() {
     expect(alpha(0.85, 0.98), 0);
     expect(alpha(0.7, 0.94), 0);
     expect(alpha(0.4, 0.5), 0);
+    if (running) {
+      final offset = ((0.5 * 301).round() * 589 + (0.9 * 588).round()) * 4;
+      expect([for (var i = 0; i < 4; i++) pixels.getUint8(offset + i)], [228, 235, 251, 255]);
+    }
     mask.dispose();
     picture.dispose();
       final boundary = capture.currentContext!.findRenderObject()! as RenderRepaintBoundary;
       expect(boundary.size.height, lessThan(220));
       final image = await boundary.toImage(pixelRatio: 589 / 356);
       final bytes = (await image.toByteData(format: ui.ImageByteFormat.png))!;
-      final output = File('build/verification/status-card.png');
+      final suffix = running ? '-running-${brightness.name}' : '-${brightness.name}';
+      final output = File('build/verification/status-card$suffix.png');
       await output.parent.create(recursive: true);
       await output.writeAsBytes(bytes.buffer.asUint8List());
       image.dispose();
     });
     await tester.pumpWidget(const SizedBox.shrink());
   });
+  }
+  }
 }

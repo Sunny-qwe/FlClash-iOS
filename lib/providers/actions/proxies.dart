@@ -41,6 +41,8 @@ class ProxiesAction extends _$ProxiesAction {
 
   final Map<String, String> _pendingSelectedRollback = {};
 
+  Future<void>? _groupsRefresh;
+
   @override
   void build() {
     ref.onDispose(() => _delayFlushTimer?.cancel());
@@ -113,6 +115,18 @@ class ProxiesAction extends _$ProxiesAction {
   }
 
   Future<void> updateGroups() async {
+    final pending = _groupsRefresh;
+    if (pending != null) return pending;
+    final refresh = _updateGroups();
+    _groupsRefresh = refresh;
+    try {
+      await refresh;
+    } finally {
+      _groupsRefresh = null;
+    }
+  }
+
+  Future<void> _updateGroups() async {
     try {
       ref.read(groupsProvider.notifier).value = await retry(
         task: () async {
@@ -134,6 +148,7 @@ class ProxiesAction extends _$ProxiesAction {
               defaultTestUrl: testUrl,
             );
           } catch (e) {
+            if (e is CoreMethodException && e.isCoreUnavailable) rethrow;
             commonPrint.log(
               'updateGroups error: $e',
               logLevel: coreFailureLogLevel(e),
