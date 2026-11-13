@@ -7,6 +7,7 @@ import 'package:fl_clash/state.dart';
 import 'package:fl_clash/ui/icons/icons.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'custom/custom.dart';
@@ -59,18 +60,18 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
     }
   }
 
-  Set<int> _selectedGroups(List<ProxyGroup> groups) =>
-      (_groupIds ??
-              groups
-                  .where(
-                    (g) =>
-                        g.includeAllProviders == true ||
-                        g.includeAllProxies == true ||
-                        (g.use?.isNotEmpty ?? false),
-                  )
-                  .map((g) => g.id)
-                  .toSet())
-          .intersection(groups.map((g) => g.id).toSet());
+  Set<int> _selectedGroups(List<ProxyGroup> groups) {
+    final defaults = {
+      for (final group in groups)
+        if (group.includeAllProviders == true ||
+            group.includeAllProxies == true ||
+            (group.use?.isNotEmpty ?? false)) group.id,
+    };
+    return (_groupIds ?? (defaults.isNotEmpty ? defaults : {
+      for (final group in groups)
+        if (group.type == GroupType.Selector || group.type == GroupType.URLTest) group.id,
+    })).intersection(groups.map((group) => group.id).toSet());
+  }
 
   Future<Set<int>?> _choose(
     String title,
@@ -157,17 +158,18 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
         for (final node in before) (id: node.id, label: node.name),
       ]);
     } else {
-      final previous = before.map((node) => node.id).toSet();
-      await BaseNavigator.push(context, const CustomProxiesView());
+      final saved = await showCustomProxyEditor(context);
       if (!mounted) return;
-      ids = ref
-          .read(customProxiesProvider)
-          .value!
-          .where((node) => !previous.contains(node.id))
-          .map((node) => node.id)
-          .toSet();
+      ids = saved == null ? null : {saved.id};
     }
     if (ids != null && ids.isNotEmpty) await _attach(nodes: ids);
+  }
+
+  Future<void> _clipboard() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final actions = ref.read(nodeSourcesActionProvider.notifier);
+    final ids = await actions.importShareLinks(data?.text ?? '');
+    if (mounted) await _attach(nodes: ids);
   }
 
   @override
@@ -217,8 +219,8 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
           (p) => p.type != ProfileType.custom && uses.contains(p.realLabel),
         )
         .toList();
-    final manual =
-        nodes?.where((node) => named.contains(node.name)).length ?? 0;
+    final manualNodes = nodes?.where((node) => named.contains(node.name)).toList() ?? <CustomProxy>[];
+    final manual = manualNodes.length;
     final canAdd = !_busy && selected.isNotEmpty;
     return Scaffold(
       title: l.nodeSourcesTitle,
@@ -295,6 +297,10 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
                           onTap: canAdd ? () => _run(() => _manual()) : null,
                         ),
                         ListItem(
+                          title: Text(l.clipboardImport),
+                          onTap: canAdd ? () => _run(_clipboard) : null,
+                        ),
+                        ListItem(
                           title: Text(l.nodeSourcesExistingNodes),
                           subtitle: Text('$manual'),
                           onTap: canAdd
@@ -312,14 +318,33 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
                                           )
                                           .value =
                                       id;
-                                  await ref
+                                  final applied = await ref
                                       .read(setupActionProvider.notifier)
                                       .applyProfile(force: true);
+                                  if (!applied) throw MessageException(l.profileApplyFailed);
                                 }),
                         ),
                       ],
                     ),
                   ],
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + context.bottomInset),
+              sliver: SliverPrismList(
+                itemCount: manualNodes.length,
+                itemBuilder: (_, index) => ListItem(
+                  title: Text(manualNodes[index].name),
+                  subtitle: Text(manualNodes[index].type),
+                  trailing: const GlyphIcon(AppGlyphs.chevronForward),
+                  onTap: _busy ? null : () => _run(() async {
+                    final node = manualNodes[index];
+                    final saved = await showCustomProxyEditor(context, proxy: node);
+                    if (saved != null) {
+                      await ref.read(clashProvidersActionProvider.notifier).applyIfProxiesNamed({node.name, saved.name});
+                    }
+                  }),
                 ),
               ),
             ),

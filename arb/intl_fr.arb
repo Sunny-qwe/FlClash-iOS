@@ -1,4 +1,6 @@
 {
+  "subscriptionNoNodes": "Cet abonnement ne contient aucun nœud utilisable directement. Ajoutez un abonnement de nœuds ou importez sa configuration complète.",
+  "profileApplyFailed": "La configuration n’a pas pu être appliquée. Consultez les journaux ; la connexion existante est conservée si possible.",
   "nodeSourcesManualGroup": "Sélection manuelle",
   "nodeSourcesAutoGroup": "Latence automatique",
   "nodeSourcesTitle": "Nœuds et abonnements",

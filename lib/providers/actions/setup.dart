@@ -77,7 +77,6 @@ class SetupAction extends _$SetupAction {
     ref.read(proxiesActionProvider.notifier).cancelDelayTests();
     ref.read(delayDataSourceProvider.notifier).value = {};
     final setupResult = applyProfile(force: true);
-    ref.read(logsProvider.notifier).value = FixedList(maxLogsLength);
     ref.read(requestsProvider.notifier).value = FixedList(maxRequestsLength);
     ref.read(dnsQueriesProvider.notifier).value = FixedList(
       maxDnsQueriesLength,
@@ -606,7 +605,7 @@ class SetupAction extends _$SetupAction {
       }
       proxies[entry.key] = {
         'type': 'file',
-        'path': await appPath.getProfilePath(entry.value.toString()),
+        'path': await _core.prepareProxyProvider(entry.value),
         ...?options[entry.key]?.definition,
       };
     }

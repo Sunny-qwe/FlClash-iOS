@@ -99,6 +99,10 @@ func SetMitmPressure(level int32) {
 	core.SetMitmPressure(level)
 }
 
+func ReportMemoryFootprint(bytes int64) {
+	core.ReportMemoryFootprint(bytes)
+}
+
 func UpdateDns(value string) {
 	core.UpdateDns(value)
 }

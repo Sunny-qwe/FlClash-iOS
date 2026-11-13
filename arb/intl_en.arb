@@ -1,4 +1,6 @@
 {
+  "subscriptionNoNodes": "This subscription contains no directly usable nodes. Add a node subscription, or import its full configuration instead.",
+  "profileApplyFailed": "The configuration could not be applied. Open Logs to see the reason; the existing connection has been preserved when possible.",
   "nodeSourcesManualGroup": "Manual selection",
   "nodeSourcesAutoGroup": "Automatic latency",
   "nodeSourcesTitle": "Nodes & subscriptions",

@@ -67,6 +67,8 @@ class _Writes {
   final void Function() _reread;
   var _pending = 0;
   var _missed = false;
+  Completer<void>? _idle;
+  (Object, StackTrace)? _failure;
 
   _Writes(this._reread);
 
@@ -78,15 +80,32 @@ class _Writes {
   }
 
   Future<void> track(Future<void> Function() write) async {
+    if (idle) {
+      _idle = Completer<void>();
+      _failure = null;
+    }
     _pending++;
     try {
       await write();
+    } catch (error, stack) {
+      _failure = (error, stack);
+      rethrow;
     } finally {
       _pending--;
+      if (idle) _idle?.complete();
       if (idle && _missed) {
         _missed = false;
         _reread();
       }
+    }
+  }
+
+  Future<void> flush() async {
+    while (!idle) {
+      await _idle!.future;
+    }
+    if (_failure case (final error, final stack)) {
+      Error.throwWithStackTrace(error, stack);
     }
   }
 }
@@ -94,6 +113,8 @@ class _Writes {
 mixin OptimisticMixin<T> on AsyncNotifierMixin<T> {
   late final _writes = _Writes(_reread);
   Future<T> Function()? _query;
+
+  Future<void> flushWrites() => _writes.flush();
 
   Stream<T> settled(Stream<T> rows, Future<T> Function() query) {
     _query = query;
@@ -140,6 +161,8 @@ Stream<Set<String>> customGroupNames(Ref ref) {
 @Riverpod(keepAlive: true)
 class Profiles extends _$Profiles {
   late final _writes = _Writes(_reread);
+
+  Future<void> flushWrites() => _writes.flush();
 
   @override
   List<Profile> build() {

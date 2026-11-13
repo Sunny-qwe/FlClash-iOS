@@ -1,4 +1,6 @@
 {
+  "subscriptionNoNodes": "此订阅没有可直接加载的节点。请添加包含节点的订阅，或将它作为完整配置导入。",
+  "profileApplyFailed": "配置未能生效，请打开日志查看原因；程序会尽可能保留原有连接。",
   "nodeSourcesManualGroup": "手动选择",
   "nodeSourcesAutoGroup": "自动测速",
   "nodeSourcesTitle": "节点与订阅",

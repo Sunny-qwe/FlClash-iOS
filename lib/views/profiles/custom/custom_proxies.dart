@@ -193,6 +193,22 @@ enum _OptionSection {
   };
 }
 
+Future<CustomProxy?> showCustomProxyEditor(BuildContext context, {CustomProxy? proxy}) async {
+  CustomProxy? saved;
+  await showNestedFormSheet<CustomProxy>(
+    context: context,
+    profileId: null,
+    overrides: [
+      customProxyProvider.overrideWithBuild(
+        (_, _) => proxy ?? const CustomProxy(id: -1, definition: {'name': '', 'type': 'ss'}),
+      ),
+    ],
+    currentOf: (ref) => ref.read(customProxyProvider),
+    formBuilder: (_) => _EditCustomProxyView(onSaved: (proxy) => saved = proxy),
+  );
+  return saved;
+}
+
 class CustomProxiesView extends ConsumerStatefulWidget {
   const CustomProxiesView({super.key});
 
@@ -791,6 +807,7 @@ Future<bool> _handleSaveCustomProxy(
   }
   final saved = proxy.id == -1 ? proxy.copyWith(id: snowflake.id) : proxy;
   ref.read(customProxiesProvider.notifier).put(saved);
+  await ref.read(customProxiesProvider.notifier).flushWrites();
   // The closing form would otherwise take its stored copy for another proxy
   // with its name.
   ref.read(customProxyProvider.notifier).value = saved;
@@ -798,7 +815,9 @@ Future<bool> _handleSaveCustomProxy(
 }
 
 class _EditCustomProxyView extends ConsumerStatefulWidget {
-  const _EditCustomProxyView();
+  const _EditCustomProxyView({this.onSaved});
+
+  final ValueChanged<CustomProxy>? onSaved;
 
   @override
   ConsumerState<_EditCustomProxyView> createState() =>
@@ -1452,6 +1471,7 @@ class _EditCustomProxyViewState extends ConsumerState<_EditCustomProxyView> {
       );
       if (!mounted) return;
       if (saved) {
+        widget.onSaved?.call(ref.read(customProxyProvider));
         context.safeNestedPop();
         return;
       }

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fl_clash/models/models.dart';
+
 String redactDiagnostic(String text) => text
     .replaceAll(
       RegExp(r'https?://[^\s<>"\x27]+', caseSensitive: false),
@@ -72,7 +74,7 @@ class VpnDiagnosticSnapshot {
 
 Future<Map<String, dynamic>> _readDiagnosticJson(File file) async {
   try {
-    if (!await file.exists() || await file.length() > 256 * 1024)
+    if (!await file.exists() || await file.length() > 1024 * 1024)
       return const {};
     final decoded = jsonDecode(await file.readAsString());
     return decoded is Map<String, dynamic> ? decoded : const {};
@@ -87,6 +89,31 @@ Future<VpnDiagnosticSnapshot> readVpnDiagnostics(String home) async {
   final memory = await _readDiagnosticJson(File('$home/vpn-memory.json'));
   final startup = await _readDiagnosticJson(File('$home/vpn-startup.json'));
   return VpnDiagnosticSnapshot.parse(memory, startup);
+}
+
+Future<List<Log>> readVpnDiagnosticLogs(String home) async {
+  final records = <Log>[];
+  for (final name in ['vpn-memory.json.previous', 'vpn-memory.json', 'vpn-startup.json']) {
+    final document = await _readDiagnosticJson(File('$home/$name'));
+    if (document.isEmpty) continue;
+    void add(Object? timestamp, Object? data) {
+      final date = timestamp is num && timestamp.isFinite && timestamp.abs() < 8640000000000
+          ? DateTime.fromMillisecondsSinceEpoch((timestamp * 1000).round()).toIso8601String()
+          : '';
+      records.add(Log(dateTime: date, payload: '[VPN][$name] ${redactDiagnostic(jsonEncode(data))}'));
+    }
+    add(null, {for (final key in ['id', 'pid', 'bundle-version', 'peak-footprint-bytes', 'stage', 'detail']) if (document.containsKey(key)) key: document[key]});
+    for (final key in ['samples', 'core-events', 'lifecycle-events']) {
+      final entries = document[key];
+      if (entries is! List) continue;
+      for (final entry in entries) {
+        if (entry is! Map) continue;
+        final millis = entry['timestamp-ms'];
+        add(entry['timestamp'] ?? (millis is num ? millis / 1000 : null), entry);
+      }
+    }
+  }
+  return records;
 }
 
 Future<Map<String, int>> inspectGeoResources(String home) async {

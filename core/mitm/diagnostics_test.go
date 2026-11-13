@@ -12,7 +12,8 @@ func TestDiagnosticActivityTracksProcessingAndRelease(t *testing.T) {
 		bodyBudget <- struct{}{}
 		defer func() { <-bodyBudget }()
 		active := DiagnosticActivity()
-		for name, count := range before {
+		for _, name := range []string{"active-sessions", "active-scripts", "active-bodies"} {
+			count := before[name]
 			if active[name] != count+1 {
 				t.Fatalf("%s count = %d, before = %d", name, active[name], count)
 			}

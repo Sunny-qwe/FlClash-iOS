@@ -2,8 +2,10 @@ package mitm
 
 func DiagnosticActivity() map[string]int {
 	return map[string]int{
-		"active-sessions": len(sessionBudget),
-		"active-scripts":  len(scriptBudget),
-		"active-bodies":   len(bodyBudget),
+		"active-sessions":        len(sessionBudget),
+		"active-scripts":         len(scriptBudget),
+		"active-bodies":          len(bodyBudget),
+		"session-limit":          cap(sessionBudget),
+		"memory-skipped-scripts": int(memorySkippedScripts.Load()),
 	}
 }

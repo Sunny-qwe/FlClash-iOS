@@ -1,4 +1,6 @@
 {
+  "subscriptionNoNodes": "このサブスクリプションには直接利用できるノードがありません。ノードのサブスクリプションを追加するか、完全な設定としてインポートしてください。",
+  "profileApplyFailed": "設定を適用できませんでした。ログで原因を確認してください。可能な場合は既存の接続を維持します。",
   "nodeSourcesManualGroup": "手動選択",
   "nodeSourcesAutoGroup": "自動測定",
   "nodeSourcesTitle": "ノードとサブスクリプション",

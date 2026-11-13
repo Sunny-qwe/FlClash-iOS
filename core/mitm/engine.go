@@ -24,7 +24,7 @@ import (
 
 type DialFunc func(context.Context, string, string) (net.Conn, error)
 
-var sessionBudget = make(chan struct{}, 16)
+var sessionBudget = make(chan struct{}, sessionConcurrency())
 var scriptBudget = make(chan struct{}, 1)
 var bodyBudget = make(chan struct{}, bodyConcurrency())
 
@@ -122,6 +122,8 @@ func newEngine(home string, cfg Config, dial DialFunc, logger func(string), prev
 	}
 	e.transport = &http.Transport{DialContext: dial, Proxy: nil, TLSClientConfig: &tls.Config{MinVersion: tls.VersionTLS12, InsecureSkipVerify: cfg.SkipVerify}, DisableCompression: false, MaxIdleConns: 8, MaxIdleConnsPerHost: 2, MaxConnsPerHost: 8, IdleConnTimeout: 30 * time.Second, TLSHandshakeTimeout: 10 * time.Second, ResponseHeaderTimeout: 20 * time.Second, MaxResponseHeaderBytes: 128 << 10, ForceAttemptHTTP2: cfg.H2}
 	if features.WithLowMemory {
+		e.transport.MaxIdleConns = 2
+		e.transport.MaxIdleConnsPerHost = 1
 		e.transport.HTTP2 = &http.HTTP2Config{
 			MaxReceiveBufferPerConnection: 256 << 10,
 			MaxReceiveBufferPerStream:     64 << 10,

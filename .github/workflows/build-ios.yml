@@ -65,6 +65,9 @@ jobs:
 
       - name: Verify visual node and subscription management
         run: |
+          dart format lib/providers/database.dart lib/core/controller.dart lib/views/profiles/custom/custom_proxies.dart lib/views/profiles/add.dart lib/views/logs.dart test/providers/database_test.dart test/core/proxy_provider_preparation_test.dart
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib/providers/database.dart lib/core/controller.dart lib/views/profiles/custom/custom_proxies.dart lib/views/logs.dart test/core/proxy_provider_preparation_test.dart
+          flutter test test/core/proxy_provider_preparation_test.dart test/providers/database_test.dart test/features/custom_profile_views_test.dart
           dart format lib/providers/actions/node_sources.dart lib/views/profiles/node_sources.dart lib/views/profiles/visual.dart lib/views/profiles/profiles.dart lib/views/profiles/custom/custom.dart test/providers/node_sources_action_test.dart test/views/node_sources_test.dart
           flutter analyze --no-fatal-infos --no-fatal-warnings lib/providers/actions/node_sources.dart lib/views/profiles/node_sources.dart test/providers/node_sources_action_test.dart test/views/node_sources_test.dart
           flutter test test/providers/node_sources_action_test.dart test/views/node_sources_test.dart test/l10n test/lint/dynamic_message_key_test.dart test/lint/design_package_test.dart test/lint/prism_list_test.dart
@@ -128,6 +131,12 @@ jobs:
         with:
           name: verified-generated-sources
           path: |
+            lib/providers/database.dart
+            lib/views/profiles/custom/custom_proxies.dart
+            lib/views/logs.dart
+            lib/views/profiles/add.dart
+            test/providers/database_test.dart
+            test/core/proxy_provider_preparation_test.dart
             lib/l10n/
             lib/providers/actions/node_sources.dart
             lib/views/profiles/node_sources.dart

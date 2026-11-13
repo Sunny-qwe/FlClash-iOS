@@ -13,6 +13,7 @@ final class TunnelMemoryMonitor {
   private var profilePolicy = TunnelMemoryProfilePolicy()
   private var peak: UInt64 = 0
   private var reclaimPolicy = TunnelMemoryReclaimPolicy()
+  private var lastSample = Date.distantPast
 
   func start(directory: URL?, id: String) {
     queue.async {
@@ -32,8 +33,9 @@ final class TunnelMemoryMonitor {
       self.peak = 0
       self.reclaimPolicy = TunnelMemoryReclaimPolicy()
       self.profilePolicy = TunnelMemoryProfilePolicy()
+      self.lastSample = .distantPast
       let timer = DispatchSource.makeTimerSource(queue: self.queue)
-      timer.schedule(deadline: .now(), repeating: .seconds(1), leeway: .milliseconds(100))
+      timer.schedule(deadline: .now(), repeating: .milliseconds(250), leeway: .milliseconds(25))
       timer.setEventHandler { [weak self] in
         autoreleasepool { self?.sample(directory: directory, id: id) }
       }
@@ -77,6 +79,13 @@ final class TunnelMemoryMonitor {
     let footprint = info.phys_footprint
     peak = max(peak, footprint)
     let reclaim = reclaimPolicy.shouldReclaim(footprint: footprint, now: now)
+    MobileReportMemoryFootprint(Int64(footprint))
+    if reclaim {
+      MobileSetMitmPressure(1)
+      MobileForceGC()
+    }
+    guard now.timeIntervalSince(lastSample) >= 1 else { return }
+    lastSample = now
     var core = MobileGetMemoryDiagnostics()
       .data(using: .utf8)
       .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] } ?? [:]
@@ -84,6 +93,7 @@ final class TunnelMemoryMonitor {
     samples.append([
       "timestamp": now.timeIntervalSince1970, "stage": stage,
       "footprint-bytes": footprint, "reclaim-requested": reclaim,
+      "resident-bytes": info.resident_size, "compressed-bytes": info.compressed,
       "core": core,
     ])
     if samples.count > 60 { samples.removeFirst() }
@@ -99,10 +109,6 @@ final class TunnelMemoryMonitor {
     if let directory, let kind = profilePolicy.next(footprint: footprint, stage: stage),
        MobileRequestMemoryProfile(directory.path, id, kind) {
       profilePolicy.accept(kind)
-    }
-    if reclaim {
-      MobileSetMitmPressure(1)
-      MobileForceGC()
     }
   }
 }
@@ -128,7 +134,8 @@ struct TunnelMemoryReclaimPolicy {
   private var lastReclaim = Date.distantPast
 
   mutating func shouldReclaim(footprint: UInt64, now: Date) -> Bool {
-    guard footprint >= 36 * 1024 * 1024, now.timeIntervalSince(lastReclaim) >= 5 else { return false }
+    let interval: TimeInterval = footprint >= 40 * 1024 * 1024 ? 1 : 5
+    guard footprint >= 32 * 1024 * 1024, now.timeIntervalSince(lastReclaim) >= interval else { return false }
     lastReclaim = now
     return true
   }

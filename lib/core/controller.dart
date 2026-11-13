@@ -202,6 +202,25 @@ extension type CoreController._(CoreHandlerInterface _interface)
     );
   }
 
+  Future<String> prepareProxyProvider(int id) async {
+    final path = await appPath.getProfilePath(id.toString());
+    final source = File(path);
+    if (!await source.exists()) return path;
+    final prepared = File('$path.provider-v1.yaml');
+    if (await prepared.exists() &&
+        !(await prepared.lastModified()).isBefore(await source.lastModified())) {
+      return prepared.path;
+    }
+    // Providers bypass readRawConfig, including its REALITY and numeric-ID compatibility.
+    final config = await readConfig(id);
+    final proxies = config['proxies'];
+    if (proxies is! List || proxies.isEmpty) {
+      throw MessageException(currentAppLocalizations.subscriptionNoNodes);
+    }
+    await prepared.safeWriteAsString(await encodeYamlTask({'proxies': proxies}));
+    return prepared.path;
+  }
+
   Future<String> buildProfile(SetupBase base) async {
     return readSpilledText(await _interface.buildProfile(base));
   }

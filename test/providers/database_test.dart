@@ -455,6 +455,22 @@ void main() {
       expect(read().map((item) => item.label), ['Direct']);
     });
 
+    test('flush waits for persistence and exposes a failed write', () async {
+      final landing = Completer<void>();
+      final write = notifier.optimisticAsync(read(), () => landing.future);
+      var flushed = false;
+      final flush = notifier.flushWrites().then((_) => flushed = true);
+      await pumpEventQueue();
+      expect(flushed, false);
+      landing.complete();
+      await write;
+      await flush;
+      expect(flushed, true);
+      final error = StateError('disk full');
+      await expectLater(notifier.optimisticAsync(read(), () => throw error), throwsA(same(error)));
+      await expectLater(notifier.flushWrites(), throwsA(same(error)));
+    });
+
     test('put appends a new script and replaces an existing one', () async {
       notifier.put(script(1, 'First'));
       await pumpEventQueue();

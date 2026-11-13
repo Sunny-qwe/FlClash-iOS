@@ -19,7 +19,7 @@ Future<void> writeVpnDiagnosticArchive({
     ]) {
       final file = File('$home/$name');
       try {
-        if (await file.exists() && await file.length() <= (256 << 10)) {
+        if (await file.exists() && await file.length() <= (1 << 20)) {
           await encoder.addFile(file, name);
         }
       } on FileSystemException {

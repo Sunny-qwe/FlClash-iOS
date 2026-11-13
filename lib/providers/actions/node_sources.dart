@@ -31,14 +31,21 @@ class NodeSourcesAction extends _$NodeSourcesAction {
         ),
       );
     }
-    actions.putProfile(profile);
+    ref.read(profilesProvider.notifier).put(profile);
+    await ref.read(profilesProvider.notifier).flushWrites();
     final groupsLease = ref.listen(proxyGroupsProvider(profile.id), (_, _) {});
     final rulesLease = ref.listen(profileRulesProvider(profile.id), (_, _) {});
+    final nodesLease = config == null ? null : ref.listen(customProxiesProvider, (_, _) {});
+    final dialersLease = config == null ? null : ref.listen(proxyDialersProvider(profile.id), (_, _) {});
     try {
       await ref.read(proxyGroupsProvider(profile.id).future);
       await ref.read(profileRulesProvider(profile.id).future);
       if (config != null) {
+        await ref.read(customProxiesProvider.future);
+        await ref.read(proxyDialersProvider(profile.id).future);
         await actions.importCustomProfile(profile.id, config);
+        await ref.read(customProxiesProvider.notifier).flushWrites();
+        await ref.read(proxyDialersProvider(profile.id).notifier).flushWrites();
       } else {
         ref.read(proxyGroupsProvider(profile.id).notifier).setAll([
           ProxyGroup(
@@ -66,10 +73,16 @@ class NodeSourcesAction extends _$NodeSourcesAction {
           Rule.parse('MATCH,${l.nodeSourcesManualGroup}', id: snowflake.id),
         ]);
       }
+      await ref.read(proxyGroupsProvider(profile.id).notifier).flushWrites();
+      await ref.read(profileRulesProvider(profile.id).notifier).flushWrites();
+      await ref.read(profilesProvider.notifier).flushWrites();
+      actions.putProfile(ref.read(profilesProvider).getProfile(profile.id)!);
       return profile.id;
     } finally {
       groupsLease.close();
       rulesLease.close();
+      nodesLease?.close();
+      dialersLease?.close();
     }
   }
 
@@ -90,8 +103,10 @@ class NodeSourcesAction extends _$NodeSourcesAction {
               profile.ageSecretKey == ageSecretKey,
         )
         .firstOrNull;
-    if (existing != null && await (await existing.file).exists())
+    if (existing != null && await (await existing.file).length() > 0) {
+      await ref.read(coreHandlerProvider).prepareProxyProvider(existing.id);
       return existing;
+    }
     final saved =
         await (existing ??
                 Profile.normal(
@@ -102,7 +117,9 @@ class NodeSourcesAction extends _$NodeSourcesAction {
               validate: (path, key) =>
                   ref.read(coreHandlerProvider).validateProfile(path, key),
             );
+    await ref.read(coreHandlerProvider).prepareProxyProvider(saved.id);
     ref.read(profilesActionProvider.notifier).putProfile(saved);
+    await ref.read(profilesProvider.notifier).flushWrites();
     return ref.read(profilesProvider).getProfile(saved.id)!;
   }
 
@@ -166,13 +183,46 @@ class NodeSourcesAction extends _$NodeSourcesAction {
         changed = true;
       }
       if (!changed) return;
+      await notifier.flushWrites();
       ref.read(profilesActionProvider.notifier).touchProfile(profileId);
+      await ref.read(profilesProvider.notifier).flushWrites();
       if (ref.read(currentProfileIdProvider) == profileId) {
         ref.read(setupActionProvider.notifier).autoApplyProfile();
       }
     } finally {
       groupsLease.close();
       nodesLease.close();
+    }
+  }
+
+  Future<Set<int>> importShareLinks(String content) async {
+    final links = content.split(RegExp(r'\s+')).where((line) => line.isShareLink).toList();
+    final core = ref.read(coreHandlerProvider);
+    if (links.isEmpty) throw MessageException(currentAppLocalizations.shareLinksInvalid);
+    final decoded = await core.decodeShareLinks(links);
+    if (decoded.any((nodes) => nodes.isEmpty)) {
+      throw MessageException(currentAppLocalizations.shareLinksInvalid);
+    }
+    final lease = ref.listen(customProxiesProvider, (_, _) {});
+    try {
+      final previous = await ref.read(customProxiesProvider.future);
+      final taken = {...reservedProxyNames, ...previous.map((node) => node.name), ...await ref.read(customGroupNamesProvider.future)};
+      final nodes = <CustomProxy>[];
+      for (final definitions in decoded) {
+        for (final definition in definitions) {
+          final name = uniqueLabelFor(definition['name']?.toString() ?? '', fallback: 'Proxy', taken: taken.contains);
+          taken.add(name);
+          nodes.add(CustomProxy.fromDefinition({...definition, 'name': name}));
+        }
+      }
+      final issues = await core.validateProxies(nodes.map((node) => node.definition).toList());
+      if (issues.isNotEmpty) throw MessageException(issues.values.first);
+      final notifier = ref.read(customProxiesProvider.notifier);
+      notifier.putAll(nodes);
+      await notifier.flushWrites();
+      return nodes.map((node) => node.id).toSet();
+    } finally {
+      lease.close();
     }
   }
 }

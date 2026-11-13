@@ -102,12 +102,19 @@ func (e *Engine) runScript(r rule, request *http.Request, response *http.Respons
 		output.Error = "script wait time limit exceeded"
 		return
 	}
+	if !scriptMemoryAvailable() {
+		memorySkippedScripts.Add(1)
+		output.Error = "script skipped: VPN memory pressure; original response retained"
+		return
+	}
 	source, err := readResource(e.home, r.params["script-path"], 256<<10)
 	if err != nil {
 		output.Error = err.Error()
 		return
 	}
 	vm := goja.New()
+	activeScript.Store(vm)
+	defer activeScript.CompareAndSwap(vm, nil)
 	vm.SetMaxCallStackSize(256)
 	stopInterrupt := context.AfterFunc(ctx, func() { vm.Interrupt("script time limit exceeded") })
 	defer stopInterrupt()

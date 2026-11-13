@@ -1,4 +1,6 @@
 {
+  "subscriptionNoNodes": "Esta suscripción no contiene nodos utilizables directamente. Añade una suscripción con nodos o importa su configuración completa.",
+  "profileApplyFailed": "No se pudo aplicar la configuración. Consulta los registros; se conserva la conexión existente siempre que es posible.",
   "nodeSourcesManualGroup": "Selección manual",
   "nodeSourcesAutoGroup": "Latencia automática",
   "nodeSourcesTitle": "Nodos y suscripciones",

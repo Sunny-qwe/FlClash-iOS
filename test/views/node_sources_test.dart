@@ -1,13 +1,18 @@
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/core/controller.dart';
+import 'package:fl_clash/core/interface.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/profiles/node_sources.dart';
+import 'package:fl_clash/views/profiles/custom/custom_proxies.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 import '../helpers/test_app.dart';
 import '../helpers/test_profiles.dart';
@@ -17,6 +22,13 @@ import '../providers/node_sources_action_test.dart'
 class _RecordingSources extends NodeSourcesAction {
   bool fail = false;
   Set<int>? attached;
+  Set<int>? attachedNodes;
+  String? pasted;
+  @override
+  Future<Set<int>> importShareLinks(String content) async {
+    pasted = content;
+    return {42};
+  }
   @override
   Future<void> attach(
     int profileId, {
@@ -26,10 +38,14 @@ class _RecordingSources extends NodeSourcesAction {
   }) async {
     if (fail) throw const MessageException('Import failed');
     attached = subscriptionIds;
+    attachedNodes = nodeIds;
   }
 }
 
+class _Core extends Mock implements CoreHandlerInterface {}
+
 void main() {
+  setUpAll(() => registerFallbackValue(<Map<String, dynamic>>[]));
   final profile = Profile.custom(label: 'My config');
   final source = Profile.normal(
     label: 'My subscription',
@@ -53,8 +69,12 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+    final core = _Core();
+    when(() => core.validateProxies(any())).thenAnswer((_) async => {});
     final container = ProviderContainer(
       overrides: [
+        coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+        customGroupNamesProvider.overrideWith((_) => Stream.value(<String>{})),
         profilesProvider.overrideWith(
           () => TestProfiles(profiles ?? [profile, source]),
         ),
@@ -155,4 +175,29 @@ void main() {
       );
     },
   );
+
+  testWidgets('manual add opens the protocol form directly', (tester) async {
+    await pump(tester, id: profile.id);
+    await tester.tap(find.text(currentAppLocalizations.nodeSourcesManual));
+    await tester.pumpAndSettle();
+    expect(find.byType(CustomProxiesView), findsNothing);
+    expect(find.text(currentAppLocalizations.server), findsWidgets);
+    expect(find.text(currentAppLocalizations.port), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('clipboard nodes are attached to the open configuration', (tester) async {
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'Clipboard.getData') return {'text': 'ss://first\nvless://second'};
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+    final action = _RecordingSources();
+    await pump(tester, id: profile.id, action: action);
+    await tester.tap(find.text(currentAppLocalizations.clipboardImport));
+    await tester.pumpAndSettle();
+    expect(action.pasted, 'ss://first\nvless://second');
+    expect(action.attachedNodes, {42});
+    expect(tester.takeException(), isNull);
+  });
 }

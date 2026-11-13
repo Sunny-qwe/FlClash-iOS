@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/vpn_diagnostics.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -45,7 +46,9 @@ class LogsView extends ConsumerStatefulWidget {
 }
 
 class _LogsViewState extends ConsumerState<LogsView>
-    with RouteMotionHoldMixin<LogsView> {
+    with WidgetsBindingObserver, RouteMotionHoldMixin<LogsView> {
+  List<Log> _nativeLogs = const [];
+  bool _readingNative = false;
   final _listController = LogListController();
   final _filters = RecordFilterController<Log>(facets: logFacets);
   late final ScrollController _scrollController;
@@ -56,6 +59,7 @@ class _LogsViewState extends ConsumerState<LogsView>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _scrollController = sheetScrollController(
       context,
       initialScrollOffset: double.maxFinite,
@@ -64,10 +68,31 @@ class _LogsViewState extends ConsumerState<LogsView>
     ref.listenManual(logsProvider.select((state) => state.revision), (_, _) {
       updateLogsThrottler();
     });
+    unawaited(_loadNative());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) unawaited(_loadNative());
+  }
+
+  Future<void> _loadNative() async {
+    if (!system.isIOS || _readingNative) return;
+    _readingNative = true;
+    try {
+      final logs = await readVpnDiagnosticLogs(await appPath.homeDirPath);
+      if (!mounted) return;
+      _nativeLogs = logs;
+      _setLogs(ref.read(logsProvider).list);
+    } finally {
+      _readingNative = false;
+    }
   }
 
   List<IconButtonData> _buildActions() {
     return [
+      if (system.isIOS)
+        IconButtonData(glyph: AppGlyphs.sync, tooltip: context.appLocalizations.sync, onPressed: _loadNative),
       IconButtonData(
         glyph: AppGlyphs.export,
         tooltip: context.appLocalizations.exportLogs,
@@ -78,6 +103,7 @@ class _LogsViewState extends ConsumerState<LogsView>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _listController.dispose();
     _filters.dispose();
     _scrollController.dispose();
@@ -99,7 +125,7 @@ class _LogsViewState extends ConsumerState<LogsView>
   }
 
   void _setLogs(List<Log> logs) {
-    _listController.setLogs(logs);
+    _listController.setLogs([..._nativeLogs, ...logs]);
     _filters.offer(_listController.value.logs);
   }
 
@@ -173,7 +199,7 @@ class _LogsViewState extends ConsumerState<LogsView>
             _listController.setAutoScrollToEnd(false);
           },
           onResumeToEnd: () {
-            _listController.resumeAutoScrollToEnd(ref.read(logsProvider).list);
+            _listController.resumeAutoScrollToEnd([..._nativeLogs, ...ref.read(logsProvider).list]);
             _filters.offer(_listController.value.logs);
           },
           controller: _scrollController,

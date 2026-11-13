@@ -104,7 +104,21 @@ void main() {
   test('oversized native report is not loaded', () async {
     await File(
       '${directory.path}/vpn-memory.json',
-    ).writeAsString(jsonEncode({'padding': 'x' * 300000}));
+    ).writeAsString(jsonEncode({'padding': 'x' * 1100000}));
     expect((await readVpnDiagnostics(directory.path)).peakBytes, isNull);
+  });
+
+  test('persisted extension evidence is visible without a live core', () async {
+    await File('${directory.path}/vpn-memory.json').writeAsString(jsonEncode({
+      'bundle-version': '2026111306',
+      'peak-footprint-bytes': 49 * 1048576,
+      'samples': [{'timestamp': 1794560000, 'stage': 'running', 'core': {'heap-allocated-bytes': 1234}}],
+      'core-events': [{'timestamp-ms': 1794560000000, 'kind': 'script.start'}],
+    }));
+    final logs = await readVpnDiagnosticLogs(directory.path);
+    expect(logs.length, 3);
+    expect(logs.map((log) => log.payload).join(), contains('2026111306'));
+    expect(logs.last.payload, contains('script.start'));
+    expect(logs[1].payload, contains('heap-allocated-bytes'));
   });
 }
