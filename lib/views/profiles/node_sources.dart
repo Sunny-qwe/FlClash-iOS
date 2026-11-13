@@ -76,12 +76,14 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
     final links = await showNamedUrlsForm(context,
       title: l.nodeSourcesAddSubscription, withAgeSecretKey: true);
     if (links == null || links.isEmpty || !mounted) return;
+    final actions = ref.read(nodeSourcesActionProvider.notifier);
+    final profileId = widget.profileId!;
+    final groupIds = _selectedGroups(ref.read(proxyGroupsProvider(profileId)).value!);
     final failures = <UpdatingMessage>[];
     final saved = <int>{};
     for (final link in links) {
       try {
-        final profile = await ref.read(nodeSourcesActionProvider.notifier)
-            .addSubscription(url: link.url, label: link.label,
+        final profile = await actions.addSubscription(url: link.url, label: link.label,
               ageSecretKey: link.ageSecretKey);
         saved.add(profile.id);
       } catch (error) {
@@ -89,8 +91,9 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
           message: userFacingErrorMessage(error, l)));
       }
     }
-    if (saved.isNotEmpty) await _attach(sources: saved);
-    dialogs.showFailures(failures);
+    if (saved.isNotEmpty) await actions.attach(profileId,
+      groupIds: groupIds, subscriptionIds: saved);
+    if (mounted) dialogs.showFailures(failures);
   }
 
   Future<void> _existingSubscriptions() async {
@@ -98,7 +101,7 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
       [for (final profile in ref.read(profilesProvider))
         if (profile.type != ProfileType.custom)
           (id: profile.id, label: profile.realLabel)]);
-    if (ids != null && ids.isNotEmpty) await _attach(sources: ids);
+    if (mounted && ids != null && ids.isNotEmpty) await _attach(sources: ids);
   }
 
   Future<void> _manual({bool existing = false}) async {

@@ -1299,6 +1299,25 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolve": MessageLookupByLibrary.simpleMessage("IP 확인 안 함"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("호스트 이름 확인 안 함"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("일치하는 결과 없음"),
+    "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage("구독 추가"),
+    "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
+      "먼저 정책 그룹을 하나 이상 선택하세요.",
+    ),
+    "nodeSourcesCopyTip": MessageLookupByLibrary.simpleMessage(
+      "편집 가능한 사본을 만듭니다. 원본 설정은 유지됩니다. 새 설정은 기본적으로 프록시를 사용하며 규칙은 설정 편집기에서 변경할 수 있습니다.",
+    ),
+    "nodeSourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "설정을 선택하고 파일 편집 없이 구독이나 노드를 추가하세요.",
+    ),
+    "nodeSourcesExisting": MessageLookupByLibrary.simpleMessage("기존 구독 사용"),
+    "nodeSourcesExistingNodes": MessageLookupByLibrary.simpleMessage(
+      "기존 노드 사용",
+    ),
+    "nodeSourcesGroups": MessageLookupByLibrary.simpleMessage("추가할 정책 그룹"),
+    "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
+      "노드 직접 추가 / 공유 링크 가져오기",
+    ),
+    "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("노드 및 구독"),
     "nodes": MessageLookupByLibrary.simpleMessage("노드"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "이 외부 리소스는 텍스트 파일이 아닙니다",

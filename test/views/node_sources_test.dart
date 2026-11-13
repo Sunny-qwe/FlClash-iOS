@@ -1,6 +1,5 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
-import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
@@ -57,6 +56,15 @@ void main() {
     await pump(tester, profiles: []);
     expect(find.text(currentAppLocalizations.addProfile), findsOneWidget);
     expect(find.text(currentAppLocalizations.nodeSourcesDesc), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('large source lists only build visible rows', (tester) async {
+    await pump(tester, profiles: List.generate(1000, (i) =>
+      Profile.normal(label: 'Subscription $i', url: 'https://example.com/$i')));
+    expect(find.text('Subscription 0'), findsOneWidget);
+    expect(find.text('Subscription 999'), findsNothing);
+    expect(find.byType(ListItem).evaluate().length, lessThan(100));
     expect(tester.takeException(), isNull);
   });
 

@@ -1657,6 +1657,33 @@ class MessageLookup extends MessageLookupByLibrary {
       "Ne pas résoudre le nom d’hôte",
     ),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("Aucun résultat"),
+    "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
+      "Ajouter des abonnements",
+    ),
+    "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
+      "Sélectionnez au moins un groupe.",
+    ),
+    "nodeSourcesCopyTip": MessageLookupByLibrary.simpleMessage(
+      "Créez une copie modifiable. La configuration d’origine est conservée. Les nouvelles configurations utilisent le proxy par défaut ; ajustez les règles dans l’éditeur.",
+    ),
+    "nodeSourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "Choisissez une configuration et ajoutez des abonnements ou des nœuds sans modifier de fichiers.",
+    ),
+    "nodeSourcesExisting": MessageLookupByLibrary.simpleMessage(
+      "Utiliser des abonnements existants",
+    ),
+    "nodeSourcesExistingNodes": MessageLookupByLibrary.simpleMessage(
+      "Utiliser des nœuds existants",
+    ),
+    "nodeSourcesGroups": MessageLookupByLibrary.simpleMessage(
+      "Ajouter aux groupes",
+    ),
+    "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
+      "Ajouter des nœuds manuellement / par liens",
+    ),
+    "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage(
+      "Nœuds et abonnements",
+    ),
     "nodes": MessageLookupByLibrary.simpleMessage("Nœuds"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "Cette ressource externe n’est pas un fichier texte",

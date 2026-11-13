@@ -1659,6 +1659,33 @@ class MessageLookup extends MessageLookupByLibrary {
     "noSearchResults": MessageLookupByLibrary.simpleMessage(
       "No hay resultados",
     ),
+    "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
+      "Añadir suscripciones",
+    ),
+    "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
+      "Selecciona al menos un grupo.",
+    ),
+    "nodeSourcesCopyTip": MessageLookupByLibrary.simpleMessage(
+      "Crea una copia editable. La configuración original se conserva. Las nuevas configuraciones usan el proxy de forma predeterminada; ajusta las reglas en el editor.",
+    ),
+    "nodeSourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "Elige una configuración y añade suscripciones o nodos sin editar archivos.",
+    ),
+    "nodeSourcesExisting": MessageLookupByLibrary.simpleMessage(
+      "Usar suscripciones existentes",
+    ),
+    "nodeSourcesExistingNodes": MessageLookupByLibrary.simpleMessage(
+      "Usar nodos existentes",
+    ),
+    "nodeSourcesGroups": MessageLookupByLibrary.simpleMessage(
+      "Añadir a grupos",
+    ),
+    "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
+      "Añadir nodos manualmente / por enlaces",
+    ),
+    "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage(
+      "Nodos y suscripciones",
+    ),
     "nodes": MessageLookupByLibrary.simpleMessage("Nodos"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "Este recurso externo no es un archivo de texto",

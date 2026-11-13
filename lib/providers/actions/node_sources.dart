@@ -20,6 +20,9 @@ class NodeSourcesAction extends _$NodeSourcesAction {
         config.droppedSubRules, config.droppedSubRules.compact));
     }
     actions.putProfile(profile);
+    final groupsLease = ref.listen(proxyGroupsProvider(profile.id), (_, _) {});
+    final rulesLease = ref.listen(profileRulesProvider(profile.id), (_, _) {});
+    try {
     await ref.read(proxyGroupsProvider(profile.id).future);
     await ref.read(profileRulesProvider(profile.id).future);
     if (config != null) {
@@ -39,6 +42,10 @@ class NodeSourcesAction extends _$NodeSourcesAction {
       ]);
     }
     return profile.id;
+    } finally {
+      groupsLease.close();
+      rulesLease.close();
+    }
   }
 
   Future<Profile> addSubscription({required String url, String label = '',
@@ -63,6 +70,9 @@ class NodeSourcesAction extends _$NodeSourcesAction {
     if (profile?.type != ProfileType.custom) {
       throw MessageException(currentAppLocalizations.importConfigInvalid);
     }
+    final groupsLease = ref.listen(proxyGroupsProvider(profileId), (_, _) {});
+    final nodesLease = ref.listen(customProxiesProvider, (_, _) {});
+    try {
     await ref.read(proxyGroupsProvider(profileId).future);
     await ref.read(customProxiesProvider.future);
     final groups = ref.read(proxyGroupsProvider(profileId)).value!;
@@ -93,6 +103,10 @@ class NodeSourcesAction extends _$NodeSourcesAction {
     ref.read(profilesActionProvider.notifier).touchProfile(profileId);
     if (ref.read(currentProfileIdProvider) == profileId) {
       ref.read(setupActionProvider.notifier).autoApplyProfile();
+    }
+    } finally {
+      groupsLease.close();
+      nodesLease.close();
     }
   }
 }

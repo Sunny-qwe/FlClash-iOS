@@ -1195,6 +1195,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolve": MessageLookupByLibrary.simpleMessage("不解析IP"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("不解析主机名"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("没有匹配的结果"),
+    "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage("添加订阅"),
+    "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
+      "请先选择至少一个策略组。",
+    ),
+    "nodeSourcesCopyTip": MessageLookupByLibrary.simpleMessage(
+      "创建可编辑副本后即可添加节点，原配置保留。新建配置默认走代理，可在配置编辑页调整分流规则。",
+    ),
+    "nodeSourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "选择配置，添加多个订阅或手动节点，无需编辑配置文件。",
+    ),
+    "nodeSourcesExisting": MessageLookupByLibrary.simpleMessage("选择已有订阅"),
+    "nodeSourcesExistingNodes": MessageLookupByLibrary.simpleMessage("选择已有节点"),
+    "nodeSourcesGroups": MessageLookupByLibrary.simpleMessage("添加到策略组"),
+    "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
+      "手动添加节点 / 导入分享链接",
+    ),
+    "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("节点与订阅"),
     "nodes": MessageLookupByLibrary.simpleMessage("节点"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage("该外部资源不是文本文件"),
     "none": MessageLookupByLibrary.simpleMessage("无"),

@@ -1548,6 +1548,33 @@ class MessageLookup extends MessageLookupByLibrary {
     "noSearchResults": MessageLookupByLibrary.simpleMessage(
       "No matching results",
     ),
+    "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
+      "Add subscriptions",
+    ),
+    "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
+      "Select at least one policy group first.",
+    ),
+    "nodeSourcesCopyTip": MessageLookupByLibrary.simpleMessage(
+      "Create an editable copy to add nodes. The original configuration is preserved. New configurations use proxy routing by default; adjust routing rules in the configuration editor.",
+    ),
+    "nodeSourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "Choose a configuration and add subscriptions or individual nodes without editing files.",
+    ),
+    "nodeSourcesExisting": MessageLookupByLibrary.simpleMessage(
+      "Use existing subscriptions",
+    ),
+    "nodeSourcesExistingNodes": MessageLookupByLibrary.simpleMessage(
+      "Use existing nodes",
+    ),
+    "nodeSourcesGroups": MessageLookupByLibrary.simpleMessage(
+      "Add to policy groups",
+    ),
+    "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
+      "Add nodes manually / from share links",
+    ),
+    "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage(
+      "Nodes & subscriptions",
+    ),
     "nodes": MessageLookupByLibrary.simpleMessage("Nodes"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "This external resource is not a text file",

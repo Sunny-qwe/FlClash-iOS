@@ -1317,6 +1317,29 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolve": MessageLookupByLibrary.simpleMessage("IPを解決しない"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("ホスト名を解決しない"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("一致する結果はありません"),
+    "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
+      "サブスクリプションを追加",
+    ),
+    "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
+      "ポリシーグループを1つ以上選択してください。",
+    ),
+    "nodeSourcesCopyTip": MessageLookupByLibrary.simpleMessage(
+      "編集可能なコピーを作成します。元の設定は保持されます。新規設定は既定でプロキシを使用します。ルールは設定画面で変更できます。",
+    ),
+    "nodeSourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "設定を選び、ファイルを編集せずにサブスクリプションやノードを追加します。",
+    ),
+    "nodeSourcesExisting": MessageLookupByLibrary.simpleMessage(
+      "既存のサブスクリプションを使用",
+    ),
+    "nodeSourcesExistingNodes": MessageLookupByLibrary.simpleMessage(
+      "既存のノードを使用",
+    ),
+    "nodeSourcesGroups": MessageLookupByLibrary.simpleMessage("追加先のグループ"),
+    "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
+      "ノードを手動追加 / 共有リンクから追加",
+    ),
+    "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("ノードとサブスクリプション"),
     "nodes": MessageLookupByLibrary.simpleMessage("ノード"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "この外部リソースはテキストファイルではありません",

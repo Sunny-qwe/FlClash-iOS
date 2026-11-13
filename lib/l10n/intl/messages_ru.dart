@@ -1622,6 +1622,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "noSearchResults": MessageLookupByLibrary.simpleMessage(
       "Ничего не найдено",
     ),
+    "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
+      "Добавить подписки",
+    ),
+    "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
+      "Сначала выберите хотя бы одну группу.",
+    ),
+    "nodeSourcesCopyTip": MessageLookupByLibrary.simpleMessage(
+      "Будет создана редактируемая копия. Исходная конфигурация сохранится. Новые конфигурации по умолчанию используют прокси; правила можно изменить в редакторе.",
+    ),
+    "nodeSourcesDesc": MessageLookupByLibrary.simpleMessage(
+      "Выберите конфигурацию и добавляйте подписки и узлы без правки файлов.",
+    ),
+    "nodeSourcesExisting": MessageLookupByLibrary.simpleMessage(
+      "Использовать существующие подписки",
+    ),
+    "nodeSourcesExistingNodes": MessageLookupByLibrary.simpleMessage(
+      "Использовать существующие узлы",
+    ),
+    "nodeSourcesGroups": MessageLookupByLibrary.simpleMessage(
+      "Добавить в группы",
+    ),
+    "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
+      "Добавить узлы вручную / по ссылкам",
+    ),
+    "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("Узлы и подписки"),
     "nodes": MessageLookupByLibrary.simpleMessage("Узлы"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(
       "Этот внешний ресурс не является текстовым файлом",

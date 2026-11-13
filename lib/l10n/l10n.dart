@@ -55,6 +55,96 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `Nodes & subscriptions`
+  String get nodeSourcesTitle {
+    return Intl.message(
+      'Nodes & subscriptions',
+      name: 'nodeSourcesTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a configuration and add subscriptions or individual nodes without editing files.`
+  String get nodeSourcesDesc {
+    return Intl.message(
+      'Choose a configuration and add subscriptions or individual nodes without editing files.',
+      name: 'nodeSourcesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select at least one policy group first.`
+  String get nodeSourcesChooseGroups {
+    return Intl.message(
+      'Select at least one policy group first.',
+      name: 'nodeSourcesChooseGroups',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add to policy groups`
+  String get nodeSourcesGroups {
+    return Intl.message(
+      'Add to policy groups',
+      name: 'nodeSourcesGroups',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add subscriptions`
+  String get nodeSourcesAddSubscription {
+    return Intl.message(
+      'Add subscriptions',
+      name: 'nodeSourcesAddSubscription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use existing subscriptions`
+  String get nodeSourcesExisting {
+    return Intl.message(
+      'Use existing subscriptions',
+      name: 'nodeSourcesExisting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add nodes manually / from share links`
+  String get nodeSourcesManual {
+    return Intl.message(
+      'Add nodes manually / from share links',
+      name: 'nodeSourcesManual',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use existing nodes`
+  String get nodeSourcesExistingNodes {
+    return Intl.message(
+      'Use existing nodes',
+      name: 'nodeSourcesExistingNodes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create an editable copy to add nodes. The original configuration is preserved. New configurations use proxy routing by default; adjust routing rules in the configuration editor.`
+  String get nodeSourcesCopyTip {
+    return Intl.message(
+      'Create an editable copy to add nodes. The original configuration is preserved. New configurations use proxy routing by default; adjust routing rules in the configuration editor.',
+      name: 'nodeSourcesCopyTip',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Restore missing data files`
   String get repairGeoResources {
     return Intl.message(

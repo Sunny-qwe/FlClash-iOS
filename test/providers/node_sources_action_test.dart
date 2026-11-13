@@ -70,6 +70,8 @@ void main() {
       profilesActionProvider.overrideWith(TestSourceProfilesAction.new),
       setupActionProvider.overrideWith(TestSourceSetup.new),
     ]);
+    result.listen(proxyGroupsProvider(target.id), (_, _) {});
+    result.listen(customProxiesProvider, (_, _) {});
     addTearDown(result.dispose);
     return result;
   }
@@ -128,6 +130,8 @@ void main() {
   test('creates a working manual and automatic group with a final routing rule', () async {
     final c = container();
     final id = await c.read(nodeSourcesActionProvider.notifier).createProfile();
+    c.listen(proxyGroupsProvider(id), (_, _) {});
+    c.listen(profileRulesProvider(id), (_, _) {});
     final groups = c.read(proxyGroupsProvider(id)).value!;
     expect(groups.length, 2);
     expect(groups.last.type, GroupType.URLTest);
