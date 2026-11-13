@@ -134,7 +134,9 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
               children: [
                 Expanded(
                   child: Column(
-                    mainAxisSize: density.isDesktop ? MainAxisSize.max : MainAxisSize.min,
+                    mainAxisSize: density.isDesktop
+                        ? MainAxisSize.max
+                        : MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DashboardCardHeader(
@@ -368,7 +370,12 @@ class _ExitRow extends StatelessWidget {
                   ),
                 )
               else
-                _IpChips(quality: quality, loading: loading, large: large, active: active),
+                _IpChips(
+                  quality: quality,
+                  loading: loading,
+                  large: large,
+                  active: active,
+                ),
             ],
           ),
         ),
@@ -630,8 +637,8 @@ class _Cells extends StatelessWidget {
                 ? _CellText(organization)
                 : active
                 ? loading
-                    ? SkeletonText(width: 96, style: _cellStyle(context))
-                    : const _Placeholder()
+                      ? SkeletonText(width: 96, style: _cellStyle(context))
+                      : const _Placeholder()
                 : Container(
                     width: 96,
                     height: 12,
@@ -971,10 +978,7 @@ class _MorphClipper extends CustomClipper<Path> {
 }
 
 class _StatusWavePainter extends CustomPainter {
-  const _StatusWavePainter({
-    required this.color,
-    this.isRtl = false,
-  });
+  const _StatusWavePainter({required this.color, this.isRtl = false});
 
   final Color color;
   final bool isRtl;
@@ -997,13 +1001,62 @@ class _StatusWavePainter extends CustomPainter {
 
     final path = Path()
       ..moveTo(w * 0.540, 0)
-      ..cubicTo(w * 0.532, h * 0.056, w * 0.565, h * 0.103, w * 0.521, h * 0.200)
-      ..cubicTo(w * 0.478, h * 0.295, w * 0.525, h * 0.365, w * 0.541, h * 0.445)
-      ..cubicTo(w * 0.562, h * 0.540, w * 0.502, h * 0.608, w * 0.555, h * 0.660)
-      ..cubicTo(w * 0.586, h * 0.693, w * 0.629, h * 0.683, w * 0.638, h * 0.771)
-      ..cubicTo(w * 0.648, h * 0.868, w * 0.686, h * 0.867, w * 0.727, h * 0.848)
-      ..cubicTo(w * 0.776, h * 0.825, w * 0.774, h * 0.929, w * 0.833, h * 0.927)
-      ..cubicTo(w * 0.887, h * 0.925, w * 0.879, h * 0.831, w * 0.946, h * 0.850)
+      ..cubicTo(
+        w * 0.532,
+        h * 0.056,
+        w * 0.565,
+        h * 0.103,
+        w * 0.521,
+        h * 0.200,
+      )
+      ..cubicTo(
+        w * 0.478,
+        h * 0.295,
+        w * 0.525,
+        h * 0.365,
+        w * 0.541,
+        h * 0.445,
+      )
+      ..cubicTo(
+        w * 0.562,
+        h * 0.540,
+        w * 0.502,
+        h * 0.608,
+        w * 0.555,
+        h * 0.660,
+      )
+      ..cubicTo(
+        w * 0.586,
+        h * 0.693,
+        w * 0.629,
+        h * 0.683,
+        w * 0.638,
+        h * 0.771,
+      )
+      ..cubicTo(
+        w * 0.648,
+        h * 0.868,
+        w * 0.686,
+        h * 0.867,
+        w * 0.727,
+        h * 0.848,
+      )
+      ..cubicTo(
+        w * 0.776,
+        h * 0.825,
+        w * 0.774,
+        h * 0.929,
+        w * 0.833,
+        h * 0.927,
+      )
+      ..cubicTo(
+        w * 0.887,
+        h * 0.925,
+        w * 0.879,
+        h * 0.831,
+        w * 0.946,
+        h * 0.850,
+      )
       ..cubicTo(w * 0.974, h * 0.862, w * 0.988, h * 0.858, w, h * 0.842)
       ..lineTo(w, 0)
       ..close();
