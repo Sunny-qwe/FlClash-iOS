@@ -3,6 +3,7 @@ import 'package:fl_clash/core/controller.dart';
 import 'package:fl_clash/core/interface.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/features/form/form.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/profiles/node_sources.dart';
@@ -179,10 +180,17 @@ void main() {
   testWidgets('manual add opens the protocol form directly', (tester) async {
     await pump(tester, id: profile.id);
     await tester.tap(find.text(currentAppLocalizations.nodeSourcesManual));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    for (var frame = 0; frame < 60; frame++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
     expect(find.byType(CustomProxiesView), findsNothing);
     expect(find.text(currentAppLocalizations.server), findsWidgets);
     expect(find.text(currentAppLocalizations.port), findsWidgets);
+    expect(tester.takeException(), isNull);
+    Navigator.of(tester.element(find.byType(NestedFormSheet<CustomProxy>))).pop();
+    await tester.pumpAndSettle();
+    expect(tester.widget<Scaffold>(find.byType(Scaffold).first).isLoading, false);
     expect(tester.takeException(), isNull);
   });
 
