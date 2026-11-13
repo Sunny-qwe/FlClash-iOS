@@ -200,7 +200,10 @@ class MitmModulesAction extends _$MitmModulesAction {
   }
 
   Future<void> deleteModule(MitmModule module) async {
-    commonPrint.log('MITM module delete id=${module.id} name=${module.name}', logLevel: LogLevel.info);
+    commonPrint.log(
+      'MITM module delete id=${module.id} name=${module.name}',
+      logLevel: LogLevel.info,
+    );
     ref.read(mitmModulesProvider.notifier).del(module.id);
     await File(await _pathOf(module)).safeDelete();
     await clean();

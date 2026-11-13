@@ -89,7 +89,10 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
                 await handle.setPosition(length - limit ~/ 2);
                 output.write('\n--- middle omitted ---\n');
                 output.write(
-                  utf8.decode(await handle.read(limit ~/ 2), allowMalformed: true),
+                  utf8.decode(
+                    await handle.read(limit ~/ 2),
+                    allowMalformed: true,
+                  ),
                 );
               }
             }
@@ -101,14 +104,22 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
         }
       }
       try {
-        final modules = await ref.read(mitmModulesProvider.future).timeout(const Duration(seconds: 2));
+        final modules = await ref
+            .read(mitmModulesProvider.future)
+            .timeout(const Duration(seconds: 2));
         output.write('\n--- module-manifest ---\n');
-        output.write(jsonEncode([
-          for (final module in modules) {
-            'id': module.id, 'name': module.name, 'enabled': module.enabled,
-            'scripts': module.scripts, 'resources': module.resources.values.toSet().toList(),
-          },
-        ]));
+        output.write(
+          jsonEncode([
+            for (final module in modules)
+              {
+                'id': module.id,
+                'name': module.name,
+                'enabled': module.enabled,
+                'scripts': module.scripts,
+                'resources': module.resources.values.toSet().toList(),
+              },
+          ]),
+        );
       } catch (e) {
         output.write('\nModule manifest unavailable: ${compactError(e)}\n');
       }
@@ -119,8 +130,16 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
     if (system.isIOS) {
       final home = await appPath.homeDirPath;
       final archivePath = '$tempFilePath.zip';
-      await compute(_writeVpnDiagnosticArchive, (home: home, logPath: tempFilePath, archivePath: archivePath));
-      return await picker.saveFileWithPath(logFileName.replaceFirst('.log', '-diagnostics.zip'), archivePath) != null;
+      await compute(_writeVpnDiagnosticArchive, (
+        home: home,
+        logPath: tempFilePath,
+        archivePath: archivePath,
+      ));
+      return await picker.saveFileWithPath(
+            logFileName.replaceFirst('.log', '-diagnostics.zip'),
+            archivePath,
+          ) !=
+          null;
     }
     bool res = false;
     res = await picker.saveFileWithPath(logFileName, tempFilePath) != null;
@@ -128,8 +147,13 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
   }
 }
 
-Future<void> _writeVpnDiagnosticArchive(({String home, String logPath, String archivePath}) paths) =>
-    writeVpnDiagnosticArchive(home: paths.home, logPath: paths.logPath, archivePath: paths.archivePath);
+Future<void> _writeVpnDiagnosticArchive(
+  ({String home, String logPath, String archivePath}) paths,
+) => writeVpnDiagnosticArchive(
+  home: paths.home,
+  logPath: paths.logPath,
+  archivePath: paths.archivePath,
+);
 
 @Riverpod(keepAlive: true)
 class Requests extends _$Requests with AutoDisposeNotifierMixin {

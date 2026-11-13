@@ -28,11 +28,18 @@ struct TunnelMemoryTests {
     monitor.setStage("running")
     let file = directory.appendingPathComponent("vpn-memory.json")
     let deadline = Date().addingTimeInterval(5)
-    while !FileManager.default.fileExists(atPath: file.path) && Date() < deadline {
+    var captured: [String: Any]?
+    while Date() < deadline {
+      if let data = try? Data(contentsOf: file),
+         let payload = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+         payload["id"] as? String == "test" {
+        captured = payload
+        break
+      }
       Thread.sleep(forTimeInterval: 0.01)
     }
     monitor.stop()
-    let payload = try JSONSerialization.jsonObject(with: Data(contentsOf: file)) as! [String: Any]
+    guard let payload = captured else { preconditionFailure("new run did not persist diagnostics") }
     precondition(payload["id"] as? String == "test")
     let samples = payload["samples"] as! [[String: Any]]
     precondition(!samples.isEmpty && samples.count <= 60)
