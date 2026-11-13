@@ -168,7 +168,11 @@ abstract class CoreHandlerInterface {
   }
 
   Future<ProxiesData> getProxies() {
-    return _query(CoreMethod.proxyList, _model(ProxiesData.fromJson), timeout: _snapshotTimeout);
+    return _query(
+      CoreMethod.proxyList,
+      _model(ProxiesData.fromJson),
+      timeout: _snapshotTimeout,
+    );
   }
 
   Future<ChangeProxyResult> changeProxy(ChangeProxyParams params) {

@@ -50,9 +50,13 @@ final class TunnelMemoryMonitor {
     let footprint = info.phys_footprint
     peak = max(peak, footprint)
     let reclaim = reclaimPolicy.shouldReclaim(footprint: footprint, now: now)
+    let core = MobileGetMemoryDiagnostics()
+      .data(using: .utf8)
+      .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] } ?? [:]
     samples.append([
       "timestamp": now.timeIntervalSince1970, "stage": stage,
       "footprint-bytes": footprint, "reclaim-requested": reclaim,
+      "core": core,
     ])
     if samples.count > 32 { samples.removeFirst() }
     if let directory, let data = try? JSONSerialization.data(withJSONObject: [

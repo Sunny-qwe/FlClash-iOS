@@ -124,7 +124,9 @@ void main() {
                   ((0.5 * 301).round() * 589 + (0.9 * 588).round()) * 4;
               expect(
                 [for (var i = 0; i < 4; i++) pixels.getUint8(offset + i)],
-                [228, 235, 251, 255],
+                brightness == Brightness.dark
+                    ? [38, 47, 62, 255]
+                    : [228, 235, 251, 255],
               );
             }
             mask.dispose();

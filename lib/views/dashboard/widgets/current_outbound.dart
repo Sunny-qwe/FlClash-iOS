@@ -118,7 +118,9 @@ class _CurrentOutboundCardState extends ConsumerState<CurrentOutboundCard>
                 size: Size.infinite,
                 painter: _StatusWavePainter(
                   color: isStart
-                      ? const Color(0xFFE4EBFB)
+                      ? Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF262F3E)
+                            : const Color(0xFFE4EBFB)
                       : Theme.of(context).brightness == Brightness.dark
                       ? Colors.white.withValues(alpha: 0.06)
                       : const Color(0xFFEFEDF0),

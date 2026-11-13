@@ -87,6 +87,10 @@ func ForceGC() {
 	core.ForceGC()
 }
 
+func GetMemoryDiagnostics() string {
+	return core.GetMemoryDiagnostics()
+}
+
 func SetMitmPressure(level int32) {
 	core.SetMitmPressure(level)
 }

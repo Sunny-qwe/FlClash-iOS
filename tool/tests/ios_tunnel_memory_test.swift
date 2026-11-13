@@ -26,6 +26,9 @@ struct TunnelMemoryTests {
     let samples = payload["samples"] as! [[String: Any]]
     precondition(!samples.isEmpty && samples.count <= 32)
     precondition((samples[0]["footprint-bytes"] as? UInt64 ?? 0) > 0)
+    let core = samples[0]["core"] as! [String: Any]
+    precondition(core["heap-allocated-bytes"] as? Int == 1234)
+    precondition((core["mitm"] as? [String: Int])?["active-scripts"] == 1)
     print("Tunnel memory policy and diagnostic passed")
   }
 }

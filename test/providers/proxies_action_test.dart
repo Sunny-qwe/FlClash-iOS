@@ -111,14 +111,19 @@ void main() {
   }
 
   group('updateGroups', () {
-    test('a read timeout preserves cached nodes without another request', () async {
-      when(core.getProxies).thenThrow(TimeoutException('snapshot deadline'));
-      final container = buildContainer();
-      container.read(groupsProvider.notifier).value = [_group('Cached', const [])];
-      await actionOf(container).updateGroups();
-      verify(core.getProxies).called(1);
-      expect(container.read(groupsProvider).single.name, 'Cached');
-    });
+    test(
+      'a read timeout preserves cached nodes without another request',
+      () async {
+        when(core.getProxies).thenThrow(TimeoutException('snapshot deadline'));
+        final container = buildContainer();
+        container.read(groupsProvider.notifier).value = [
+          _group('Cached', const []),
+        ];
+        await actionOf(container).updateGroups();
+        verify(core.getProxies).called(1);
+        expect(container.read(groupsProvider).single.name, 'Cached');
+      },
+    );
 
     test('coalesces concurrent refreshes into one core request', () async {
       final response = Completer<ProxiesData>();
@@ -127,24 +132,36 @@ void main() {
       final action = actionOf(container);
       final first = action.updateGroups();
       final second = action.updateGroups();
-      response.complete(ProxiesData(
-        all: const ['Proxy'],
-        proxies: {
-          'Proxy': {'name': 'Proxy', 'type': 'Selector', 'all': ['HK-01'], 'now': 'HK-01'},
-          'HK-01': {'name': 'HK-01', 'type': 'ss'},
-        },
-      ));
+      response.complete(
+        ProxiesData(
+          all: const ['Proxy'],
+          proxies: {
+            'Proxy': {
+              'name': 'Proxy',
+              'type': 'Selector',
+              'all': ['HK-01'],
+              'now': 'HK-01',
+            },
+            'HK-01': {'name': 'HK-01', 'type': 'ss'},
+          },
+        ),
+      );
       await Future.wait([first, second]);
       verify(core.getProxies).called(1);
       expect(container.read(groupsProvider).single.name, 'Proxy');
     });
 
     test('keeps cached nodes and stops retrying a disconnected core', () async {
-      when(core.getProxies).thenThrow(const CoreMethodException(
-        code: 'core_unavailable', message: 'VPN stopped',
-      ));
+      when(core.getProxies).thenThrow(
+        const CoreMethodException(
+          code: 'core_unavailable',
+          message: 'VPN stopped',
+        ),
+      );
       final container = buildContainer();
-      container.read(groupsProvider.notifier).value = [_group('Cached', const [])];
+      container.read(groupsProvider.notifier).value = [
+        _group('Cached', const []),
+      ];
       await actionOf(container).updateGroups();
       verify(core.getProxies).called(1);
       expect(container.read(groupsProvider).single.name, 'Cached');

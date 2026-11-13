@@ -160,9 +160,6 @@ class ProxiesAction extends _$ProxiesAction {
         retryIf: (res) => res.isEmpty,
       );
     } catch (e) {
-      // The Core failure path already runs inside the retry task above; a
-      // throw here only means ref.read hit a disposed container or the
-      // groupsProvider write itself failed.
       commonPrint.log(
         'updateGroups failed: $e',
         logLevel: coreFailureLogLevel(e),

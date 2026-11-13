@@ -55,6 +55,7 @@ jobs:
           CGO_ENABLED: '0'
         run: |
           test -z "$(gofmt -l reality_compat.go reality_compat_test.go config.go config_test.go profile_base.go short_id.go mitm/engine.go mitm/body_budget_test.go mitm/http2_memory_test.go)"
+          test -z "$(gofmt -l memory_diagnostics.go memory_diagnostics_test.go mitm/diagnostics.go mitm/diagnostics_test.go mobile/mobile.go)"
           go test . ./mitm
           go test -tags=with_low_memory . ./mitm
           go vet . ./mitm
