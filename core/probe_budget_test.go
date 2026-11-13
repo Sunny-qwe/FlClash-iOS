@@ -49,3 +49,24 @@ func TestQueuedProbeDoesNotOverwriteNodeHistory(t *testing.T) {
 		t.Fatal("waiting for a slot published a false unreachable measurement")
 	}
 }
+
+func TestProbeBudgetReusesSlotBeforeStartingTimeout(t *testing.T) {
+	previous := adapter.UrlTestAcquireHook
+	adapter.UrlTestAcquireHook = acquireProbeSlot
+	defer func() { adapter.UrlTestAcquireHook = previous }()
+	ctx, release, err := adapter.AcquireURLTestSlot(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer release()
+	probeCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	_, nestedRelease, err := adapter.AcquireURLTestSlot(probeCtx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nestedRelease()
+	if len(backgroundProbeSlots) != 1 {
+		t.Fatalf("a queued health check acquired more than one slot: %d", len(backgroundProbeSlots))
+	}
+}

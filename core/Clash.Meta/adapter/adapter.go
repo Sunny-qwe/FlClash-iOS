@@ -164,13 +164,11 @@ func (p *Proxy) MarshalJSON() ([]byte, error) {
 // URLTest get the delay for the specified URL
 // implements C.Proxy
 func (p *Proxy) URLTest(ctx context.Context, url string, expectedStatus utils.IntRanges[uint16]) (t uint16, err error) {
-	if UrlTestAcquireHook != nil {
-		release, acquireErr := UrlTestAcquireHook(ctx)
-		if acquireErr != nil {
-			return 0, acquireErr
-		}
-		defer release()
+	ctx, release, acquireErr := AcquireURLTestSlot(ctx)
+	if acquireErr != nil {
+		return 0, acquireErr
 	}
+	defer release()
 	var satisfied bool
 
 	defer func() {

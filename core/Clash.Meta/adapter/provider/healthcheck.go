@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/common/atomic"
 	"github.com/metacubex/mihomo/common/singledo"
 	"github.com/metacubex/mihomo/common/utils"
@@ -191,7 +192,12 @@ func (hc *HealthCheck) execute(b *errgroup.Group, proxies []C.Proxy, version uin
 
 		p := proxy
 		b.Go(func() error {
-			ctx, cancel := context.WithTimeout(hc.ctx, hc.testTimeout())
+			queueCtx, release, err := adapter.AcquireURLTestSlot(hc.ctx)
+			if err != nil {
+				return err
+			}
+			defer release()
+			ctx, cancel := context.WithTimeout(queueCtx, hc.testTimeout())
 			defer cancel()
 			log.Debugln("Health Checking, proxy: %s, url: %s, id: {%s}", p.Name(), url, uid)
 			_, _ = p.URLTest(ctx, url, expectedStatus)
