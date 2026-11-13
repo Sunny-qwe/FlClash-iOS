@@ -32,7 +32,7 @@ void main() {
     final source = File(await appPath.getProfilePath('42'));
     await source.create(recursive: true);
     await source.writeAsString('original subscription');
-    final normalized = {
+    final normalized = <String, dynamic>{
       'proxies': [{'name': 'REALITY', 'type': 'vless', 'tls': true, 'client-fingerprint': 'chrome', 'reality-opts': {'short-id': '001234'}}],
       'rule': ['MATCH,DIRECT'],
     };
