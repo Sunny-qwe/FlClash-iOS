@@ -68,17 +68,27 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
     output.write('\nExported at ${DateTime.now().toIso8601String()}\n');
     if (system.isIOS) {
       try {
-        final providers = await ref.read(coreHandlerProvider)
-            .getExternalProviders().timeout(const Duration(seconds: 2));
+        final providers = await ref
+            .read(coreHandlerProvider)
+            .getExternalProviders()
+            .timeout(const Duration(seconds: 2));
         output.write('\n--- subscription-runtime ---\n');
-        output.write(jsonEncode([
-          for (final provider in providers)
-            {'name': provider.name, 'type': provider.type,
-              'vehicle': provider.vehicleType, 'nodes': provider.count,
-              'updated': provider.updateAt.toIso8601String()},
-        ]));
+        output.write(
+          jsonEncode([
+            for (final provider in providers)
+              {
+                'name': provider.name,
+                'type': provider.type,
+                'vehicle': provider.vehicleType,
+                'nodes': provider.count,
+                'updated': provider.updateAt.toIso8601String(),
+              },
+          ]),
+        );
       } catch (error) {
-        output.write('\nSubscription runtime unavailable: ${compactError(error)}\n');
+        output.write(
+          '\nSubscription runtime unavailable: ${compactError(error)}\n',
+        );
       }
       final home = await appPath.homeDirPath;
       for (final name in [
@@ -150,8 +160,10 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
         archivePath: archivePath,
       ));
       return await picker.saveFileWithPath(
-            logFileName.replaceFirst('.log',
-              '-b${globalState.packageInfo.buildNumber}-${DateTime.now().millisecondsSinceEpoch}-diagnostics.zip'),
+            logFileName.replaceFirst(
+              '.log',
+              '-b${globalState.packageInfo.buildNumber}-${DateTime.now().millisecondsSinceEpoch}-diagnostics.zip',
+            ),
             archivePath,
           ) !=
           null;

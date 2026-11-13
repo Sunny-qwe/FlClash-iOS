@@ -42,26 +42,29 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
   Future<void> _draftWrite = Future.value();
   int _draftRevision = 0;
 
-  Future<File> get _draftFile async =>
-      File('${await appPath.getProfilePath(widget.profile.id.toString())}.draft');
+  Future<File> get _draftFile async => File(
+    '${await appPath.getProfilePath(widget.profile.id.toString())}.draft',
+  );
 
   Future<void> _writeDraft(EditorContent? content) async {
     final revision = ++_draftRevision;
     final data = await content?.readBytes();
     if (revision != _draftRevision) return;
-    _draftWrite = _draftWrite.then((_) async {
-      final file = await _draftFile;
-      if (data == null) {
-        if (await file.exists()) await file.delete();
-      } else {
-        final temporary = File('${file.path}.tmp');
-        await temporary.parent.create(recursive: true);
-        await temporary.writeAsBytes(data, flush: true);
-        await temporary.rename(file.path);
-      }
-    }).catchError((Object error) {
-      commonPrint.log('profile draft write failed: ${compactError(error)}');
-    });
+    _draftWrite = _draftWrite
+        .then((_) async {
+          final file = await _draftFile;
+          if (data == null) {
+            if (await file.exists()) await file.delete();
+          } else {
+            final temporary = File('${file.path}.tmp');
+            await temporary.parent.create(recursive: true);
+            await temporary.writeAsBytes(data, flush: true);
+            await temporary.rename(file.path);
+          }
+        })
+        .catchError((Object error) {
+          commonPrint.log('profile draft write failed: ${compactError(error)}');
+        });
     await _draftWrite;
   }
 
@@ -242,11 +245,13 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
     final draft = await _draftFile;
     await _draftWrite;
     final original = await widget.profile.file;
-    if (await draft.exists() && await original.exists() &&
+    if (await draft.exists() &&
+        await original.exists() &&
         (await original.lastModified()).isAfter(await draft.lastModified())) {
       await _writeDraft(null);
     }
-    final editedData = _editedData ??
+    final editedData =
+        _editedData ??
         (await draft.exists() ? await draft.readAsBytes() : null);
     if (!mounted) return;
     final editorPage = EditorPage(

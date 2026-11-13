@@ -1952,36 +1952,52 @@ void main() {
       expect(group['include-all-providers'], isTrue);
     });
 
-    test('an older include-all import injects its declared provider options', () async {
-      final profile = Profile.custom(label: 'p');
-      final core = _MockCoreHandlerInterface();
-      final setupState = nullProfileSetupState.copyWith(
-        profileId: profile.id,
-        profileType: ProfileType.custom,
-        proxyGroups: const [
-          ProxyGroup(id: 1, name: 'Auto', type: GroupType.URLTest,
-            includeAllProviders: true),
-        ],
-        profileProviders: const {'sub': 42, 'unrelated': 43},
-        overrides: const ProfileOverrides(proxyProviders: {
-          'sub': ProxyProviderOptions(
-            healthCheck: ProviderHealthCheck(interval: 600)),
-        }),
-      );
-      final scoped = ProviderContainer(overrides: [
-        coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
-        setupActionProvider.overrideWith(SetupAction.new),
-      ]);
-      addTearDown(scoped.dispose);
-      final result = await scoped.read(setupActionProvider.notifier).getProfile(
-        setupState: setupState, patchConfig: const PatchClashConfig());
-      final config = loadYaml(result.yaml) as YamlMap;
-      final providers = config['proxy-providers'] as YamlMap;
-      expect(providers.keys, {'sub'});
-      expect(providers['sub']['path'], await appPath.getProfilePath('42'));
-      expect(providers['sub']['health-check']['interval'], 600);
-      expect(config['proxy-groups'][0]['include-all-providers'], isTrue);
-    });
+    test(
+      'an older include-all import injects its declared provider options',
+      () async {
+        final profile = Profile.custom(label: 'p');
+        final core = _MockCoreHandlerInterface();
+        final setupState = nullProfileSetupState.copyWith(
+          profileId: profile.id,
+          profileType: ProfileType.custom,
+          proxyGroups: const [
+            ProxyGroup(
+              id: 1,
+              name: 'Auto',
+              type: GroupType.URLTest,
+              includeAllProviders: true,
+            ),
+          ],
+          profileProviders: const {'sub': 42, 'unrelated': 43},
+          overrides: const ProfileOverrides(
+            proxyProviders: {
+              'sub': ProxyProviderOptions(
+                healthCheck: ProviderHealthCheck(interval: 600),
+              ),
+            },
+          ),
+        );
+        final scoped = ProviderContainer(
+          overrides: [
+            coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+            setupActionProvider.overrideWith(SetupAction.new),
+          ],
+        );
+        addTearDown(scoped.dispose);
+        final result = await scoped
+            .read(setupActionProvider.notifier)
+            .getProfile(
+              setupState: setupState,
+              patchConfig: const PatchClashConfig(),
+            );
+        final config = loadYaml(result.yaml) as YamlMap;
+        final providers = config['proxy-providers'] as YamlMap;
+        expect(providers.keys, {'sub'});
+        expect(providers['sub']['path'], await appPath.getProfilePath('42'));
+        expect(providers['sub']['health-check']['interval'], 600);
+        expect(config['proxy-groups'][0]['include-all-providers'], isTrue);
+      },
+    );
 
     test('only a subscription profile runs its script extension', () async {
       final engine = scriptEvaluator;

@@ -9,7 +9,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:prism_ui/prism_ui.dart';
 
 void main() {
-  testWidgets('a transient empty viewport preserves the last page size', (tester) async {
+  testWidgets('a transient empty viewport preserves the last page size', (
+    tester,
+  ) async {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     container.listen(viewSizeProvider, (_, _) {});

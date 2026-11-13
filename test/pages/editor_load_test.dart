@@ -23,22 +23,32 @@ void main() {
     tester,
   ) async {
     final drafts = <String?>[];
-    await tester.pumpWidget(TestApp(
-      overrides: [
-        viewSizeProvider.overrideWithBuild((_, _) => const Size(1200, 1000)),
-      ],
-      child: EditorPage(
-        title: 'Draft',
-        content: 'mode: rule',
-        onSave: (_, _, _) {},
-        onDraft: (content) async => drafts.add(await content?.readText()),
+    await tester.pumpWidget(
+      TestApp(
+        overrides: [
+          viewSizeProvider.overrideWithBuild((_, _) => const Size(1200, 1000)),
+        ],
+        child: EditorPage(
+          title: 'Draft',
+          content: 'mode: rule',
+          onSave: (_, _, _) {},
+          onDraft: (content) async => drafts.add(await content?.readText()),
+        ),
       ),
-    ));
+    );
     await settle(tester);
-    final controller = tester.widget<CodeForge>(find.byType(CodeForge)).controller;
+    final controller = tester
+        .widget<CodeForge>(find.byType(CodeForge))
+        .controller;
     controller.replaceRange(6, 10, 'global');
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-    await tester.runAsync(() async { await Future<void>.delayed(const Duration(milliseconds: 40)); });
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+    });
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pump();
     expect(drafts, contains('mode: global'));
