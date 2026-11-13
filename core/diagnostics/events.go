@@ -1,6 +1,7 @@
 package diagnostics
 
 import (
+	"strings"
 	"sync"
 	"time"
 )
@@ -25,8 +26,11 @@ func Record(kind string, details map[string]any) {
 		if len(bounded) == 8 {
 			break
 		}
-		if text, ok := value.(string); ok && len(text) > 160 {
-			value = text[:160]
+		if text, ok := value.(string); ok {
+			if len(text) > 160 {
+				text = text[:160]
+			}
+			value = strings.Clone(text)
 		}
 		bounded[key] = value
 	}
