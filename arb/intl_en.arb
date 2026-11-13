@@ -1,4 +1,6 @@
 {
+  "nodeSourcesManualGroup": "Manual selection",
+  "nodeSourcesAutoGroup": "Automatic latency",
   "nodeSourcesTitle": "Nodes & subscriptions",
   "nodeSourcesDesc": "Choose a configuration and add subscriptions or individual nodes without editing files.",
   "nodeSourcesChooseGroups": "Select at least one policy group first.",

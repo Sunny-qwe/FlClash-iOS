@@ -1,4 +1,6 @@
 {
+  "nodeSourcesManualGroup": "Selección manual",
+  "nodeSourcesAutoGroup": "Latencia automática",
   "nodeSourcesTitle": "Nodos y suscripciones",
   "nodeSourcesDesc": "Elige una configuración y añade suscripciones o nodos sin editar archivos.",
   "nodeSourcesChooseGroups": "Selecciona al menos un grupo.",

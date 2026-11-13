@@ -1,4 +1,6 @@
 {
+  "nodeSourcesManualGroup": "수동 선택",
+  "nodeSourcesAutoGroup": "자동 지연 측정",
   "nodeSourcesTitle": "노드 및 구독",
   "nodeSourcesDesc": "설정을 선택하고 파일 편집 없이 구독이나 노드를 추가하세요.",
   "nodeSourcesChooseGroups": "먼저 정책 그룹을 하나 이상 선택하세요.",

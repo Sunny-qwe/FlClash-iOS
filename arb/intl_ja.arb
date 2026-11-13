@@ -1,4 +1,6 @@
 {
+  "nodeSourcesManualGroup": "手動選択",
+  "nodeSourcesAutoGroup": "自動測定",
   "nodeSourcesTitle": "ノードとサブスクリプション",
   "nodeSourcesDesc": "設定を選び、ファイルを編集せずにサブスクリプションやノードを追加します。",
   "nodeSourcesChooseGroups": "ポリシーグループを1つ以上選択してください。",

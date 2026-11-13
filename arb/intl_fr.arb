@@ -1,4 +1,6 @@
 {
+  "nodeSourcesManualGroup": "Sélection manuelle",
+  "nodeSourcesAutoGroup": "Latence automatique",
   "nodeSourcesTitle": "Nœuds et abonnements",
   "nodeSourcesDesc": "Choisissez une configuration et ajoutez des abonnements ou des nœuds sans modifier de fichiers.",
   "nodeSourcesChooseGroups": "Sélectionnez au moins un groupe.",

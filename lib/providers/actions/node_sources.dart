@@ -29,16 +29,16 @@ class NodeSourcesAction extends _$NodeSourcesAction {
       await actions.importCustomProfile(profile.id, config);
     } else {
       ref.read(proxyGroupsProvider(profile.id).notifier).setAll([
-        ProxyGroup(id: snowflake.id, name: l.select, type: GroupType.Selector,
-          proxies: [l.auto, 'DIRECT'], includeAllProviders: true,
+        ProxyGroup(id: snowflake.id, name: l.nodeSourcesManualGroup, type: GroupType.Selector,
+          proxies: [l.nodeSourcesAutoGroup, 'DIRECT'], includeAllProviders: true,
           includeAllProxies: true),
-        ProxyGroup(id: snowflake.id, name: l.auto, type: GroupType.URLTest,
+        ProxyGroup(id: snowflake.id, name: l.nodeSourcesAutoGroup, type: GroupType.URLTest,
           includeAllProviders: true, includeAllProxies: true,
           emptyFallback: 'REJECT', url: defaultTestUrl, interval: 600,
           tolerance: 50, lazy: true),
       ]);
       ref.read(profileRulesProvider(profile.id).notifier).setAll([
-        Rule.parse('MATCH,${l.select}', id: snowflake.id),
+        Rule.parse('MATCH,${l.nodeSourcesManualGroup}', id: snowflake.id),
       ]);
     }
     return profile.id;

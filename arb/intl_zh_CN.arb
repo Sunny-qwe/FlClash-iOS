@@ -1,4 +1,6 @@
 {
+  "nodeSourcesManualGroup": "手动选择",
+  "nodeSourcesAutoGroup": "自动测速",
   "nodeSourcesTitle": "节点与订阅",
   "nodeSourcesDesc": "选择配置，添加多个订阅或手动节点，无需编辑配置文件。",
   "nodeSourcesChooseGroups": "请先选择至少一个策略组。",
