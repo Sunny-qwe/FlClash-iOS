@@ -10,6 +10,8 @@ import 'method.dart';
 /// A method answers its result or throws: a [CoreMethodException] for what the
 /// Core reports or a Core out of reach, a [TimeoutException] for no answer.
 abstract class CoreHandlerInterface {
+  static const _snapshotTimeout = Duration(seconds: 10);
+
   Future<CoreLifecycleResult> start();
 
   Future<CoreLifecycleResult> restart();
@@ -166,7 +168,7 @@ abstract class CoreHandlerInterface {
   }
 
   Future<ProxiesData> getProxies() {
-    return _query(CoreMethod.proxyList, _model(ProxiesData.fromJson));
+    return _query(CoreMethod.proxyList, _model(ProxiesData.fromJson), timeout: _snapshotTimeout);
   }
 
   Future<ChangeProxyResult> changeProxy(ChangeProxyParams params) {
@@ -336,6 +338,7 @@ abstract class CoreHandlerInterface {
       CoreMethod.routeWatch,
       _model(RouteSnapshot.fromJson),
       arguments: {'watch': watch},
+      timeout: _snapshotTimeout,
     );
   }
 

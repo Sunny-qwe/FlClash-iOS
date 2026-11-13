@@ -111,6 +111,15 @@ void main() {
   }
 
   group('updateGroups', () {
+    test('a read timeout preserves cached nodes without another request', () async {
+      when(core.getProxies).thenThrow(TimeoutException('snapshot deadline'));
+      final container = buildContainer();
+      container.read(groupsProvider.notifier).value = [_group('Cached', const [])];
+      await actionOf(container).updateGroups();
+      verify(core.getProxies).called(1);
+      expect(container.read(groupsProvider).single.name, 'Cached');
+    });
+
     test('coalesces concurrent refreshes into one core request', () async {
       final response = Completer<ProxiesData>();
       when(core.getProxies).thenAnswer((_) => response.future);

@@ -148,7 +148,8 @@ class ProxiesAction extends _$ProxiesAction {
               defaultTestUrl: testUrl,
             );
           } catch (e) {
-            if (e is CoreMethodException && e.isCoreUnavailable) rethrow;
+            if (e is TimeoutException ||
+                e is CoreMethodException && e.isCoreUnavailable) rethrow;
             commonPrint.log(
               'updateGroups error: $e',
               logLevel: coreFailureLogLevel(e),

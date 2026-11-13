@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 
 class _NullCore extends CoreHandlerInterface {
   final invoked = <CoreMethod>[];
+  final timeouts = <CoreMethod, Duration?>{};
 
   @override
   Future<Object?> invokeMethod({
@@ -15,6 +16,7 @@ class _NullCore extends CoreHandlerInterface {
     Duration? timeout,
   }) async {
     invoked.add(method);
+    timeouts[method] = timeout;
     return null;
   }
 
@@ -67,6 +69,15 @@ void main() {
   late _NullCore core;
 
   setUp(() => core = _NullCore());
+
+  test('node and route snapshots have a short read timeout', () async {
+    await expectLater(core.getProxies(), _emptyResult);
+    await expectLater(core.watchRoute(true), _emptyResult);
+    await core.setupConfig(_setupParams);
+    expect(core.timeouts[CoreMethod.proxyList], const Duration(seconds: 10));
+    expect(core.timeouts[CoreMethod.routeWatch], const Duration(seconds: 10));
+    expect(core.timeouts[CoreMethod.configSetup], isNull);
+  });
 
   test('a command succeeds on an answer that carries nothing', () async {
     await core.setupConfig(_setupParams);

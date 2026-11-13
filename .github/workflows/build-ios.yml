@@ -88,6 +88,8 @@ jobs:
 
       - name: Verify Dart changes and startup ordering
         run: |
+          dart format lib/core/interface.dart test/core/interface_result_test.dart
+          flutter test test/core/interface_result_test.dart
           dart format lib/common/geo_asset.dart lib/common/vpn_diagnostics.dart lib/common/mitm_module_audit.dart lib/views/diagnostics test/common/vpn_diagnostics_test.dart test/common/mitm_module_audit_test.dart test/views/diagnostics_test.dart
           flutter analyze --no-fatal-infos lib/common/geo_asset.dart lib/common/vpn_diagnostics.dart lib/common/mitm_module_audit.dart lib/views/diagnostics test/common/vpn_diagnostics_test.dart test/common/mitm_module_audit_test.dart test/views/diagnostics_test.dart
           flutter test test/common/vpn_diagnostics_test.dart test/common/mitm_module_audit_test.dart test/views/diagnostics_test.dart
@@ -109,6 +111,8 @@ jobs:
           name: verified-generated-sources
           path: |
             lib/l10n/
+            lib/core/interface.dart
+            test/core/interface_result_test.dart
             lib/common/geo_asset.dart
             lib/common/vpn_diagnostics.dart
             lib/common/mitm_module_audit.dart
