@@ -1,4 +1,13 @@
 {
+  "nodeSourcesTitle": "ノードとサブスクリプション",
+  "nodeSourcesDesc": "設定を選び、ファイルを編集せずにサブスクリプションやノードを追加します。",
+  "nodeSourcesChooseGroups": "ポリシーグループを1つ以上選択してください。",
+  "nodeSourcesGroups": "追加先のグループ",
+  "nodeSourcesAddSubscription": "サブスクリプションを追加",
+  "nodeSourcesExisting": "既存のサブスクリプションを使用",
+  "nodeSourcesManual": "ノードを手動追加 / 共有リンクから追加",
+  "nodeSourcesExistingNodes": "既存のノードを使用",
+  "nodeSourcesCopyTip": "編集可能なコピーを作成します。元の設定は保持されます。新規設定は既定でプロキシを使用します。ルールは設定画面で変更できます。",
   "repairGeoResources": "不足データを復元",
   "repairGeoResourcesDesc": "同梱データから不足または空のファイルを復元します。既存データは上書きしません。その後 VPN を再試行してください。",
   "reliabilityCenter": "診断センター",

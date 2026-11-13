@@ -20,10 +20,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dialers.dart';
-import 'custom_proxies.dart';
 import 'groups.dart';
 import 'providers.dart';
 import 'rules.dart';
+import '../node_sources.dart';
 
 void showCustomProfileSheet(BuildContext context, int profileId) {
   showSheet<void>(
@@ -481,7 +481,7 @@ class _Overview extends ConsumerWidget {
               AppGlyphs.proxies,
               appLocalizations.proxies,
               const SizedBox.shrink(),
-              const CustomProxiesView(),
+              NodeSourcesView(profileId: profileId),
             ),
             row(0, _CountText(count: ruleNum, issueCount: issueCounts.rules)),
             row(

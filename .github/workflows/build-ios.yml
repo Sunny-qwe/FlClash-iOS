@@ -63,6 +63,12 @@ jobs:
           go test -tags=with_low_memory . ./mitm
           go vet . ./mitm
 
+      - name: Verify visual node and subscription management
+        run: |
+          dart format lib/providers/actions/node_sources.dart lib/views/profiles/node_sources.dart lib/views/profiles/visual.dart lib/views/profiles/profiles.dart lib/views/profiles/custom/custom.dart test/providers/node_sources_action_test.dart test/views/node_sources_test.dart
+          flutter analyze --no-fatal-infos --no-fatal-warnings lib/providers/actions/node_sources.dart lib/views/profiles/node_sources.dart test/providers/node_sources_action_test.dart test/views/node_sources_test.dart
+          flutter test test/providers/node_sources_action_test.dart test/views/node_sources_test.dart test/l10n test/lint/dynamic_message_key_test.dart test/lint/design_package_test.dart test/lint/prism_list_test.dart test/lint/superellipse_corners_test.dart
+
       - name: Verify background editor and imported subscriptions
         run: |
           dart format lib/bootstrap.dart lib/common/constant.dart lib/common/preferences.dart lib/pages/editor.dart lib/providers/actions/setup.dart lib/providers/actions/theme.dart lib/providers/app.dart lib/providers/state/custom_import.dart lib/views/profiles/edit.dart test/common/preferences_test.dart test/manager/theme_manager_test.dart test/pages/editor_load_test.dart test/providers/custom_import_test.dart test/providers/setup_action_test.dart
@@ -123,6 +129,10 @@ jobs:
           name: verified-generated-sources
           path: |
             lib/l10n/
+            lib/providers/actions/node_sources.dart
+            lib/views/profiles/node_sources.dart
+            test/providers/node_sources_action_test.dart
+            test/views/node_sources_test.dart
             lib/core/interface.dart
             test/core/interface_result_test.dart
             lib/common/geo_asset.dart

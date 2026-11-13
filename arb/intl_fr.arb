@@ -1,4 +1,13 @@
 {
+  "nodeSourcesTitle": "Nœuds et abonnements",
+  "nodeSourcesDesc": "Choisissez une configuration et ajoutez des abonnements ou des nœuds sans modifier de fichiers.",
+  "nodeSourcesChooseGroups": "Sélectionnez au moins un groupe.",
+  "nodeSourcesGroups": "Ajouter aux groupes",
+  "nodeSourcesAddSubscription": "Ajouter des abonnements",
+  "nodeSourcesExisting": "Utiliser des abonnements existants",
+  "nodeSourcesManual": "Ajouter des nœuds manuellement / par liens",
+  "nodeSourcesExistingNodes": "Utiliser des nœuds existants",
+  "nodeSourcesCopyTip": "Créez une copie modifiable. La configuration d’origine est conservée. Les nouvelles configurations utilisent le proxy par défaut ; ajustez les règles dans l’éditeur.",
   "repairGeoResources": "Restaurer les données manquantes",
   "repairGeoResourcesDesc": "Restaure les fichiers absents ou vides sans remplacer les autres. Réessayez ensuite de démarrer le VPN.",
   "reliabilityCenter": "Centre de diagnostic",

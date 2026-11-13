@@ -36,6 +36,7 @@ part 'actions/store.dart';
 part 'actions/theme.dart';
 part 'actions/proxies.dart';
 part 'actions/profiles.dart';
+part 'actions/node_sources.dart';
 part 'actions/scripts.dart';
 part 'actions/mitm_modules.dart';
 part 'actions/clash_providers.dart';

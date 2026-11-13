@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'custom/custom.dart';
 import 'custom/custom_proxies.dart';
+import 'node_sources.dart';
 
 class VisualConfigView extends ConsumerWidget {
   const VisualConfigView({super.key});
@@ -24,6 +25,13 @@ class VisualConfigView extends ConsumerWidget {
         children: [
           generateSection(
             items: [
+              ListItem(
+                leading: const GlyphIcon(AppGlyphs.addCircle),
+                title: Text(l.nodeSourcesTitle),
+                subtitle: Text(l.nodeSourcesDesc),
+                trailing: const GlyphIcon(AppGlyphs.chevronForward),
+                onTap: () => BaseNavigator.push(context, const NodeSourcesView()),
+              ),
               ListItem(
                 leading: const GlyphIcon(AppGlyphs.addCircle),
                 title: Text(l.addProfile),

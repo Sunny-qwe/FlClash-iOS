@@ -1,4 +1,13 @@
 {
+  "nodeSourcesTitle": "节点与订阅",
+  "nodeSourcesDesc": "选择配置，添加多个订阅或手动节点，无需编辑配置文件。",
+  "nodeSourcesChooseGroups": "请先选择至少一个策略组。",
+  "nodeSourcesGroups": "添加到策略组",
+  "nodeSourcesAddSubscription": "添加订阅",
+  "nodeSourcesExisting": "选择已有订阅",
+  "nodeSourcesManual": "手动添加节点 / 导入分享链接",
+  "nodeSourcesExistingNodes": "选择已有节点",
+  "nodeSourcesCopyTip": "创建可编辑副本后即可添加节点，原配置保留。新建配置默认走代理，可在配置编辑页调整分流规则。",
   "repairGeoResources": "修复缺失资源",
   "repairGeoResourcesDesc": "从安装包恢复缺失或为空的文件，不覆盖非空文件。修复后请重试启动 VPN。",
   "reliabilityCenter": "诊断中心",

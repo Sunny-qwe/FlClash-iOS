@@ -1,4 +1,13 @@
 {
+  "nodeSourcesTitle": "Nodos y suscripciones",
+  "nodeSourcesDesc": "Elige una configuración y añade suscripciones o nodos sin editar archivos.",
+  "nodeSourcesChooseGroups": "Selecciona al menos un grupo.",
+  "nodeSourcesGroups": "Añadir a grupos",
+  "nodeSourcesAddSubscription": "Añadir suscripciones",
+  "nodeSourcesExisting": "Usar suscripciones existentes",
+  "nodeSourcesManual": "Añadir nodos manualmente / por enlaces",
+  "nodeSourcesExistingNodes": "Usar nodos existentes",
+  "nodeSourcesCopyTip": "Crea una copia editable. La configuración original se conserva. Las nuevas configuraciones usan el proxy de forma predeterminada; ajusta las reglas en el editor.",
   "repairGeoResources": "Restaurar datos que faltan",
   "repairGeoResourcesDesc": "Restaura archivos ausentes o vacíos sin reemplazar los demás. Después vuelve a iniciar la VPN.",
   "reliabilityCenter": "Centro de diagnóstico",

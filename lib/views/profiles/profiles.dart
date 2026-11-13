@@ -17,6 +17,7 @@ import 'add.dart';
 import 'edit.dart';
 import 'preview.dart';
 import 'visual.dart';
+import 'node_sources.dart';
 
 const _infoGap = 4.0;
 
@@ -69,6 +70,11 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
 
   List<IconButtonData> _buildActions(List<Profile> profiles) {
     return [
+      IconButtonData(
+        glyph: AppGlyphs.proxies,
+        tooltip: context.appLocalizations.nodeSourcesTitle,
+        onPressed: () => BaseNavigator.push(context, const NodeSourcesView()),
+      ),
       IconButtonData(
         glyph: AppGlyphs.sliders,
         tooltip: context.appLocalizations.visualConfig,

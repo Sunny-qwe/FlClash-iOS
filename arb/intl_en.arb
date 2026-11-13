@@ -1,4 +1,13 @@
 {
+  "nodeSourcesTitle": "Nodes & subscriptions",
+  "nodeSourcesDesc": "Choose a configuration and add subscriptions or individual nodes without editing files.",
+  "nodeSourcesChooseGroups": "Select at least one policy group first.",
+  "nodeSourcesGroups": "Add to policy groups",
+  "nodeSourcesAddSubscription": "Add subscriptions",
+  "nodeSourcesExisting": "Use existing subscriptions",
+  "nodeSourcesManual": "Add nodes manually / from share links",
+  "nodeSourcesExistingNodes": "Use existing nodes",
+  "nodeSourcesCopyTip": "Create an editable copy to add nodes. The original configuration is preserved. New configurations use proxy routing by default; adjust routing rules in the configuration editor.",
   "repairGeoResources": "Restore missing data files",
   "repairGeoResourcesDesc": "Restore missing or empty bundled data without replacing nonempty files. Retry starting the VPN afterwards.",
   "reliabilityCenter": "Diagnostics center",
