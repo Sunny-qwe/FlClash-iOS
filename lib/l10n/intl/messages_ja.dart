@@ -1320,6 +1320,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
       "サブスクリプションを追加",
     ),
+    "nodeSourcesAutoGroup": MessageLookupByLibrary.simpleMessage("自動測定"),
     "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
       "ポリシーグループを1つ以上選択してください。",
     ),
@@ -1339,6 +1340,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
       "ノードを手動追加 / 共有リンクから追加",
     ),
+    "nodeSourcesManualGroup": MessageLookupByLibrary.simpleMessage("手動選択"),
     "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("ノードとサブスクリプション"),
     "nodes": MessageLookupByLibrary.simpleMessage("ノード"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(

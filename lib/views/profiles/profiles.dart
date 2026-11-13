@@ -81,25 +81,25 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
         onPressed: () => BaseNavigator.push(context, const VisualConfigView()),
       ),
       if (profiles.isNotEmpty) ...[
-            IconButtonData(
-              glyph: AppGlyphs.sync,
-              onPressed: () {
-                _updateProfiles(profiles);
+        IconButtonData(
+          glyph: AppGlyphs.sync,
+          onPressed: () {
+            _updateProfiles(profiles);
+          },
+          tooltip: context.appLocalizations.update,
+        ),
+        IconButtonData(
+          glyph: AppGlyphs.sort,
+          onPressed: () {
+            showSheet(
+              context: context,
+              builder: (_) {
+                return ReorderableProfilesSheet(profiles: profiles);
               },
-              tooltip: context.appLocalizations.update,
-            ),
-            IconButtonData(
-              glyph: AppGlyphs.sort,
-              onPressed: () {
-                showSheet(
-                  context: context,
-                  builder: (_) {
-                    return ReorderableProfilesSheet(profiles: profiles);
-                  },
-                );
-              },
-              tooltip: context.appLocalizations.profilesSort,
-            ),
+            );
+          },
+          tooltip: context.appLocalizations.profilesSort,
+        ),
       ],
     ];
   }

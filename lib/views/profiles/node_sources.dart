@@ -46,61 +46,105 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
         );
         if (confirmed != true || !mounted) return;
       }
-      final id = await ref.read(nodeSourcesActionProvider.notifier)
+      final id = await ref
+          .read(nodeSourcesActionProvider.notifier)
           .createProfile(source: profile);
       if (!mounted) return;
       await BaseNavigator.push(context, NodeSourcesView(profileId: id));
     } else {
-      await BaseNavigator.push(context, NodeSourcesView(profileId: profile!.id));
+      await BaseNavigator.push(
+        context,
+        NodeSourcesView(profileId: profile!.id),
+      );
     }
   }
 
   Set<int> _selectedGroups(List<ProxyGroup> groups) =>
-      (_groupIds ?? groups.where((g) => g.includeAllProviders == true ||
-          g.includeAllProxies == true || (g.use?.isNotEmpty ?? false)).map((g) => g.id).toSet())
+      (_groupIds ??
+              groups
+                  .where(
+                    (g) =>
+                        g.includeAllProviders == true ||
+                        g.includeAllProxies == true ||
+                        (g.use?.isNotEmpty ?? false),
+                  )
+                  .map((g) => g.id)
+                  .toSet())
           .intersection(groups.map((g) => g.id).toSet());
 
-  Future<Set<int>?> _choose(String title, List<({int id, String label})> items,
-      {Set<int> selected = const {}}) => BaseNavigator.push<Set<int>>(
-    context, _SourcePicker(title: title, items: items, selected: selected),
+  Future<Set<int>?> _choose(
+    String title,
+    List<({int id, String label})> items, {
+    Set<int> selected = const {},
+  }) => BaseNavigator.push<Set<int>>(
+    context,
+    _SourcePicker(title: title, items: items, selected: selected),
   );
 
-  Future<void> _attach({Set<int> sources = const {}, Set<int> nodes = const {}}) async {
-    final groups = await ref.read(proxyGroupsProvider(widget.profileId!).future);
-    await ref.read(nodeSourcesActionProvider.notifier).attach(widget.profileId!,
-      groupIds: _selectedGroups(groups), subscriptionIds: sources, nodeIds: nodes);
+  Future<void> _attach({
+    Set<int> sources = const {},
+    Set<int> nodes = const {},
+  }) async {
+    final groups = await ref.read(
+      proxyGroupsProvider(widget.profileId!).future,
+    );
+    await ref
+        .read(nodeSourcesActionProvider.notifier)
+        .attach(
+          widget.profileId!,
+          groupIds: _selectedGroups(groups),
+          subscriptionIds: sources,
+          nodeIds: nodes,
+        );
   }
 
   Future<void> _subscriptions() async {
     final l = context.appLocalizations;
-    final links = await showNamedUrlsForm(context,
-      title: l.nodeSourcesAddSubscription, withAgeSecretKey: true);
+    final links = await showNamedUrlsForm(
+      context,
+      title: l.nodeSourcesAddSubscription,
+      withAgeSecretKey: true,
+    );
     if (links == null || links.isEmpty || !mounted) return;
     final actions = ref.read(nodeSourcesActionProvider.notifier);
     final profileId = widget.profileId!;
-    final groupIds = _selectedGroups(ref.read(proxyGroupsProvider(profileId)).value!);
+    final groupIds = _selectedGroups(
+      ref.read(proxyGroupsProvider(profileId)).value!,
+    );
     final failures = <UpdatingMessage>[];
     final saved = <int>{};
     for (final link in links) {
       try {
-        final profile = await actions.addSubscription(url: link.url, label: link.label,
-              ageSecretKey: link.ageSecretKey);
+        final profile = await actions.addSubscription(
+          url: link.url,
+          label: link.label,
+          ageSecretKey: link.ageSecretKey,
+        );
         saved.add(profile.id);
       } catch (error) {
-        failures.add(UpdatingMessage(label: link.label.isEmpty ? l.profiles : link.label,
-          message: userFacingErrorMessage(error, l)));
+        failures.add(
+          UpdatingMessage(
+            label: link.label.isEmpty ? l.profiles : link.label,
+            message: userFacingErrorMessage(error, l),
+          ),
+        );
       }
     }
-    if (saved.isNotEmpty) await actions.attach(profileId,
-      groupIds: groupIds, subscriptionIds: saved);
+    if (saved.isNotEmpty)
+      await actions.attach(
+        profileId,
+        groupIds: groupIds,
+        subscriptionIds: saved,
+      );
     if (mounted) dialogs.showFailures(failures);
   }
 
   Future<void> _existingSubscriptions() async {
-    final ids = await _choose(context.appLocalizations.nodeSourcesExisting,
-      [for (final profile in ref.read(profilesProvider))
+    final ids = await _choose(context.appLocalizations.nodeSourcesExisting, [
+      for (final profile in ref.read(profilesProvider))
         if (profile.type != ProfileType.custom)
-          (id: profile.id, label: profile.realLabel)]);
+          (id: profile.id, label: profile.realLabel),
+    ]);
     if (mounted && ids != null && ids.isNotEmpty) await _attach(sources: ids);
   }
 
@@ -109,14 +153,19 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
     if (!mounted) return;
     Set<int>? ids;
     if (existing) {
-      ids = await _choose(context.appLocalizations.nodeSourcesExistingNodes,
-        [for (final node in before) (id: node.id, label: node.name)]);
+      ids = await _choose(context.appLocalizations.nodeSourcesExistingNodes, [
+        for (final node in before) (id: node.id, label: node.name),
+      ]);
     } else {
       final previous = before.map((node) => node.id).toSet();
       await BaseNavigator.push(context, const CustomProxiesView());
       if (!mounted) return;
-      ids = ref.read(customProxiesProvider).value!
-          .where((node) => !previous.contains(node.id)).map((node) => node.id).toSet();
+      ids = ref
+          .read(customProxiesProvider)
+          .value!
+          .where((node) => !previous.contains(node.id))
+          .map((node) => node.id)
+          .toSet();
     }
     if (ids != null && ids.isNotEmpty) await _attach(nodes: ids);
   }
@@ -127,18 +176,31 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
     final profiles = ref.watch(profilesProvider);
     final id = widget.profileId;
     if (id == null) {
-      return Scaffold(title: l.nodeSourcesTitle, isLoading: _busy,
+      return Scaffold(
+        title: l.nodeSourcesTitle,
+        isLoading: _busy,
         body: PrismListView(
-          padding: EdgeInsets.fromLTRB(16, context.contentTopPadding, 16,
-            24 + context.bottomInset),
+          padding: EdgeInsets.fromLTRB(
+            16,
+            context.contentTopPadding,
+            16,
+            24 + context.bottomInset,
+          ),
           itemCount: profiles.length + 1,
           itemBuilder: (_, index) => index == 0
-              ? ListItem(leading: const GlyphIcon(AppGlyphs.addCircle),
-                  title: Text(l.addProfile), subtitle: Text(l.nodeSourcesDesc),
-                  onTap: _busy ? null : () => _run(() => _open(null)))
-              : ListItem(title: Text(profiles[index - 1].realLabel),
+              ? ListItem(
+                  leading: const GlyphIcon(AppGlyphs.addCircle),
+                  title: Text(l.addProfile),
+                  subtitle: Text(l.nodeSourcesDesc),
+                  onTap: _busy ? null : () => _run(() => _open(null)),
+                )
+              : ListItem(
+                  title: Text(profiles[index - 1].realLabel),
                   trailing: const GlyphIcon(AppGlyphs.chevronForward),
-                  onTap: _busy ? null : () => _run(() => _open(profiles[index - 1]))),
+                  onTap: _busy
+                      ? null
+                      : () => _run(() => _open(profiles[index - 1])),
+                ),
         ),
       );
     }
@@ -147,62 +209,133 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
     final nodes = ref.watch(customProxiesProvider).value;
     final selected = groups == null ? <int>{} : _selectedGroups(groups);
     final uses = {for (final group in groups ?? <ProxyGroup>[]) ...?group.use};
-    final named = {for (final group in groups ?? <ProxyGroup>[]) ...?group.proxies};
-    final attached = profiles.where((p) => p.type != ProfileType.custom && uses.contains(p.realLabel)).toList();
-    final manual = nodes?.where((node) => named.contains(node.name)).length ?? 0;
+    final named = {
+      for (final group in groups ?? <ProxyGroup>[]) ...?group.proxies,
+    };
+    final attached = profiles
+        .where(
+          (p) => p.type != ProfileType.custom && uses.contains(p.realLabel),
+        )
+        .toList();
+    final manual =
+        nodes?.where((node) => named.contains(node.name)).length ?? 0;
     final canAdd = !_busy && selected.isNotEmpty;
-    return Scaffold(title: l.nodeSourcesTitle, isLoading: _busy,
-      body: NullStatusSwitcher(isLoading: groups == null || nodes == null,
+    return Scaffold(
+      title: l.nodeSourcesTitle,
+      isLoading: _busy,
+      body: NullStatusSwitcher(
+        isLoading: groups == null || nodes == null,
         isEmpty: profile == null,
         child: CustomScrollView(
-          slivers: [SliverPadding(
-            padding: EdgeInsets.fromLTRB(16, context.sectionsTopPadding, 16, 16),
-            sliver: SliverToBoxAdapter(child: Column(children: [
-            generateSection(items: [
-              ListItem(title: Text(profile?.realLabel ?? l.profiles),
-                subtitle: Text(l.nodeSourcesDesc),
-                trailing: const GlyphIcon(AppGlyphs.chevronForward),
-                onTap: _busy ? null : () => BaseNavigator.push(context, CustomProfileView(profileId: id))),
-              ListItem(title: Text(l.nodeSourcesGroups),
-                subtitle: Text(selected.isEmpty ? l.nodeSourcesChooseGroups :
-                  '${selected.length} / ${groups?.length ?? 0}'),
-                trailing: const GlyphIcon(AppGlyphs.chevronForward),
-                onTap: _busy ? null : () async {
-                  final result = await _choose(l.nodeSourcesGroups,
-                    [for (final group in groups ?? <ProxyGroup>[]) (id: group.id, label: group.name)],
-                    selected: selected);
-                  if (result != null && mounted) setState(() => _groupIds = result);
-                }),
-            ]),
-            const SizedBox(height: 16),
-            generateSection(items: [
-              ListItem(leading: const GlyphIcon(AppGlyphs.addCircle),
-                title: Text(l.nodeSourcesAddSubscription),
-                subtitle: Text(l.batchUrlInputTip),
-                onTap: canAdd ? () => _run(_subscriptions) : null),
-              ListItem(title: Text(l.nodeSourcesExisting),
-                onTap: canAdd ? () => _run(_existingSubscriptions) : null),
-              ListItem(leading: const GlyphIcon(AppGlyphs.proxies),
-                title: Text(l.nodeSourcesManual),
-                onTap: canAdd ? () => _run(() => _manual()) : null),
-              ListItem(title: Text(l.nodeSourcesExistingNodes),
-                subtitle: Text('$manual'),
-                onTap: canAdd ? () => _run(() => _manual(existing: true)) : null),
-              ListItem(title: Text(l.applyNow),
-                onTap: _busy ? null : () => _run(() async {
-                  ref.read(currentProfileIdProvider.notifier).value = id;
-                  await ref.read(setupActionProvider.notifier).applyProfile(force: true);
-                })),
-            ]),
-            ])),
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                16,
+                context.sectionsTopPadding,
+                16,
+                16,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    generateSection(
+                      items: [
+                        ListItem(
+                          title: Text(profile?.realLabel ?? l.profiles),
+                          subtitle: Text(l.nodeSourcesDesc),
+                          trailing: const GlyphIcon(AppGlyphs.chevronForward),
+                          onTap: _busy
+                              ? null
+                              : () => BaseNavigator.push(
+                                  context,
+                                  CustomProfileView(profileId: id),
+                                ),
+                        ),
+                        ListItem(
+                          title: Text(l.nodeSourcesGroups),
+                          subtitle: Text(
+                            selected.isEmpty
+                                ? l.nodeSourcesChooseGroups
+                                : '${selected.length} / ${groups?.length ?? 0}',
+                          ),
+                          trailing: const GlyphIcon(AppGlyphs.chevronForward),
+                          onTap: _busy
+                              ? null
+                              : () async {
+                                  final result =
+                                      await _choose(l.nodeSourcesGroups, [
+                                        for (final group
+                                            in groups ?? <ProxyGroup>[])
+                                          (id: group.id, label: group.name),
+                                      ], selected: selected);
+                                  if (result != null && mounted)
+                                    setState(() => _groupIds = result);
+                                },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    generateSection(
+                      items: [
+                        ListItem(
+                          leading: const GlyphIcon(AppGlyphs.addCircle),
+                          title: Text(l.nodeSourcesAddSubscription),
+                          subtitle: Text(l.batchUrlInputTip),
+                          onTap: canAdd ? () => _run(_subscriptions) : null,
+                        ),
+                        ListItem(
+                          title: Text(l.nodeSourcesExisting),
+                          onTap: canAdd
+                              ? () => _run(_existingSubscriptions)
+                              : null,
+                        ),
+                        ListItem(
+                          leading: const GlyphIcon(AppGlyphs.proxies),
+                          title: Text(l.nodeSourcesManual),
+                          onTap: canAdd ? () => _run(() => _manual()) : null,
+                        ),
+                        ListItem(
+                          title: Text(l.nodeSourcesExistingNodes),
+                          subtitle: Text('$manual'),
+                          onTap: canAdd
+                              ? () => _run(() => _manual(existing: true))
+                              : null,
+                        ),
+                        ListItem(
+                          title: Text(l.applyNow),
+                          onTap: _busy
+                              ? null
+                              : () => _run(() async {
+                                  ref
+                                          .read(
+                                            currentProfileIdProvider.notifier,
+                                          )
+                                          .value =
+                                      id;
+                                  await ref
+                                      .read(setupActionProvider.notifier)
+                                      .applyProfile(force: true);
+                                }),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-            SliverPadding(padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + context.bottomInset),
-              sliver: SliverPrismList(itemCount: attached.length,
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 24 + context.bottomInset),
+              sliver: SliverPrismList(
+                itemCount: attached.length,
                 itemBuilder: (_, index) => ListItem(
                   title: Text(attached[index].realLabel),
                   trailing: const GlyphIcon(AppGlyphs.chevronForward),
-                  onTap: _busy ? null : () => BaseNavigator.push(context,
-                    EditProfileView(profile: attached[index])),
+                  onTap: _busy
+                      ? null
+                      : () => BaseNavigator.push(
+                          context,
+                          EditProfileView(profile: attached[index]),
+                        ),
                 ),
               ),
             ),
@@ -214,7 +347,11 @@ class _NodeSourcesViewState extends ConsumerState<NodeSourcesView> {
 }
 
 class _SourcePicker extends StatefulWidget {
-  const _SourcePicker({required this.title, required this.items, required this.selected});
+  const _SourcePicker({
+    required this.title,
+    required this.items,
+    required this.selected,
+  });
   final String title;
   final List<({int id, String label})> items;
   final Set<int> selected;
@@ -230,35 +367,60 @@ class _SourcePickerState extends State<_SourcePicker> {
   @override
   Widget build(BuildContext context) {
     final l = context.appLocalizations;
-    final items = widget.items.where((item) => item.label.toLowerCase().contains(_query)).toList();
-    return Scaffold(title: widget.title,
-      searchState: AppBarSearchState(onSearch: (value) => setState(() => _query = value.toLowerCase())),
-      confirmationAction: IconButtonData(glyph: AppGlyphs.check,
-        tooltip: l.save, onPressed: () => Navigator.of(context).pop(_selected)),
-      iconActions: [IconButtonData(glyph: AppGlyphs.selectAll, tooltip: l.selectAll,
-        onPressed: () => setState(() {
-          if (items.every((item) => _selected.contains(item.id))) {
-            _selected.removeAll(items.map((item) => item.id));
-          } else {
-            _selected.addAll(items.map((item) => item.id));
-          }
-        }))],
-      body: Builder(builder: (context) => NullStatusSwitcher(
-        isEmpty: items.isEmpty,
-        child: PrismListView(
-          padding: EdgeInsets.fromLTRB(16, context.contentTopPadding, 16,
-            24 + context.bottomInset),
-          itemCount: items.length,
-          itemBuilder: (_, index) {
-            final item = items[index];
-            void toggle() => setState(() {
-              if (!_selected.add(item.id)) _selected.remove(item.id);
-            });
-            return ListItem(title: Text(item.label), onTap: toggle,
-              trailing: Checkbox(value: _selected.contains(item.id), onChanged: (_) => toggle()));
-          },
+    final items = widget.items
+        .where((item) => item.label.toLowerCase().contains(_query))
+        .toList();
+    return Scaffold(
+      title: widget.title,
+      searchState: AppBarSearchState(
+        onSearch: (value) => setState(() => _query = value.toLowerCase()),
+      ),
+      confirmationAction: IconButtonData(
+        glyph: AppGlyphs.check,
+        tooltip: l.save,
+        onPressed: () => Navigator.of(context).pop(_selected),
+      ),
+      iconActions: [
+        IconButtonData(
+          glyph: AppGlyphs.selectAll,
+          tooltip: l.selectAll,
+          onPressed: () => setState(() {
+            if (items.every((item) => _selected.contains(item.id))) {
+              _selected.removeAll(items.map((item) => item.id));
+            } else {
+              _selected.addAll(items.map((item) => item.id));
+            }
+          }),
         ),
-      )),
+      ],
+      body: Builder(
+        builder: (context) => NullStatusSwitcher(
+          isEmpty: items.isEmpty,
+          child: PrismListView(
+            padding: EdgeInsets.fromLTRB(
+              16,
+              context.contentTopPadding,
+              16,
+              24 + context.bottomInset,
+            ),
+            itemCount: items.length,
+            itemBuilder: (_, index) {
+              final item = items[index];
+              void toggle() => setState(() {
+                if (!_selected.add(item.id)) _selected.remove(item.id);
+              });
+              return ListItem(
+                title: Text(item.label),
+                onTap: toggle,
+                trailing: Checkbox(
+                  value: _selected.contains(item.id),
+                  onChanged: (_) => toggle(),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }

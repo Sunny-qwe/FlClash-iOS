@@ -1196,6 +1196,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("不解析主机名"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("没有匹配的结果"),
     "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage("添加订阅"),
+    "nodeSourcesAutoGroup": MessageLookupByLibrary.simpleMessage("自动测速"),
     "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
       "请先选择至少一个策略组。",
     ),
@@ -1211,6 +1212,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
       "手动添加节点 / 导入分享链接",
     ),
+    "nodeSourcesManualGroup": MessageLookupByLibrary.simpleMessage("手动选择"),
     "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("节点与订阅"),
     "nodes": MessageLookupByLibrary.simpleMessage("节点"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage("该外部资源不是文本文件"),

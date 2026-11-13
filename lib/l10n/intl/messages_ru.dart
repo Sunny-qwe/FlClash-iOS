@@ -1625,6 +1625,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
       "Добавить подписки",
     ),
+    "nodeSourcesAutoGroup": MessageLookupByLibrary.simpleMessage(
+      "Автоматическая проверка",
+    ),
     "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
       "Сначала выберите хотя бы одну группу.",
     ),
@@ -1645,6 +1648,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
       "Добавить узлы вручную / по ссылкам",
+    ),
+    "nodeSourcesManualGroup": MessageLookupByLibrary.simpleMessage(
+      "Ручной выбор",
     ),
     "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("Узлы и подписки"),
     "nodes": MessageLookupByLibrary.simpleMessage("Узлы"),

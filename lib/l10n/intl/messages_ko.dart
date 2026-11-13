@@ -1300,6 +1300,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("호스트 이름 확인 안 함"),
     "noSearchResults": MessageLookupByLibrary.simpleMessage("일치하는 결과 없음"),
     "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage("구독 추가"),
+    "nodeSourcesAutoGroup": MessageLookupByLibrary.simpleMessage("자동 지연 측정"),
     "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
       "먼저 정책 그룹을 하나 이상 선택하세요.",
     ),
@@ -1317,6 +1318,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
       "노드 직접 추가 / 공유 링크 가져오기",
     ),
+    "nodeSourcesManualGroup": MessageLookupByLibrary.simpleMessage("수동 선택"),
     "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage("노드 및 구독"),
     "nodes": MessageLookupByLibrary.simpleMessage("노드"),
     "nonTextProviderFile": MessageLookupByLibrary.simpleMessage(

@@ -1551,6 +1551,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeSourcesAddSubscription": MessageLookupByLibrary.simpleMessage(
       "Add subscriptions",
     ),
+    "nodeSourcesAutoGroup": MessageLookupByLibrary.simpleMessage(
+      "Automatic latency",
+    ),
     "nodeSourcesChooseGroups": MessageLookupByLibrary.simpleMessage(
       "Select at least one policy group first.",
     ),
@@ -1571,6 +1574,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "nodeSourcesManual": MessageLookupByLibrary.simpleMessage(
       "Add nodes manually / from share links",
+    ),
+    "nodeSourcesManualGroup": MessageLookupByLibrary.simpleMessage(
+      "Manual selection",
     ),
     "nodeSourcesTitle": MessageLookupByLibrary.simpleMessage(
       "Nodes & subscriptions",

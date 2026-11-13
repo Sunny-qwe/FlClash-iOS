@@ -55,6 +55,26 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
+  /// `Manual selection`
+  String get nodeSourcesManualGroup {
+    return Intl.message(
+      'Manual selection',
+      name: 'nodeSourcesManualGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Automatic latency`
+  String get nodeSourcesAutoGroup {
+    return Intl.message(
+      'Automatic latency',
+      name: 'nodeSourcesAutoGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Nodes & subscriptions`
   String get nodeSourcesTitle {
     return Intl.message(

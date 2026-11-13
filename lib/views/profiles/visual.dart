@@ -30,7 +30,8 @@ class VisualConfigView extends ConsumerWidget {
                 title: Text(l.nodeSourcesTitle),
                 subtitle: Text(l.nodeSourcesDesc),
                 trailing: const GlyphIcon(AppGlyphs.chevronForward),
-                onTap: () => BaseNavigator.push(context, const NodeSourcesView()),
+                onTap: () =>
+                    BaseNavigator.push(context, const NodeSourcesView()),
               ),
               ListItem(
                 leading: const GlyphIcon(AppGlyphs.addCircle),
@@ -38,7 +39,8 @@ class VisualConfigView extends ConsumerWidget {
                 subtitle: Text(l.visualConfigDesc),
                 trailing: const GlyphIcon(AppGlyphs.chevronForward),
                 onTap: () {
-                  final id = ref.read(profilesActionProvider.notifier)
+                  final id = ref
+                      .read(profilesActionProvider.notifier)
                       .addCustomProfile(l.unnamed);
                   BaseNavigator.push(
                     context,
@@ -51,7 +53,8 @@ class VisualConfigView extends ConsumerWidget {
                 title: Text(l.proxies),
                 subtitle: Text(l.visualNodeMembershipTip),
                 trailing: const GlyphIcon(AppGlyphs.chevronForward),
-                onTap: () => BaseNavigator.push(context, const CustomProxiesView()),
+                onTap: () =>
+                    BaseNavigator.push(context, const CustomProxiesView()),
               ),
             ],
           ),
